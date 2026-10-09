@@ -33,8 +33,8 @@ l'esprit de Galène :
 
 | | |
 |---|---|
-| ✅ Connexion par lien d'invitation ou saisie manuelle (mot de passe ou token) | ✅ Audio bidirectionnel avec annulation d'écho |
-| ✅ Vidéo bidirectionnelle, caméra avant / arrière | ✅ Grille adaptative des participants |
+| ✅ Groupes publics, connexion par mot de passe, lien d'invitation ou serveur d'authentification (YunoHost…) | ✅ Audio bidirectionnel avec annulation d'écho |
+| ✅ Vidéo bidirectionnelle, caméra avant / arrière | ✅ Grille adaptative des participants, plein écran d'un appui |
 | ✅ Couper micro / caméra (la caméra s'éteint réellement) | ✅ Appel maintenu en arrière-plan (notification) |
 | ✅ Caméra coupée automatiquement en arrière-plan, rallumée au retour | ✅ Relance automatique de la connexion en cas d'échec ICE |
 | ⏳ Reconnexion après perte réseau | ⏳ Bluetooth / casque filaire |
@@ -47,26 +47,29 @@ Une publication sur F-Droid est prévue une fois l'application stabilisée.
 
 ## Utilisation
 
-**Avec un lien d'invitation** — collez-le dans le premier champ :
+Le parcours est le même que sur le client web de Galène.
+
+1. **Serveur** — saisissez l'adresse du serveur (`galene.example.org`) : l'application
+   affiche ses groupes publics. Un groupe non listé se rejoint par son nom. Le dernier
+   serveur utilisé est retenu.
+2. **Groupe** — choisissez un groupe : nom d'utilisateur, mot de passe, et ce que vous
+   publiez en entrant (*Rien*, *Micro*, *Caméra + micro*). Le formulaire s'adapte au groupe :
+   - mot de passe Galène classique ;
+   - **serveur d'authentification** (`authServer`, par exemple les comptes YunoHost) :
+     vos identifiants sont vérifiés par ce serveur, qui délivre un jeton d'accès ;
+   - portail web (`authPortal`) : pas encore pris en charge, utilisez un lien d'invitation.
+3. **Salle** — en cas de refus du serveur, vous revenez au formulaire avec la raison.
+
+**Avec un lien d'invitation** — collez-le directement dans le champ du serveur :
 
 ```
 https://galene.example.org/group/ma-salle/?token=ABCDEF
 ```
 
-Serveur, salle et token sont remplis automatiquement ; choisissez un nom et rejoignez.
+Le nom d'utilisateur devient facultatif ; il n'est demandé que si le lien l'exige.
 
-**Manuellement** :
-
-| Champ | Exemple |
-|-------|---------|
-| URL du serveur | `wss://galene.example.org/ws` |
-| Salle | `ma-salle` |
-| Nom d'affichage | `Antoine` |
-| Mot de passe | selon la configuration du groupe |
-
-À l'entrée en salle, l'application demande l'accès au micro, à la caméra et (Android 13+)
-aux notifications. Chacun peut être refusé : sans micro on publie la vidéo seule, sans
-caméra l'audio seul, sans les deux on écoute simplement.
+L'application ne demande que les permissions nécessaires au choix fait (micro, caméra,
+et notifications sur Android 13+). Le mot de passe n'est jamais enregistré.
 
 ### Côté serveur
 
@@ -145,11 +148,11 @@ Les tests d'intégration valident le protocole de signaling contre un vrai serve
 ## Architecture
 
 ```
-UI (Jetpack Compose)  ConnectScreen · RoomScreen · VideoGrid
+UI (Jetpack Compose)  ServerScreen · GroupLoginScreen · RoomScreen · VideoGrid
         │
 RoomViewModel         orchestre l'appel, expose l'état à l'UI
         │
-Domaine               GaleneClient (WebSocket) · WebRTCManager (médias) · AudioRouter
+Domaine               GaleneDirectory (HTTP) · GaleneClient (WebSocket) · WebRTCManager · AudioRouter
         │
 Services Android      CallForegroundService (appel en arrière-plan)
 ```

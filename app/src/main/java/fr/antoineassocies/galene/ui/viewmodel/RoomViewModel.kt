@@ -36,10 +36,13 @@ data class RoomUiState(
     val participants: List<Participant> = emptyList(),
     val remoteStreams: List<RemoteStream> = emptyList(),
     val selfId: String = "",
+    val sendingAudio: Boolean = false,      // le micro est publié
     val sendingVideo: Boolean = false,      // une caméra est ouverte et publiée
     val frontCamera: Boolean = true,        // pour le miroir de l'aperçu local
     val selfUsername: String = "",
     val errorMessage: String? = null,
+    /** Entrée refusée par le serveur : l'écran revient au formulaire de connexion. */
+    val joinFailure: SignalingEvent.JoinFailed? = null,
     val statusText: String = "",            // info debug visible dans l'UI
 )
 
@@ -91,7 +94,7 @@ class RoomViewModel(
     private var videoPausedByBackground = false
 
     init {
-        _uiState.update { it.copy(statusText = "Connexion à ${request.serverUrl}…") }
+        _uiState.update { it.copy(statusText = "Connexion à ${request.endpoint}…") }
         observeSignaling()
         observeConnectionState()
         webRTCManager.onLocalIceCandidate = { streamId, candidate ->
@@ -101,7 +104,7 @@ class RoomViewModel(
         webRTCManager.onIceFailed = { streamId, up ->
             if (up) restartUplinkIce(streamId) else galeneClient.sendRenegotiate(streamId)
         }
-        galeneClient.connect(request.serverUrl)
+        galeneClient.connect(request.endpoint)
         startConnectionTimeout()
     }
 
@@ -109,7 +112,7 @@ class RoomViewModel(
         viewModelScope.launch {
             delay(15_000)
             if (_uiState.value.connectionState == ConnectionState.Connecting) {
-                val msg = "Pas de réponse après 15 s — vérifier l'URL et le réseau\n${request.serverUrl}"
+                val msg = "Pas de réponse après 15 s — vérifier l'URL et le réseau\n${request.endpoint}"
                 _uiState.update { it.copy(statusText = msg, errorMessage = msg) }
                 galeneClient.disconnect()
             }
@@ -123,8 +126,8 @@ class RoomViewModel(
             galeneClient.events.collect { event ->
                 when (event) {
                     is SignalingEvent.Connected -> {
-                        _uiState.update { it.copy(statusText = "Handshake OK → join ${request.roomName}…") }
-                        galeneClient.sendJoin(request.roomName, request.displayName, request.password, request.token)
+                        _uiState.update { it.copy(statusText = "Handshake OK → join ${request.group}…") }
+                        galeneClient.sendJoin(request.group, request.username, request.password, request.token)
                     }
 
                     is SignalingEvent.Joined -> {
@@ -142,12 +145,7 @@ class RoomViewModel(
                     }
 
                     is SignalingEvent.JoinFailed -> {
-                        _uiState.update {
-                            it.copy(
-                                statusText = "Join refusé : ${event.error}",
-                                errorMessage = "Connexion refusée : ${event.error ?: "inconnu"}"
-                            )
-                        }
+                        _uiState.update { it.copy(joinFailure = event) }
                     }
 
                     is SignalingEvent.JoinLeft -> {
@@ -247,15 +245,19 @@ class RoomViewModel(
      */
     fun onPermissionsResult(mic: Boolean, camera: Boolean) {
         permissionsAnswered = true
-        micGranted = mic
-        cameraGranted = camera
-        val refused = listOfNotNull("micro".takeIf { !mic }, "caméra".takeIf { !camera })
+        // On ne publie que ce que l'utilisateur a choisi au formulaire, même si plus est autorisé
+        micGranted = mic && request.present.usesMic
+        cameraGranted = camera && request.present.usesCamera
+        val refused = listOfNotNull(
+            "micro".takeIf { request.present.usesMic && !mic },
+            "caméra".takeIf { request.present.usesCamera && !camera },
+        )
         if (refused.isNotEmpty()) {
             _uiState.update { it.copy(statusText = "Refusé : ${refused.joinToString()}") }
         }
         // Le micro est autorisé et l'app est visible : seul moment où Android 14 accepte
         // de démarrer un service de premier plan « microphone »
-        if (mic) CallForegroundService.start(appContext)
+        if (micGranted) CallForegroundService.start(appContext)
         maybeStartUplink()
     }
 
@@ -273,7 +275,9 @@ class RoomViewModel(
                 val sdp = webRTCManager.startUpstream(streamId, "camera", withAudio = micGranted, withVideo = cameraGranted)
                 galeneClient.sendOffer(streamId, "camera", sdp)
                 uplinkStreamId = streamId
-                _uiState.update { it.copy(sendingVideo = webRTCManager.localVideoTrack.value != null) }
+                _uiState.update {
+                    it.copy(sendingAudio = micGranted, sendingVideo = webRTCManager.localVideoTrack.value != null)
+                }
             }.onFailure {
                 uplinkRequested = false
                 _uiState.update { s -> s.copy(errorMessage = "Erreur micro : ${it.message}") }

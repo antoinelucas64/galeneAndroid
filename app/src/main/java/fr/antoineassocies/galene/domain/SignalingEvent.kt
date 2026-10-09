@@ -20,8 +20,14 @@ sealed class SignalingEvent {
         val rtcConfiguration: RtcConfigurationJson?,
     ) : SignalingEvent()
 
-    /** Entrée refusée (mauvais mot de passe, groupe inexistant…) ; [error] est lisible par un humain. */
-    data class JoinFailed(val error: String?) : SignalingEvent()
+    /**
+     * Entrée refusée.
+     * @property error code machine éventuel, ex. `need-username` (le lien d'invitation exige un nom)
+     * @property message explication lisible envoyée par le serveur (« not authorised »…)
+     */
+    data class JoinFailed(val error: String?, val message: String?) : SignalingEvent() {
+        val needsUsername: Boolean get() = error == "need-username"
+    }
 
     /** Le serveur nous a fait sortir du groupe. */
     data class JoinLeft(val group: String) : SignalingEvent()

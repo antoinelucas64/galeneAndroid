@@ -192,7 +192,7 @@ class GaleneClient(
                             rtcConfiguration = msg.rtcConfiguration,
                         )
                     )
-                    "fail" -> _events.tryEmit(SignalingEvent.JoinFailed(msg.value ?: msg.error))
+                    "fail" -> _events.tryEmit(SignalingEvent.JoinFailed(error = msg.error, message = msg.value))
                     "leave" -> _events.tryEmit(SignalingEvent.JoinLeft(msg.group ?: currentGroup ?: ""))
                 }
             }

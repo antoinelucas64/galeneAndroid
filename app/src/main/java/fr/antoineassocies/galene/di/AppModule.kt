@@ -2,10 +2,15 @@ package fr.antoineassocies.galene.di
 
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
+import fr.antoineassocies.galene.data.UserPreferences
 import fr.antoineassocies.galene.domain.AudioRouter
+import fr.antoineassocies.galene.domain.GaleneDirectory
 import fr.antoineassocies.galene.domain.GaleneClient
 import fr.antoineassocies.galene.domain.WebRTCManager
+import fr.antoineassocies.galene.domain.model.GroupTarget
 import fr.antoineassocies.galene.domain.model.JoinRequest
+import fr.antoineassocies.galene.ui.viewmodel.GroupLoginViewModel
+import fr.antoineassocies.galene.ui.viewmodel.ServerViewModel
 import fr.antoineassocies.galene.ui.viewmodel.RoomViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -51,6 +56,14 @@ val appModule = module {
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(egl))
             .createPeerConnectionFactory()
     }
+
+    single { GaleneDirectory(get(), get()) }
+
+    single { UserPreferences(androidContext()) }
+
+    viewModel { ServerViewModel(get(), get()) }
+
+    viewModel { (target: GroupTarget) -> GroupLoginViewModel(target, get(), get()) }
 
     // factory = nouvelle instance par session (une instance partagée causerait des leaks)
     factory { GaleneClient(get(), get()) }

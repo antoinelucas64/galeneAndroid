@@ -1,0 +1,178 @@
+package fr.antoineassocies.galene.ui.screens
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import fr.antoineassocies.galene.R
+import fr.antoineassocies.galene.domain.SignalingEvent
+import fr.antoineassocies.galene.domain.model.GroupTarget
+import fr.antoineassocies.galene.domain.model.JoinRequest
+import fr.antoineassocies.galene.domain.model.PresentMode
+import fr.antoineassocies.galene.ui.viewmodel.GroupLoginViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+/**
+ * Formulaire de connexion à un groupe : nom, mot de passe et choix de ce que l'on publie,
+ * adapté au mode d'authentification annoncé par le serveur.
+ *
+ * @param pendingFailure refus du serveur rapporté par l'écran de salle, à afficher une fois
+ * @param onFailureShown appelé quand [pendingFailure] a été pris en compte
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GroupLoginScreen(
+    target: GroupTarget,
+    pendingFailure: SignalingEvent.JoinFailed?,
+    onFailureShown: () -> Unit,
+    onJoin: (JoinRequest) -> Unit,
+    onBack: () -> Unit,
+    viewModel: GroupLoginViewModel = koinViewModel(parameters = { parametersOf(target) }),
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) { viewModel.join.collect(onJoin) }
+    LaunchedEffect(pendingFailure) {
+        if (pendingFailure != null) {
+            viewModel.onJoinFailed(pendingFailure)
+            onFailureShown()
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(state.status?.title ?: "") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                },
+            )
+        },
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            when {
+                state.loading -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+                state.loadError != null -> {
+                    Text(state.loadError!!, color = MaterialTheme.colorScheme.error)
+                    OutlinedButton(onClick = viewModel::loadStatus) { Text(stringResource(R.string.action_retry)) }
+                }
+                else -> LoginForm(state = state, viewModel = viewModel)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ColumnScope.LoginForm(
+    state: fr.antoineassocies.galene.ui.viewmodel.GroupLoginUiState,
+    viewModel: GroupLoginViewModel,
+) {
+    val status = state.status ?: return
+
+    // ─── Présentation du groupe ───────────────────────────────────────────
+    status.description?.takeIf { it.isNotBlank() }?.let {
+        Text(it, style = MaterialTheme.typography.bodyLarge)
+    }
+    if (status.locked) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.label_group_locked), style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+    if (state.token != null) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Link, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.label_invitation_link), style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+
+    if (state.portalOnly) {
+        // Le portail SSO renvoie vers le navigateur ; le retour dans l'app n'est pas encore géré
+        Text(stringResource(R.string.label_portal_unsupported), color = MaterialTheme.colorScheme.error)
+        return
+    }
+
+    // ─── Identifiants ─────────────────────────────────────────────────────
+    OutlinedTextField(
+        value = state.username,
+        onValueChange = viewModel::onUsernameChange,
+        label = {
+            Text(stringResource(if (state.usernameRequired) R.string.label_username else R.string.label_username_optional))
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = if (state.showPassword) ImeAction.Next else ImeAction.Go),
+        keyboardActions = KeyboardActions(onGo = { viewModel.submit() }),
+        modifier = Modifier.fillMaxWidth(),
+    )
+    if (state.showPassword) {
+        OutlinedTextField(
+            value = state.password,
+            onValueChange = viewModel::onPasswordChange,
+            label = { Text(stringResource(R.string.label_password)) },
+            supportingText = status.authServer?.let { { Text(stringResource(R.string.hint_auth_server)) } },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Go),
+            keyboardActions = KeyboardActions(onGo = { viewModel.submit() }),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
+    // ─── Que publier en entrant ───────────────────────────────────────────
+    Text(stringResource(R.string.label_present), style = MaterialTheme.typography.titleSmall)
+    val options = listOf(
+        PresentMode.NONE to R.string.present_none,
+        PresentMode.MIC to R.string.present_mic,
+        PresentMode.MIC_AND_CAMERA to R.string.present_both,
+    )
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+        options.forEachIndexed { index, (mode, label) ->
+            SegmentedButton(
+                selected = state.present == mode,
+                onClick = { viewModel.onPresentChange(mode) },
+                shape = SegmentedButtonDefaults.itemShape(index, options.size),
+            ) { Text(stringResource(label), maxLines = 1) }
+        }
+    }
+
+    state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+
+    Button(
+        onClick = viewModel::submit,
+        enabled = state.canJoin,
+        modifier = Modifier.fillMaxWidth().height(52.dp),
+    ) {
+        if (state.joining) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+        else Text(stringResource(R.string.action_join))
+    }
+}

@@ -108,7 +108,7 @@ class GaleneTestClient(private val wsUrl: String) : AutoCloseable {
                         permissions      = msg.permissions ?: emptyList(),
                         rtcConfiguration = msg.rtcConfiguration,
                     ))
-                    "fail"  -> events.trySend(SignalingEvent.JoinFailed(msg.value ?: msg.error))
+                    "fail"  -> events.trySend(SignalingEvent.JoinFailed(error = msg.error, message = msg.value))
                     "leave" -> events.trySend(SignalingEvent.JoinLeft(msg.group ?: ""))
                 }
             }

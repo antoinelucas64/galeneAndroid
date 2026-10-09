@@ -9,8 +9,8 @@ Ce document décrit l'organisation du code, les responsabilités de chaque packa
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                    UI  (Jetpack Compose)                     │
-│  ConnectScreen           RoomScreen + VideoGrid              │
-│  (saisie params)         (grille vidéo + contrôles)          │
+│  ServerScreen → GroupLoginScreen → RoomScreen + VideoGrid    │
+│  (serveur, groupes)  (connexion)     (grille vidéo, contrôles)│
 └───────────────────────────┬──────────────────────────────────┘
                             │ StateFlow<RoomUiState>
 ┌───────────────────────────▼──────────────────────────────────┐
@@ -45,19 +45,27 @@ app/src/main/java/fr/antoineassocies/galene/
 ├── di/
 │   └── AppModule.kt               # Graphe de dépendances Koin
 │                                  # (OkHttpClient, Json, EglBase, PeerConnectionFactory,
-│                                  #  GaleneClient, WebRTCManager, AudioRouter, RoomViewModel)
+│                                  #  GaleneDirectory, UserPreferences, GaleneClient,
+│                                  #  WebRTCManager, AudioRouter, ViewModels)
+│
+├── data/
+│   └── UserPreferences.kt         # Dernier serveur et dernier nom (jamais de secret)
 │
 ├── domain/                        # Couche métier pure (pas d'UI, pas d'Android UI)
 │   ├── AudioRouter.kt             # Mode communication + haut-parleur pendant l'appel
 │   ├── ConnectionState.kt         # Enum : Connecting | Connected | Disconnected
+│   ├── GaleneDirectory.kt         # HTTP : groupes publics, statut d'un groupe, authServer
 │   ├── GaleneClient.kt            # WebSocket + dispatch des messages du protocole
 │   ├── SignalingEvent.kt          # Sealed class : événements internes du signaling
 │   ├── WebRTCManager.kt           # PeerConnections (up/downlinks), micro, caméra,
 │   │                              # pistes vidéo exposées à l'UI
 │   │
 │   ├── model/
-│   │   ├── JoinRequest.kt         # Paramètres de connexion (URL, salle, nom, password/token)
-│   │   └── Participant.kt         # Données d'un pair dans la salle
+│   │   ├── GaleneLink.kt          # Saisie libre → serveur ou groupe (+ token) ; GroupTarget
+│   │   ├── GroupStatus.kt         # Statut public d'un groupe (.status / public-groups.json)
+│   │   ├── JoinRequest.kt         # Entrée en salle, authentification résolue
+│   │   ├── Participant.kt         # Données d'un pair dans la salle
+│   │   └── PresentMode.kt         # Rien / Micro / Caméra + micro
 │   │
 │   └── protocol/
 │       └── Messages.kt            # Data classes @Serializable pour le protocole Galène
@@ -68,13 +76,14 @@ app/src/main/java/fr/antoineassocies/galene/
 │                                  # garde le micro actif quand l'app est en arrière-plan
 │
 └── ui/
-    ├── GaleneNavHost.kt           # Graphe de navigation Compose (connect → room)
+    ├── GaleneNavHost.kt           # Navigation : server → group → room
     │
     ├── components/
     │   └── VideoGrid.kt           # Grille de tuiles + VideoRenderer (SurfaceViewRenderer)
     │
     ├── screens/
-    │   ├── ConnectScreen.kt       # Écran de connexion : saisie URL/salle/token
+    │   ├── ServerScreen.kt        # Accueil : serveur ou lien, groupes publics
+    │   ├── GroupLoginScreen.kt    # Page du groupe : nom, mot de passe, que publier
     │   └── RoomScreen.kt          # Écran de salle : grille, contrôles, permissions,
     │                              # premier plan / arrière-plan
     │
@@ -101,17 +110,28 @@ MainActivity.onCreate()
     └─ setContent { GaleneNavHost() }
             │
 GaleneNavHost
-    └─ NavHost(startDestination = "connect")
-            └─ ConnectScreen
+    └─ NavHost(startDestination = "server")
+            └─ ServerScreen
 ```
 
-### 2. Rejoindre une salle
+### 2. Rejoindre une salle (même parcours que le client web Galène)
 
 ```
-ConnectScreen
-    onJoin(JoinRequest)
-        │
-        ├─ joinRequestHolder.request = request
+ServerScreen / ServerViewModel
+    saisie « galene.example.org »  → GET /public-groups.json → liste des groupes
+    saisie d'un lien de groupe     → directement à l'étape suivante (token éventuel)
+        │ GroupTarget(location, token?)
+GroupLoginScreen / GroupLoginViewModel
+    GET <location>.status  → nom affiché, description, endpoint, authServer, authPortal
+    formulaire : nom · mot de passe · publier (Rien / Micro / Caméra + micro)
+    résolution de l'authentification :
+        token d'invitation  → join { token }
+        authServer          → POST {location, username, password} → JWT → join { token }
+                              (HTTP 204 : join { password }, comme le client web)
+        sinon               → join { password }
+        authPortal          → non pris en charge (message)
+        │ JoinRequest(endpoint, group, username, password|token, present)
+        ├─ holder.request = request
         └─ navController.navigate("room")
                 │
         RoomScreen(request)
@@ -119,7 +139,7 @@ ConnectScreen
                 └─ koinViewModel<RoomViewModel>(params)
                         │
                 RoomViewModel.init
-                        ├─ galeneClient.connect(serverUrl)    # ouvre le WebSocket
+                        ├─ galeneClient.connect(endpoint)     # ouvre le WebSocket
                         ├─ observeSignaling()                 # collecte galeneClient.events
                         └─ observeConnectionState()           # collecte galeneClient.connectionState
 ```
@@ -130,7 +150,7 @@ ConnectScreen
 GaleneClient                         RoomViewModel
     │                                    │
     │  WS onOpen                         │
-    ├──► Connected event ────────────────► sendJoin(roomName, displayName, …)
+    ├──► Connected event ────────────────► sendJoin(group, username, password | token)
     │                                    │
     │  "joined" kind=join                │
     ├──► Joined event ───────────────────► applyRtcConfiguration() + audioRouter.start()
@@ -242,8 +262,11 @@ appModule
 │                                 # (évite les leaks d'état entre appels)
 ├── factory<WebRTCManager>
 ├── factory<AudioRouter>
+├── single<GaleneDirectory>, single<UserPreferences>
 │
-└── viewModel<RoomViewModel>(params)   # paramétré : JoinRequest
+├── viewModel<ServerViewModel>
+├── viewModel<GroupLoginViewModel>(params)   # paramétré : GroupTarget
+└── viewModel<RoomViewModel>(params)         # paramétré : JoinRequest
 ```
 
 `factory` (et non `single`) pour `GaleneClient` et `WebRTCManager` : chaque appel  
@@ -275,7 +298,7 @@ Définis dans `domain/protocol/Messages.kt` et dispatché dans `GaleneClient.han
 |------|--------|--------------------------|
 | `handshake` | `ServerHandshakeMsg` | Vérifie version=["2"], émet `Connected` |
 | `joined` kind=join | `JoinedMsg` | Émet `Joined`, démarre uplink |
-| `joined` kind=fail | `JoinedMsg` | Émet `JoinFailed`, affiche erreur |
+| `joined` kind=fail | `JoinedMsg` | Émet `JoinFailed` (code + message), retour au formulaire du groupe |
 | `joined` kind=leave | `JoinedMsg` | Émet `JoinLeft`, vide participants |
 | `user` | `UserMsg` | Émet `UserUpdate`, met à jour la liste |
 | `offer` | `ServerOfferMsg` | Émet `RemoteOffer`, crée (ou renégocie) un downlink |
@@ -291,24 +314,21 @@ Définis dans `domain/protocol/Messages.kt` et dispatché dans `GaleneClient.han
 ## Navigation UI
 
 ```
-GaleneNavHost                      JoinRequestHolder (ViewModel scope Activity)
-│                                      ▲ request: JoinRequest?
-├── "connect"  →  ConnectScreen ───────┘ onJoin(JoinRequest)
-│                 Parse optionnel d'un lien d'invitation
-│                 https://host/group/<room>/?token=XXX
-│                 → extrait serverUrl (wss://host/ws), roomName, token
-│
-└── "room"     →  RoomScreen(request)
-                     ViewModel injecté par Koin : parametersOf(request)
+GaleneNavHost                          NavigationHolder (ViewModel scope Activity)
+│                                          target: GroupTarget?
+├── "server" → ServerScreen ─────────────► request: JoinRequest?
+├── "group"  → GroupLoginScreen(target) ─► joinFailure: JoinFailed?
+└── "room"   → RoomScreen(request)
+                 │ joined kind=fail
+                 └─ retour à "group" avec la raison ; `need-username` → le nom
+                    devient obligatoire, sinon le token est abandonné (comme le web)
 ```
 
-Les paramètres de connexion **ne passent pas par la route** : un argument de chemin
-vide (password et token sont exclusifs, l'un est donc toujours vide) ne matche pas
-la route Navigation et provoquait un crash, et le mot de passe se retrouvait dans
-l'état sauvegardé du back stack.
+Les paramètres **ne passent pas par les routes** : tokens et mots de passe n'ont rien à
+faire dans l'état sauvegardé du back stack, et un argument vide ne matche pas une route.
 
-`JoinRequestHolder` survit aux changements de configuration mais pas à la mort du
-process. Dans ce cas, la destination `room` revient à `connect`.
+`NavigationHolder` survit aux changements de configuration mais pas à la mort du
+process. Dans ce cas, les destinations `group` et `room` reviennent à `server`.
 
 ---
 

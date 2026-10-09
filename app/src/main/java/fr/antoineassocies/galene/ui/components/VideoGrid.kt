@@ -1,6 +1,7 @@
 package fr.antoineassocies.galene.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +40,7 @@ data class VideoTile(
 fun VideoGrid(
     tiles: List<VideoTile>,
     eglContext: EglBase.Context,
+    onTileClick: (VideoTile) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (tiles.isEmpty()) return
@@ -50,7 +52,7 @@ fun VideoGrid(
             Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 row.forEach { tile ->
                     key(tile.key) {
-                        TileView(tile, eglContext, Modifier.weight(1f).fillMaxHeight())
+                        TileView(tile, eglContext, Modifier.weight(1f).fillMaxHeight(), onClick = { onTileClick(tile) })
                     }
                 }
                 // Cases vides pour garder des tuiles de même largeur sur la dernière ligne
@@ -60,15 +62,42 @@ fun VideoGrid(
     }
 }
 
+/**
+ * Un participant seul sur tout l'espace disponible. La vidéo est affichée entière
+ * (bandes noires si besoin) plutôt que recadrée : on veut tout voir, ex. un tableau.
+ */
 @Composable
-private fun TileView(tile: VideoTile, eglContext: EglBase.Context, modifier: Modifier) {
+fun FullscreenTile(
+    tile: VideoTile,
+    eglContext: EglBase.Context,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TileView(
+        tile, eglContext,
+        modifier.background(Color.Black),
+        onClick = onClick,
+        scaling = RendererCommon.ScalingType.SCALE_ASPECT_FIT,
+        rounded = false,
+    )
+}
+
+@Composable
+private fun TileView(
+    tile: VideoTile,
+    eglContext: EglBase.Context,
+    modifier: Modifier,
+    onClick: () -> Unit,
+    scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL,
+    rounded: Boolean = true,
+) {
     Box(
         modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .then(if (rounded) Modifier.clip(RoundedCornerShape(12.dp)) else Modifier)
+            .background(if (rounded) MaterialTheme.colorScheme.surfaceVariant else Color.Black)
     ) {
         if (tile.track != null) {
-            VideoRenderer(tile.track, eglContext, tile.mirror, Modifier.fillMaxSize())
+            VideoRenderer(tile.track, eglContext, tile.mirror, Modifier.fillMaxSize(), scaling)
         } else {
             Surface(
                 shape = CircleShape,
@@ -95,6 +124,9 @@ private fun TileView(tile: VideoTile, eglContext: EglBase.Context, modifier: Mod
                 .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
                 .padding(horizontal = 6.dp, vertical = 2.dp)
         )
+        // Calque transparent au-dessus du SurfaceView : les touchers arrivent à Compose,
+        // pas à la vue native qui les ignorerait ou les avalerait selon les versions
+        Box(Modifier.matchParentSize().clickable(onClick = onClick))
     }
 }
 
@@ -104,18 +136,26 @@ private fun TileView(tile: VideoTile, eglContext: EglBase.Context, modifier: Mod
  * Les runCatching couvrent le cas où la PeerConnection a déjà libéré la piste (stream fermé).
  */
 @Composable
-fun VideoRenderer(track: VideoTrack, eglContext: EglBase.Context, mirror: Boolean, modifier: Modifier = Modifier) {
+fun VideoRenderer(
+    track: VideoTrack,
+    eglContext: EglBase.Context,
+    mirror: Boolean,
+    modifier: Modifier = Modifier,
+    scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL,
+) {
     key(track) {
         AndroidView(
             factory = { ctx ->
                 SurfaceViewRenderer(ctx).apply {
                     init(eglContext, null)
-                    setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
                     setEnableHardwareScaler(true)
                     runCatching { track.addSink(this) }
                 }
             },
-            update = { it.setMirror(mirror) },
+            update = {
+                it.setMirror(mirror)
+                it.setScalingType(scaling)
+            },
             onRelease = { renderer ->
                 runCatching { track.removeSink(renderer) }
                 renderer.release()

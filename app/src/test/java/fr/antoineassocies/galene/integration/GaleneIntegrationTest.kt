@@ -106,7 +106,7 @@ class GaleneIntegrationTest {
 
             assertTrue("Attendu JoinFailed, reçu : $event", event is SignalingEvent.JoinFailed)
             val failed = event as SignalingEvent.JoinFailed
-            assertNotNull(failed.error)
+            assertNotNull(failed.message ?: failed.error)
         }
     }
 

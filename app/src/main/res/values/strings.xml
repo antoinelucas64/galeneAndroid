@@ -2,13 +2,34 @@
 <resources>
     <string name="app_name">Galène</string>
 
-    <!-- ConnectScreen -->
-    <string name="label_invite_link">Lien d\'invitation (optionnel)</string>
-    <string name="label_server_url">URL du serveur</string>
-    <string name="label_room">Salle</string>
-    <string name="label_display_name">Nom d\'affichage</string>
-    <string name="label_password">Mot de passe (optionnel)</string>
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Serveur ou lien d\'invitation</string>
+    <string name="hint_server_or_link">Adresse du serveur Galène, ou lien vers un groupe</string>
+    <string name="label_public_groups">Groupes publics de %1$s</string>
+    <string name="label_no_public_groups">Aucun groupe public sur ce serveur.</string>
+    <string name="label_other_group">Autre groupe (nom)</string>
+    <string name="label_locked">Verrouillé</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d participant</item>
+        <item quantity="other">%d participants</item>
+    </plurals>
+    <string name="action_continue">Continuer</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Nom d\'utilisateur</string>
+    <string name="label_username_optional">Nom d\'utilisateur (facultatif)</string>
+    <string name="label_password">Mot de passe</string>
+    <string name="hint_auth_server">Vérifié par le serveur d\'authentification du groupe</string>
+    <string name="label_present">En entrant, publier</string>
+    <string name="present_none">Rien</string>
+    <string name="present_mic">Micro</string>
+    <string name="present_both">Caméra + micro</string>
+    <string name="label_group_locked">Groupe verrouillé : seuls les opérateurs peuvent entrer.</string>
+    <string name="label_invitation_link">Connexion par lien d\'invitation</string>
+    <string name="label_portal_unsupported">Ce groupe s\'authentifie via un portail web, pas encore pris en charge par l\'application. Utilisez un lien d\'invitation.</string>
     <string name="action_join">Rejoindre</string>
+    <string name="action_back">Retour</string>
+    <string name="action_retry">Réessayer</string>
 
     <!-- RoomScreen -->
     <string name="action_mute">Couper micro</string>

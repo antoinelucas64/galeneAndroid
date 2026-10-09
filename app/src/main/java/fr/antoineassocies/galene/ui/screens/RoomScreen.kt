@@ -1,7 +1,11 @@
 package fr.antoineassocies.galene.ui.screens
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -22,7 +26,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.antoineassocies.galene.R
 import fr.antoineassocies.galene.domain.ConnectionState
+import fr.antoineassocies.galene.domain.SignalingEvent
 import fr.antoineassocies.galene.domain.model.JoinRequest
+import fr.antoineassocies.galene.domain.model.PresentMode
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import fr.antoineassocies.galene.ui.components.FullscreenTile
 import fr.antoineassocies.galene.ui.components.VideoGrid
 import fr.antoineassocies.galene.ui.components.VideoTile
 import fr.antoineassocies.galene.ui.viewmodel.RoomViewModel
@@ -41,6 +52,7 @@ import org.koin.core.parameter.parametersOf
 fun RoomScreen(
     request: JoinRequest,
     onLeave: () -> Unit,
+    onJoinFailed: (SignalingEvent.JoinFailed) -> Unit,
     viewModel: RoomViewModel = koinViewModel(
         parameters = { parametersOf(request) }
     )
@@ -59,12 +71,26 @@ fun RoomScreen(
         )
     }
     LaunchedEffect(Unit) {
+        // Seulement ce qu'exige le choix « publier » du formulaire ; écoute seule → rien à demander
+        val present = request.present
+        if (present == PresentMode.NONE) {
+            viewModel.onPermissionsResult(mic = false, camera = false)
+            return@LaunchedEffect
+        }
         permissionLauncher.launch(buildList {
             add(Manifest.permission.RECORD_AUDIO)
-            add(Manifest.permission.CAMERA)
+            if (present.usesCamera) add(Manifest.permission.CAMERA)
             // Notification « appel en cours » ; facultative, le service tourne même si refusée
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) add(Manifest.permission.POST_NOTIFICATIONS)
         }.toTypedArray())
+    }
+
+    // ─── Entrée refusée → retour au formulaire avec la raison ─────────────
+    LaunchedEffect(uiState.joinFailure) {
+        uiState.joinFailure?.let { failure ->
+            viewModel.leave()
+            onJoinFailed(failure)
+        }
     }
 
     // ─── Premier plan / arrière-plan → caméra coupée puis rallumée ────────
@@ -88,6 +114,30 @@ fun RoomScreen(
         onDispose { view.keepScreenOn = false }
     }
 
+    // ─── Tuiles : moi, flux reçus, participants sans flux ─────────────────
+    val selfLabel = stringResource(R.string.label_me)
+    val tiles = buildList {
+        add(VideoTile("self", selfLabel, localTrack.takeIf { !uiState.videoMuted }, mirror = uiState.frontCamera))
+        uiState.remoteStreams.forEach { add(VideoTile(it.id, it.username, remoteTracks[it.id])) }
+        // Participants sans flux (écoute seule) : tuile avatar
+        val publishing = uiState.remoteStreams.mapNotNull { it.sourceId }.toSet()
+        uiState.participants
+            .filter { it.id != uiState.selfId && it.id !in publishing }
+            .forEach { add(VideoTile(it.id, it.username, null)) }
+    }
+
+    // ─── Plein écran sur une tuile (appui), retour par appui ou bouton retour ─
+    var focusedKey by rememberSaveable { mutableStateOf<String?>(null) }
+    // La personne est partie ou a cessé de publier : on revient à la grille
+    val focused = tiles.firstOrNull { it.key == focusedKey }
+        .takeIf { uiState.connectionState == ConnectionState.Connected }
+    BackHandler(enabled = focused != null) { focusedKey = null }
+    ImmersiveMode(enabled = focused != null)
+    if (focused != null) {
+        FullscreenTile(focused, viewModel.eglContext, onClick = { focusedKey = null }, Modifier.fillMaxSize())
+        return
+    }
+
     // ─── Erreur (JoinFailed / Disconnected avec raison) ───────────────────
     uiState.errorMessage?.let { msg ->
         AlertDialog(
@@ -103,7 +153,7 @@ fun RoomScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(request.roomName) },
+                title = { Text(request.title) },
                 navigationIcon = {
                     IconButton(onClick = { viewModel.leave(); onLeave() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_leave))
@@ -115,6 +165,8 @@ fun RoomScreen(
             RoomControls(
                 audioMuted  = uiState.audioMuted,
                 videoMuted  = uiState.videoMuted,
+                micAvailable = uiState.sendingAudio,
+                cameraAvailable = uiState.sendingVideo,
                 canSwitchCamera = uiState.sendingVideo && !uiState.videoMuted,
                 onToggleAudio = viewModel::toggleAudio,
                 onToggleVideo = viewModel::toggleVideo,
@@ -158,17 +210,11 @@ fun RoomScreen(
 
             // ─── Contenu principal ────────────────────────────────────────
             if (uiState.connectionState == ConnectionState.Connected) {
-                val selfLabel = stringResource(R.string.label_me)
-                val tiles = buildList {
-                    add(VideoTile("self", selfLabel, localTrack.takeIf { !uiState.videoMuted }, mirror = uiState.frontCamera))
-                    uiState.remoteStreams.forEach { add(VideoTile(it.id, it.username, remoteTracks[it.id])) }
-                    // Participants sans flux (écoute seule) : tuile avatar
-                    val publishing = uiState.remoteStreams.mapNotNull { it.sourceId }.toSet()
-                    uiState.participants
-                        .filter { it.id != uiState.selfId && it.id !in publishing }
-                        .forEach { add(VideoTile(it.id, it.username, null)) }
-                }
-                VideoGrid(tiles, viewModel.eglContext, Modifier.weight(1f).fillMaxWidth())
+                VideoGrid(
+                    tiles, viewModel.eglContext,
+                    onTileClick = { focusedKey = it.key },
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                )
             } else {
                 Box(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -199,6 +245,8 @@ fun RoomScreen(
 private fun RoomControls(
     audioMuted: Boolean,
     videoMuted: Boolean,
+    micAvailable: Boolean,
+    cameraAvailable: Boolean,
     canSwitchCamera: Boolean,
     onToggleAudio: () -> Unit,
     onToggleVideo: () -> Unit,
@@ -211,13 +259,14 @@ private fun RoomControls(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onToggleAudio) {
+            // Grisés quand on ne publie pas ce média (écoute seule, permission refusée)
+            IconButton(onClick = onToggleAudio, enabled = micAvailable) {
                 Icon(
                     imageVector = if (audioMuted) Icons.Default.MicOff else Icons.Default.Mic,
                     contentDescription = stringResource(if (audioMuted) R.string.action_unmute else R.string.action_mute)
                 )
             }
-            IconButton(onClick = onToggleVideo) {
+            IconButton(onClick = onToggleVideo, enabled = cameraAvailable) {
                 Icon(
                     imageVector = if (videoMuted) Icons.Default.VideocamOff else Icons.Default.Videocam,
                     contentDescription = stringResource(if (videoMuted) R.string.action_video_on else R.string.action_video_off)
@@ -240,4 +289,28 @@ private fun RoomControls(
             }
         }
     }
+}
+
+/**
+ * Masque les barres système (état, navigation) tant que [enabled] : vrai plein écran.
+ * Un balayage depuis le bord les fait réapparaître temporairement.
+ */
+@Composable
+private fun ImmersiveMode(enabled: Boolean) {
+    val view = LocalView.current
+    DisposableEffect(enabled) {
+        val window = view.context.findActivity()?.window
+        val controller = window?.let { WindowCompat.getInsetsController(it, view) }
+        if (enabled && controller != null) {
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+        }
+        onDispose { controller?.show(WindowInsetsCompat.Type.systemBars()) }
+    }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
