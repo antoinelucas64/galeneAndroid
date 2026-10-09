@@ -29,11 +29,11 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 /**
- * Formulaire de connexion à un groupe : nom, mot de passe et choix de ce que l'on publie,
- * adapté au mode d'authentification annoncé par le serveur.
+ * Group login form: name, password and what to publish, adapted to the authentication
+ * mode announced by the server.
  *
- * @param pendingFailure refus du serveur rapporté par l'écran de salle, à afficher une fois
- * @param onFailureShown appelé quand [pendingFailure] a été pris en compte
+ * @param pendingFailure server refusal reported by the room screen, to be shown once
+ * @param onFailureShown called once [pendingFailure] has been taken into account
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +97,7 @@ private fun ColumnScope.LoginForm(
 ) {
     val status = state.status ?: return
 
-    // ─── Présentation du groupe ───────────────────────────────────────────
+    // ─── Group description ────────────────────────────────────────────────
     status.description?.takeIf { it.isNotBlank() }?.let {
         Text(it, style = MaterialTheme.typography.bodyLarge)
     }
@@ -117,12 +117,12 @@ private fun ColumnScope.LoginForm(
     }
 
     if (state.portalOnly) {
-        // Le portail SSO renvoie vers le navigateur ; le retour dans l'app n'est pas encore géré
+        // The SSO portal sends the user to the browser; coming back to the app is not handled yet
         Text(stringResource(R.string.label_portal_unsupported), color = MaterialTheme.colorScheme.error)
         return
     }
 
-    // ─── Identifiants ─────────────────────────────────────────────────────
+    // ─── Credentials ──────────────────────────────────────────────────────
     OutlinedTextField(
         value = state.username,
         onValueChange = viewModel::onUsernameChange,
@@ -148,7 +148,7 @@ private fun ColumnScope.LoginForm(
         )
     }
 
-    // ─── Que publier en entrant ───────────────────────────────────────────
+    // ─── What to publish on joining ───────────────────────────────────────
     Text(stringResource(R.string.label_present), style = MaterialTheme.typography.titleSmall)
     val options = listOf(
         PresentMode.NONE to R.string.present_none,

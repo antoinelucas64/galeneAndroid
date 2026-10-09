@@ -6,9 +6,9 @@ import android.media.AudioManager
 import android.os.Build
 
 /**
- * Bascule l'audio en mode communication sur haut-parleur pendant l'appel.
- * Sans ça, Android joue le son distant dans l'écouteur, à peine audible.
- * Version minimale — le routage bluetooth/casque viendra en Phase 3.
+ * Switches audio to communication mode on the loudspeaker during the call.
+ * Without it, Android plays remote audio through the earpiece, barely audible.
+ * Minimal version — Bluetooth / headset routing will come later.
  */
 class AudioRouter(context: Context) {
 

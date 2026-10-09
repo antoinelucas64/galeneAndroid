@@ -18,7 +18,7 @@ class GaleneTestClient(private val wsUrl: String) : AutoCloseable {
     private val httpClient = OkHttpClient()
     private val json = Json {
         ignoreUnknownKeys = true
-        encodeDefaults = true   // obligatoire : type/kind ont des valeurs par défaut qui doivent être sérialisées
+        encodeDefaults = true   // required: type/kind have default values that must be serialised
     }
 
     val clientId: String = UUID.randomUUID().toString().replace("-", "").take(16)

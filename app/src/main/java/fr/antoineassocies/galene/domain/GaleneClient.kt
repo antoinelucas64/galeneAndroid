@@ -22,16 +22,16 @@ import fr.antoineassocies.galene.domain.protocol.*
 import java.util.UUID
 
 /**
- * Client de signaling Galène : une connexion WebSocket par session.
+ * Galène signaling client: one WebSocket connection per session.
  *
- * Responsabilités :
- * - ouvrir le WebSocket et faire le handshake (protocole v2) ;
- * - sérialiser les messages sortants (`send*`) ;
- * - décoder les messages entrants et les publier comme [SignalingEvent] sur [events].
+ * Responsibilities:
+ * - open the WebSocket and perform the handshake (protocol v2);
+ * - serialise outgoing messages (`send*`);
+ * - decode incoming messages and publish them as [SignalingEvent]s on [events].
  *
- * Il ne connaît rien de WebRTC : les SDP et candidats ICE ne font que transiter.
- * Les callbacks OkHttp arrivent sur un thread d'OkHttp ; [events] est un SharedFlow
- * thread-safe, collecté par le ViewModel sur le thread principal.
+ * It knows nothing about WebRTC: SDPs and ICE candidates just pass through.
+ * OkHttp callbacks arrive on an OkHttp thread; [events] is a thread-safe SharedFlow,
+ * collected by the ViewModel on the main thread.
  */
 class GaleneClient(
     private val httpClient: OkHttpClient,
@@ -42,22 +42,22 @@ class GaleneClient(
         private const val PROTOCOL_VERSION = "2"
     }
 
-    /** Identifiant de session envoyé au handshake ; le serveur l'utilise comme `id` utilisateur. */
+    /** Session identifier sent in the handshake; the server uses it as our user `id`. */
     val clientId: String = UUID.randomUUID().toString().replace("-", "")
 
     private val _connectionState = MutableStateFlow(ConnectionState.Disconnected)
     val connectionState: StateFlow<ConnectionState> = _connectionState.asStateFlow()
 
-    // Replay = 0 car le ViewModel collecte en temps réel ; extraBufferCapacity évite les pertes
+    // Replay = 0 because the ViewModel collects in real time; extraBufferCapacity avoids losses
     private val _events = MutableSharedFlow<SignalingEvent>(replay = 0, extraBufferCapacity = 64)
     val events: SharedFlow<SignalingEvent> = _events.asSharedFlow()
 
     private var webSocket: WebSocket? = null
     private var currentGroup: String? = null
 
-    // ─── Connexion ─────────────────────────────────────────────────────────
+    // ─── Connection ────────────────────────────────────────────────────────
 
-    /** Ouvre le WebSocket vers [serverUrl] (`wss://hôte/ws`), en fermant toute connexion précédente. */
+    /** Opens the WebSocket to [serverUrl] (`wss://host/ws`), closing any previous connection. */
     fun connect(serverUrl: String) {
         disconnect()
         _connectionState.value = ConnectionState.Connecting
@@ -65,7 +65,7 @@ class GaleneClient(
 
         val request = runCatching { Request.Builder().url(serverUrl).build() }
             .onFailure { e ->
-                Log.e(TAG, "URL invalide : $serverUrl — ${e.message}")
+                Log.e(TAG, "Invalid URL: $serverUrl — ${e.message}")
                 _connectionState.value = ConnectionState.Disconnected
                 _events.tryEmit(SignalingEvent.Disconnected("URL invalide : ${e.message}"))
             }
@@ -74,7 +74,7 @@ class GaleneClient(
         webSocket = httpClient.newWebSocket(request, Listener())
     }
 
-    /** Quitte le groupe proprement (`leave`) puis ferme le WebSocket. Idempotent. */
+    /** Leaves the group cleanly (`leave`), then closes the WebSocket. Idempotent. */
     fun disconnect() {
         currentGroup?.let { group ->
             webSocket?.send(json.encodeToString(LeaveMsg(group = group)))
@@ -85,9 +85,9 @@ class GaleneClient(
         _connectionState.value = ConnectionState.Disconnected
     }
 
-    // ─── Envoi de messages ─────────────────────────────────────────────────
+    // ─── Sending messages ──────────────────────────────────────────────────
 
-    /** Demande l'entrée dans [group]. Un [token] (lien d'invitation) remplace le mot de passe. */
+    /** Asks to join [group]. A [token] (invitation link or auth server token) replaces the password. */
     fun sendJoin(group: String, username: String?, password: String?, token: String? = null) {
         currentGroup = group
         send(
@@ -95,50 +95,50 @@ class GaleneClient(
                 group    = group,
                 username = username?.ifBlank { null },
                 token    = token?.ifBlank { null },
-                // token prend la priorité sur le password
+                // the token takes precedence over the password
                 password = if (token.isNullOrBlank()) password?.ifBlank { null } else null,
             )
         )
     }
 
     /**
-     * Indique quels médias on veut recevoir, par label de flux.
-     * La clé `""` s'applique à tous les labels ; valeurs : `audio`, `video`, `video-low`.
+     * Declares which media we want to receive, per stream label.
+     * The `""` key applies to every label; values: `audio`, `video`, `video-low`.
      */
     fun sendRequest(request: Map<String, List<String>>) {
         send(RequestMsg(request = request))
     }
 
     /**
-     * Publie (ou renégocie) le flux montant [streamId].
-     * @param replace id d'un flux précédent que celui-ci remplace côté serveur
-     * @param kind `"renegotiate"` pour une re-offre sur un stream déjà établi (ICE restart)
+     * Publishes (or renegotiates) the up stream [streamId].
+     * @param replace id of a previous stream that this one replaces on the server
+     * @param kind `"renegotiate"` for a new offer on an established stream (ICE restart)
      */
     fun sendOffer(streamId: String, label: String, sdp: String, replace: String? = null, kind: String? = null) {
         send(OfferMsg(kind = kind, id = streamId, label = label, sdp = sdp, replace = replace))
     }
 
-    /** Demande au serveur un ICE restart sur un stream descendant (comme le client web). */
+    /** Asks the server for an ICE restart on a down stream (as the web client does). */
     fun sendRenegotiate(streamId: String) {
         send(RenegotiateMsg(id = streamId))
     }
 
-    /** Répond à une offre de flux descendant. */
+    /** Answers a down stream offer. */
     fun sendAnswer(streamId: String, sdp: String) {
         send(AnswerMsg(id = streamId, sdp = sdp))
     }
 
-    /** Transmet un candidat ICE local pour [streamId] (trickle ICE). */
+    /** Forwards a local ICE candidate for [streamId] (trickle ICE). */
     fun sendIce(streamId: String, candidate: IceCandidateJson) {
         send(IceMsg(id = streamId, candidate = candidate))
     }
 
-    // ─── Listener WebSocket ────────────────────────────────────────────────
+    // ─── WebSocket listener ────────────────────────────────────────────────
 
     private inner class Listener : WebSocketListener() {
 
         override fun onOpen(ws: WebSocket, response: Response) {
-            Log.d(TAG, "WebSocket ouvert → envoi handshake id=$clientId")
+            Log.d(TAG, "WebSocket open → sending handshake id=$clientId")
             ws.send(json.encodeToString(HandshakeMsg(id = clientId)))
         }
 
@@ -154,13 +154,13 @@ class GaleneClient(
         }
 
         override fun onClosed(ws: WebSocket, code: Int, reason: String) {
-            Log.d(TAG, "WebSocket fermé: code=$code reason=$reason")
+            Log.d(TAG, "WebSocket closed: code=$code reason=$reason")
             _connectionState.value = ConnectionState.Disconnected
             _events.tryEmit(SignalingEvent.Disconnected(if (code != 1000) reason else null))
         }
     }
 
-    // ─── Dispatch des messages entrants ────────────────────────────────────
+    // ─── Incoming message dispatch ─────────────────────────────────────────
 
     private fun handleMessage(text: String) {
         val obj = runCatching { json.parseToJsonElement(text) as? JsonObject }.getOrNull() ?: return
@@ -168,7 +168,7 @@ class GaleneClient(
 
             "handshake" -> {
                 val msg = decode<ServerHandshakeMsg>(text) ?: return
-                // Le serveur renvoie version comme ["2"] (tableau) ou "2" (string)
+                // The server sends version either as ["2"] (array) or "2" (string)
                 val versions = when (val v = msg.version) {
                     is JsonArray -> v.map { it.jsonPrimitive.content }
                     else         -> listOf(v.jsonPrimitive.content)
@@ -251,17 +251,17 @@ class GaleneClient(
             "ping" -> send(PongMsg())
 
             "pong", "chat", "chathistory", "usermessage",
-            "useraction", "groupaction" -> Unit   // ignoré pour l'instant
+            "useraction", "groupaction" -> Unit   // ignored for now
 
-            else -> Unit // message inconnu — on ignore silencieusement
+            else -> Unit // unknown message — silently ignored
         }
     }
 
-    // ─── Utilitaires ───────────────────────────────────────────────────────
+    // ─── Utilities ─────────────────────────────────────────────────────────
 
     private inline fun <reified T> decode(text: String): T? =
         runCatching { json.decodeFromString<T>(text) }.onFailure {
-            Log.e(TAG, "Échec décodage ${T::class.simpleName}: ${it.message}\njson=$text")
+            Log.e(TAG, "Failed to decode ${T::class.simpleName}: ${it.message}\njson=$text")
         }.getOrNull()
 
     private fun send(msg: Any) {

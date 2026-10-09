@@ -1,10 +1,10 @@
 package fr.antoineassocies.galene.domain.model
 
 /**
- * Un utilisateur présent dans le groupe, tel qu'annoncé par les messages `user` du serveur.
+ * A user present in the group, as announced by the server's `user` messages.
  *
- * @property id identifiant de session Galène (change à chaque connexion)
- * @property permissions droits Galène : `present` (publier), `op` (opérateur), `record`, …
+ * @property id Galène session identifier (changes on every connection)
+ * @property permissions Galène permissions: `present` (publish), `op` (operator), `record`, …
  */
 data class Participant(
     val id: String,

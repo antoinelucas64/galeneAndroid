@@ -8,16 +8,16 @@ import org.koin.core.context.startKoin
 import org.webrtc.PeerConnectionFactory
 
 /**
- * Point d'entrée du process : initialise libwebrtc puis le graphe Koin.
+ * Process entry point: initialises libwebrtc, then the Koin graph.
  *
- * L'ordre compte : [PeerConnectionFactory.initialize] doit précéder la création de toute
- * factory, et la factory est un `single` Koin créé à la première injection.
+ * Order matters: [PeerConnectionFactory.initialize] must precede the creation of any
+ * factory, and the factory is a Koin `single` created on first injection.
  */
 class GaleneApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Initialisation globale WebRTC — obligatoire avant tout PeerConnectionFactory
+        // Global WebRTC initialisation — required before any PeerConnectionFactory
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(this)
                 .setEnableInternalTracer(false)

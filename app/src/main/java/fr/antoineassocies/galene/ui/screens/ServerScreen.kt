@@ -27,8 +27,8 @@ import fr.antoineassocies.galene.ui.viewmodel.ServerViewModel
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Écran d'accueil : adresse du serveur (ou lien de groupe / d'invitation collé),
- * puis liste des groupes publics du serveur et saisie d'un groupe non listé.
+ * Home screen: server address (or a pasted group / invitation link), then the server's
+ * public groups and a field for an unlisted group.
  */
 @Composable
 fun ServerScreen(
@@ -55,7 +55,7 @@ fun ServerScreen(
             )
         }
 
-        // ─── Serveur ou lien ──────────────────────────────────────────────
+        // ─── Server or link ───────────────────────────────────────────────
         item {
             OutlinedTextField(
                 value = state.input,
@@ -80,7 +80,7 @@ fun ServerScreen(
             item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
         }
 
-        // ─── Groupes publics ──────────────────────────────────────────────
+        // ─── Public groups ────────────────────────────────────────────────
         val groups = state.groups
         if (groups != null && state.server != null) {
             item {
@@ -102,7 +102,7 @@ fun ServerScreen(
                 GroupRow(group, onClick = { viewModel.openGroup(group) })
             }
 
-            // ─── Groupe non listé ─────────────────────────────────────────
+            // ─── Unlisted group ───────────────────────────────────────────
             item {
                 OutlinedTextField(
                     value = otherGroup,
@@ -123,7 +123,7 @@ fun ServerScreen(
     }
 }
 
-/** Une ligne de la liste des groupes publics : nom, description, occupation, verrou. */
+/** One row of the public group list: name, description, occupancy, lock. */
 @Composable
 private fun GroupRow(group: GroupStatus, onClick: () -> Unit) {
     ElevatedCard(Modifier.fillMaxWidth().clickable(onClick = onClick)) {

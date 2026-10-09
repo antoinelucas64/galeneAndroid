@@ -1,15 +1,15 @@
 package fr.antoineassocies.galene.domain.model
 
 /**
- * Tout ce qu'il faut pour entrer dans un groupe, une fois l'authentification résolue.
+ * Everything needed to join a group, once authentication is resolved.
  *
- * @property endpoint WebSocket de signaling, fourni par le serveur dans le statut du groupe
- * @property group nom technique du groupe (peut contenir des `/` pour les sous-groupes)
- * @property title nom affiché du groupe, pour la barre de titre
- * @property username nom d'utilisateur ; null laisse le serveur décider (lien d'invitation
- *   qui fixe déjà le nom). Un token qui fixe le nom l'emporte sur celui envoyé.
- * @property password mot de passe Galène (exclusif avec [token])
- * @property token jeton d'invitation ou jeton délivré par un serveur d'authentification
+ * @property endpoint signaling WebSocket, given by the server in the group status
+ * @property group technical group name (may contain `/` for subgroups)
+ * @property title display name of the group, for the title bar
+ * @property username user name; null lets the server decide (invitation link that already
+ *   sets the name). A token that sets the name wins over the one sent.
+ * @property password Galène password (exclusive with [token])
+ * @property token invitation token, or token issued by an authentication server
  */
 data class JoinRequest(
     val endpoint: String,
@@ -20,7 +20,7 @@ data class JoinRequest(
     val token: String?,
     val present: PresentMode,
 ) {
-    // Évite de faire fuiter les secrets dans les logs
+    // Keeps secrets out of logs
     override fun toString() =
         "JoinRequest(endpoint=$endpoint, group=$group, username=$username, present=$present)"
 }

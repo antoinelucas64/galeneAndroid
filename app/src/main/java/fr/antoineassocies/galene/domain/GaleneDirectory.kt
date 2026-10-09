@@ -16,19 +16,19 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 /**
- * Accès HTTP aux informations publiques d'un serveur Galène, avant toute connexion WebSocket.
+ * HTTP access to a Galène server's public information, before any WebSocket connection.
  *
- * Reproduit ce que fait le client web : liste des groupes publics (page d'accueil),
- * statut d'un groupe (page du groupe), et échange avec un serveur d'authentification.
- * Toutes les fonctions s'exécutent sur [Dispatchers.IO] et lèvent [IOException]
- * avec un message lisible par l'utilisateur.
+ * Mirrors what the web client does: list of public groups (landing page), status of a
+ * group (group page), and the exchange with an authentication server.
+ * Every function runs on [Dispatchers.IO] and throws [IOException] with a message
+ * meant for the user.
  */
 class GaleneDirectory(
     private val http: OkHttpClient,
     private val json: Json,
 ) {
 
-    /** Groupes déclarés publics (`public = true` dans leur configuration). */
+    /** Groups declared public (`public = true` in their configuration). */
     suspend fun publicGroups(server: HttpUrl): List<GroupStatus> = withContext(Dispatchers.IO) {
         val url = server.resolve("/public-groups.json") ?: throw IOException("Adresse invalide")
         val body = get(url.toString(), notFound = "Ce serveur ne publie pas de liste de groupes")
@@ -36,8 +36,8 @@ class GaleneDirectory(
     }
 
     /**
-     * Statut d'un groupe. Les serveurs récents servent `.status` ; les plus anciens
-     * `.status.json`, essayé en second.
+     * Status of a group. Recent servers serve `.status`; older ones `.status.json`,
+     * which is tried second.
      */
     suspend fun groupStatus(target: GroupTarget): GroupStatus = withContext(Dispatchers.IO) {
         val body = runCatching { get(target.statusUrl, notFound = NO_SUCH_GROUP) }
@@ -49,19 +49,19 @@ class GaleneDirectory(
         json.decodeFromString(GroupStatus.serializer(), body)
     }
 
-    /** Résultat de l'échange avec un serveur d'authentification. */
+    /** Result of the exchange with an authentication server. */
     sealed class AuthResult {
-        /** Jeton (JWT) à présenter au `join` à la place du mot de passe. */
+        /** Token (JWT) to present in the `join` instead of the password. */
         data class Token(val token: String) : AuthResult() {
             override fun toString() = "Token(***)"
         }
-        /** Le serveur ne délivre pas de jeton (HTTP 204) : envoyer le mot de passe tel quel. */
+        /** The server issues no token (HTTP 204): send the password as-is. */
         data object UsePassword : AuthResult()
     }
 
     /**
-     * Vérifie [username]/[password] auprès de [authServer] (ex. comptes YunoHost),
-     * selon le protocole du client web : POST JSON `{location, username, password}`.
+     * Checks [username]/[password] with [authServer] (e.g. YunoHost accounts), using the
+     * web client's protocol: POST JSON `{location, username, password}`.
      */
     suspend fun authenticate(
         authServer: String,

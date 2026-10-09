@@ -3,11 +3,10 @@ package fr.antoineassocies.galene.data
 import android.content.Context
 
 /**
- * Préférences locales de l'utilisateur : dernier serveur et dernier nom d'utilisateur,
- * pour ne pas les ressaisir à chaque fois.
+ * Local user preferences: last server and last user name, so they need not be retyped.
  *
- * Volontairement minimal : aucun mot de passe ni token n'est jamais enregistré,
- * et rien ne quitte l'appareil (`allowBackup="false"` au manifeste).
+ * Deliberately minimal: no password or token is ever stored, and nothing leaves the
+ * device (`allowBackup="false"` in the manifest).
  */
 class UserPreferences(context: Context) {
 

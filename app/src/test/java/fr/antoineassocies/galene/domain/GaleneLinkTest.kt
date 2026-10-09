@@ -6,26 +6,26 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Interprétation de ce que l'utilisateur saisit ou colle sur l'écran d'accueil. */
+/** Interpretation of what the user types or pastes on the home screen. */
 class GaleneLinkTest {
 
     private fun group(input: String) = GaleneLink.parse(input) as GaleneLink.Group
 
     @Test
-    fun `nom d'hôte seul - serveur en https`() {
+    fun `bare host name - https server`() {
         val link = GaleneLink.parse("galene.example.org")
         assertTrue(link is GaleneLink.Server)
         assertEquals("https://galene.example.org/", (link as GaleneLink.Server).base.toString())
     }
 
     @Test
-    fun `adresse avec chemin quelconque - serveur sans chemin`() {
+    fun `address with arbitrary path - server without path`() {
         val link = GaleneLink.parse("https://galene.example.org:8443/foo") as GaleneLink.Server
         assertEquals("https://galene.example.org:8443/", link.base.toString())
     }
 
     @Test
-    fun `lien de groupe`() {
+    fun `group link`() {
         val link = group("https://galene.example.org/group/ma-salle/")
         assertEquals("https://galene.example.org/group/ma-salle/", link.target.location)
         assertEquals("https://galene.example.org/group/ma-salle/.status", link.target.statusUrl)
@@ -33,7 +33,7 @@ class GaleneLinkTest {
     }
 
     @Test
-    fun `lien d'invitation avec token`() {
+    fun `invitation link with token`() {
         val link = group("https://galene.example.org/group/ma-salle/?token=ABC123")
         assertEquals("https://galene.example.org/group/ma-salle/", link.target.location)
         assertEquals("ABC123", link.target.token)
@@ -41,24 +41,24 @@ class GaleneLinkTest {
     }
 
     @Test
-    fun `sous-groupe et lien sans barre finale`() {
+    fun `subgroup and link without trailing slash`() {
         val link = group("galene.example.org/group/cours/td1")
         assertEquals("https://galene.example.org/group/cours/td1/", link.target.location)
     }
 
     @Test
-    fun `segment group sans nom - serveur`() {
+    fun `group segment without a name - server`() {
         assertTrue(GaleneLink.parse("https://galene.example.org/group/") is GaleneLink.Server)
     }
 
     @Test
-    fun `saisie vide ou invalide`() {
+    fun `empty or invalid input`() {
         assertNull(GaleneLink.parse("   "))
-        assertNull(GaleneLink.parse("pas une url"))
+        assertNull(GaleneLink.parse("not a url"))
     }
 
     @Test
-    fun `le token n'apparaît pas dans les logs`() {
+    fun `token never appears in logs`() {
         val link = group("https://galene.example.org/group/s/?token=SECRET")
         assertTrue("SECRET" !in link.target.toString())
     }

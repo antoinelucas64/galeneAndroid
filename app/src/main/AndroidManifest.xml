@@ -2,19 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Requis par le NetworkMonitor de libwebrtc : sans elle, abort natif sur network_thread -->
+    <!-- Required by libwebrtc's NetworkMonitor: without it, native abort on network_thread -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <!-- Bluetooth audio (API < 31 legacy, API 31+ nouveau modèle) -->
+    <!-- Bluetooth audio (API < 31 legacy, API 31+ new model) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <!-- Maintien de l'appel en arrière-plan : sans service de premier plan « microphone »,
-         Android (11+) coupe l'accès au micro dès que l'app n'est plus visible -->
+    <!-- Keeps the call alive in the background: without a "microphone" foreground service,
+         Android (11+) cuts microphone access as soon as the app is no longer visible -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-    <!-- Notification d'appel en cours (Android 13+, demandée à l'entrée en salle) -->
+    <!-- Call-in-progress notification (Android 13+, requested when joining a room) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 

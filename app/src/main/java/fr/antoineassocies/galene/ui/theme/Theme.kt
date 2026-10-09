@@ -31,7 +31,7 @@ fun GaleneTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        // Dynamic color (Android 12+) — respecte le thème système sans télémétrie
+        // Dynamic color (Android 12+) — follows the system theme, no telemetry
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)

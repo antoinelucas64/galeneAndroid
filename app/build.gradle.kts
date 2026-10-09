@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "fr.antoineassocies.galene"
-        minSdk = 26  // Android 8.0 — couvre 95 %+ des devices actifs
+        minSdk = 26  // Android 8.0 — covers 95%+ of active devices
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"

@@ -1,94 +1,106 @@
 # Galène Android
 
-[![Licence MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+[![MIT licence](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1-7F52FF?logo=kotlin&logoColor=white)
-![Sans Google Play Services](https://img.shields.io/badge/Google%20Play%20Services-non%20requis-success)
-![Statut : prototype](https://img.shields.io/badge/statut-prototype-orange)
+![No Google Play Services](https://img.shields.io/badge/Google%20Play%20Services-not%20required-success)
+![Status: prototype](https://img.shields.io/badge/status-prototype-orange)
 
-Client Android natif, léger et respectueux de la vie privée pour le serveur de
-visioconférence libre [Galène](https://galene.org).
+A lightweight, privacy-friendly, open-source native Android client for the
+[Galène](https://galene.org) videoconferencing server.
 
-> **English summary** — A lightweight, privacy-friendly native Android client for the
-> [Galène](https://galene.org) videoconferencing server. Kotlin, Jetpack Compose and
-> libwebrtc; no Google Play Services, no telemetry. MIT licensed. Early prototype:
-> audio and video calls work, see the roadmap below.
+**[⬇ Download the APK (v0.1)](https://antoineassocies.fr/galene-0.1.apk)** — Android 8.0 or later.
 
 ---
 
-## Pourquoi
+## Why
 
-Galène n'a pas de client mobile officiel : sur téléphone, on passe par le navigateur,
-qui coupe les flux dès que l'écran s'éteint ou que l'on change d'application, et
-n'offre aucune intégration au système. Ce projet comble ce manque côté Android, dans
-l'esprit de Galène :
+On a phone, Galène is normally used through its web client. Mobile browsers cut audio
+and video as soon as the screen turns off or you switch apps, and offer no system
+integration. This project provides a native Android client in the spirit of Galène:
 
-- **Léger** : une seule Activity, peu de dépendances, démarrage rapide.
-- **Respectueux de la vie privée** : aucune télémétrie, aucun appel réseau hors du serveur Galène choisi.
-- **Sans Google** : fonctionne sur LineageOS, GrapheneOS, /e/OS, sans Google Play Services.
-- **Auditable** : code Kotlin commenté, architecture simple (voir [ARCHITECTURE.md](ARCHITECTURE.md)).
-- **Libre** : licence MIT ; publication visée sur F-Droid.
+- **Lightweight**: a single Activity, few dependencies, fast start-up.
+- **Privacy-friendly**: no telemetry, no network traffic other than to the Galène server you choose.
+- **Google-free**: runs on LineageOS, GrapheneOS and /e/OS, without Google Play Services.
+- **Auditable**: documented Kotlin code and a simple architecture (see [ARCHITECTURE.md](ARCHITECTURE.md)).
+- **Free software**: MIT licence; F-Droid publication planned.
 
-## Fonctionnalités
+### Relation to the Android client on galene.org
+
+Juliusz Chroboczek, Galène's author, distributes his own native Android client at
+[galene.org/android](https://galene.org/android/). It is audio-only, supports screen
+sharing, and its sources are not published. This project is an independent effort:
+open source from the start, with video, and a login flow modelled on the web client.
+It is not affiliated with the Galène project.
+
+## Features
 
 | | |
 |---|---|
-| ✅ Groupes publics, connexion par mot de passe, lien d'invitation ou serveur d'authentification (YunoHost…) | ✅ Audio bidirectionnel avec annulation d'écho |
-| ✅ Vidéo bidirectionnelle, caméra avant / arrière | ✅ Grille adaptative des participants, plein écran d'un appui |
-| ✅ Couper micro / caméra (la caméra s'éteint réellement) | ✅ Appel maintenu en arrière-plan (notification) |
-| ✅ Caméra coupée automatiquement en arrière-plan, rallumée au retour | ✅ Relance automatique de la connexion en cas d'échec ICE |
-| ⏳ Reconnexion après perte réseau | ⏳ Bluetooth / casque filaire |
-| ⏳ Intégration aux appels Android (ConnectionService) | ⏳ Partage d'écran, Picture-in-Picture |
+| ✅ Public group list; login by password, invitation link or authentication server (YunoHost…) | ✅ Two-way audio with echo cancellation |
+| ✅ Two-way video, front / back camera | ✅ Adaptive participant grid, tap for fullscreen |
+| ✅ Mute microphone / camera (the camera really turns off) | ✅ Call kept alive in the background (notification) |
+| ✅ Camera paused in the background, resumed on return | ✅ Automatic connection restart on ICE failure |
+| ⏳ Reconnection after network loss | ⏳ Bluetooth / wired headset routing |
+| ⏳ Android call integration (ConnectionService) | ⏳ Screen sharing, Picture-in-Picture |
+
+The user interface is currently in French; an English translation is planned.
 
 ## Installation
 
-Aucune version publiée pour l'instant : il faut construire l'APK (voir ci-dessous).
-Une publication sur F-Droid est prévue une fois l'application stabilisée.
+Download [galene-0.1.apk](https://antoineassocies.fr/galene-0.1.apk) on your phone and
+open it. Android asks you to allow installing apps from this source (your browser or
+file manager) the first time.
 
-## Utilisation
+You can also build the APK yourself (see [Building](#building)). F-Droid publication is
+planned once the app is stable.
 
-Le parcours est le même que sur le client web de Galène.
+## Usage
 
-1. **Serveur** — saisissez l'adresse du serveur (`galene.example.org`) : l'application
-   affiche ses groupes publics. Un groupe non listé se rejoint par son nom. Le dernier
-   serveur utilisé est retenu.
-2. **Groupe** — choisissez un groupe : nom d'utilisateur, mot de passe, et ce que vous
-   publiez en entrant (*Rien*, *Micro*, *Caméra + micro*). Le formulaire s'adapte au groupe :
-   - mot de passe Galène classique ;
-   - **serveur d'authentification** (`authServer`, par exemple les comptes YunoHost) :
-     vos identifiants sont vérifiés par ce serveur, qui délivre un jeton d'accès ;
-   - portail web (`authPortal`) : pas encore pris en charge, utilisez un lien d'invitation.
-3. **Salle** — en cas de refus du serveur, vous revenez au formulaire avec la raison.
+The flow is the same as in Galène's web client.
 
-**Avec un lien d'invitation** — collez-le directement dans le champ du serveur :
+1. **Server** — enter the server address (`galene.example.org`): the app lists its public
+   groups. An unlisted group can be joined by name. The last server used is remembered.
+2. **Group** — pick a group, then enter your user name, password, and what you publish on
+   joining (*Nothing*, *Microphone*, *Camera + microphone*). The form adapts to the group:
+   - plain Galène password;
+   - **authentication server** (`authServer`, e.g. YunoHost accounts): your credentials
+     are checked by that server, which issues an access token;
+   - web portal (`authPortal`): not supported yet, use an invitation link instead.
+3. **Room** — if the server refuses you, you are taken back to the form with the reason.
+
+**With an invitation link** — paste it straight into the server field:
 
 ```
-https://galene.example.org/group/ma-salle/?token=ABCDEF
+https://galene.example.org/group/my-room/?token=ABCDEF
 ```
 
-Le nom d'utilisateur devient facultatif ; il n'est demandé que si le lien l'exige.
+The user name then becomes optional; it is only asked for if the link requires it.
 
-L'application ne demande que les permissions nécessaires au choix fait (micro, caméra,
-et notifications sur Android 13+). Le mot de passe n'est jamais enregistré.
+The app only requests the permissions your choice needs (microphone, camera, and
+notifications on Android 13+). Passwords are never stored.
 
-### Côté serveur
+In the room, tap a participant to see them fullscreen; tap again or press back to
+return to the grid.
 
-Toute instance Galène parlant la version 2 du protocole convient. Pour les téléphones en
-réseau mobile ou derrière un NAT, un **serveur TURN fonctionnel** est indispensable :
-sans lui, la connexion directe échoue souvent. Voir la
-[documentation Galène](https://galene.org) sur le TURN intégré ou coturn.
+### Server side
 
-## Compiler
+Any Galène server speaking version 2 of the protocol works. For phones on mobile data or
+behind NAT, a **working TURN server** is essential: without one, direct connections
+often fail. See the [Galène documentation](https://galene.org) on the built-in TURN
+server or coturn.
 
-### Prérequis
+## Building
 
-| Outil | Version |
-|-------|---------|
-| JDK | 17 ou 21 |
+### Requirements
+
+| Tool | Version |
+|------|---------|
+| JDK | 17 or 21 |
 | Android SDK | platform `android-35`, build-tools `35.0.0` |
-| Gradle | wrapper inclus |
+| Gradle | wrapper included |
 
-Android Studio n'est pas nécessaire : tout se fait en ligne de commande.
+Android Studio is not required: everything works from the command line.
 
 ```bash
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
@@ -100,37 +112,37 @@ cd galeneAndroid
 ./gradlew assembleDebug          # → app/build/outputs/apk/debug/app-debug.apk
 ```
 
-### Installer sur un téléphone
+### Installing on a phone
 
-Activez le débogage USB sur le téléphone (l'émulateur gère mal WebRTC), puis :
+Enable USB debugging on the phone (the emulator handles WebRTC poorly), then:
 
 ```bash
-adb devices                      # le téléphone doit apparaître
+adb devices                      # the phone must be listed
 ./gradlew installDebug
 ```
 
-### Suivre les logs
+### Following the logs
 
 ```bash
 adb logcat -s GaleneClient WebRTCManager
 ```
 
-- `GaleneClient` : messages de signaling échangés avec le serveur (`→` envoyé, `←` reçu) ;
-- `WebRTCManager` : serveurs ICE, candidats locaux, états de connexion de chaque flux.
+- `GaleneClient`: signaling messages exchanged with the server (`→` sent, `←` received);
+- `WebRTCManager`: ICE servers, local candidates, connection state of each stream.
 
-En cas de plantage natif (libwebrtc), la cause est sous les tags `rtc`, `libc` et `DEBUG` :
+After a native crash (libwebrtc), the cause is under the `rtc`, `libc` and `DEBUG` tags:
 
 ```bash
 adb logcat -b crash -d
 ```
 
-### Version release
+### Release build
 
 ```bash
 ./gradlew assembleRelease
 # → app/build/outputs/apk/release/app-release-unsigned.apk
 
-# Signature (keystore à créer une seule fois)
+# Signing (create the keystore once)
 keytool -genkey -v -keystore galene-release.jks -alias galene -keyalg RSA -keysize 4096 -validity 10000
 $ANDROID_HOME/build-tools/35.0.0/apksigner sign --ks galene-release.jks \
   --out app-release-signed.apk app/build/outputs/apk/release/app-release-unsigned.apk
@@ -138,10 +150,17 @@ $ANDROID_HOME/build-tools/35.0.0/apksigner sign --ks galene-release.jks \
 
 ### Tests
 
-Les tests d'intégration valident le protocole de signaling contre un vrai serveur Galène
-(sur la JVM, sans téléphone) :
+```bash
+./gradlew :app:testDebugUnitTest
+```
+
+Unit tests run anywhere. Integration tests check the signaling protocol against a real
+Galène server (on the JVM, no phone needed); they are skipped unless a server is provided:
 
 ```bash
+export GALENE_TEST_URL=wss://galene.example.org/ws
+export GALENE_TEST_TOKEN=<the group's invitation token>
+export GALENE_TEST_GROUP=public        # optional
 ./gradlew :app:testDebugUnitTest
 ```
 
@@ -150,49 +169,49 @@ Les tests d'intégration valident le protocole de signaling contre un vrai serve
 ```
 UI (Jetpack Compose)  ServerScreen · GroupLoginScreen · RoomScreen · VideoGrid
         │
-RoomViewModel         orchestre l'appel, expose l'état à l'UI
+ViewModels            ServerViewModel · GroupLoginViewModel · RoomViewModel
         │
-Domaine               GaleneDirectory (HTTP) · GaleneClient (WebSocket) · WebRTCManager · AudioRouter
+Domain                GaleneDirectory (HTTP) · GaleneClient (WebSocket) · WebRTCManager · AudioRouter
         │
-Services Android      CallForegroundService (appel en arrière-plan)
+Android services      CallForegroundService (call in the background)
 ```
 
-| Composant | Choix |
-|-----------|-------|
-| Langage | Kotlin |
+| Component | Choice |
+|-----------|--------|
+| Language | Kotlin |
 | UI | Jetpack Compose + Material 3 |
-| WebRTC | [`io.github.webrtc-sdk:android`](https://github.com/webrtc-sdk/android) (libwebrtc sans Play Services) |
+| WebRTC | [`io.github.webrtc-sdk:android`](https://github.com/webrtc-sdk/android) (libwebrtc without Play Services) |
 | Signaling | OkHttp WebSocket |
 | JSON | kotlinx.serialization |
-| Injection | Koin |
+| Dependency injection | Koin |
 
-Le détail des packages, du protocole Galène implémenté et des flux de données est dans
-[ARCHITECTURE.md](ARCHITECTURE.md).
+Packages, the implemented subset of the Galène protocol and the data flows are detailed
+in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Feuille de route
+## Roadmap
 
-- [x] **Phase 1 — MVP audio** : connexion, authentification, audio bidirectionnel
-- [x] **Phase 2 — Vidéo et UX** : vidéo, permissions, grille, contrôles, cycle de vie
-- [ ] **Phase 3 — Robustesse** : ~~appel en arrière-plan~~ ✓, reconnexion réseau, routage audio, appels entrants
-- [ ] **Phase 4 — Intégration système** : ConnectionService, UnifiedPush, partage d'écran, PiP
-- [ ] **Phase 5 — Distribution** : build reproductible, F-Droid, documentation utilisateur
+- [x] **Phase 1 — Audio MVP**: connection, authentication, two-way audio
+- [x] **Phase 2 — Video and UX**: video, permissions, grid, controls, lifecycle, Galène-style login
+- [ ] **Phase 3 — Robustness**: ~~background calls~~ ✓, network reconnection, audio routing, incoming phone calls
+- [ ] **Phase 4 — System integration**: ConnectionService, UnifiedPush, screen sharing, PiP
+- [ ] **Phase 5 — Distribution**: reproducible builds, F-Droid, user documentation, English UI
 
-## Contribuer
+## Contributing
 
-Les retours et contributions sont bienvenus : ouvrez une
-[issue](https://github.com/antoinelucas64/galeneAndroid/issues) ou une pull request.
-Merci de joindre les logs `adb logcat -s GaleneClient WebRTCManager` à tout rapport de bug
-de connexion, en masquant les tokens et mots de passe.
+Feedback and contributions are welcome: open an
+[issue](https://github.com/antoinelucas64/galeneAndroid/issues) or a pull request.
+Please attach `adb logcat -s GaleneClient WebRTCManager` output to connection bug
+reports, with tokens and passwords masked.
 
-Les discussions sur le protocole Galène lui-même ont lieu sur la
-[liste de diffusion Galène](https://lists.galene.org).
+Discussions about the Galène protocol itself happen on the
+[Galène mailing list](https://lists.galene.org).
 
-## Auteur
+## Author
 
 **Antoine Lucas** — [Antoine & Associés](https://antoineassocies.fr)
 
-Projet indépendant, non affilié au projet Galène. Galène est développé par
-Juliusz Chroboczek (Université Paris Cité) et ses contributeurs.
+Independent project, not affiliated with the Galène project. Galène is developed by
+Juliusz Chroboczek (Université Paris Cité) and its contributors.
 
 ## Licence
 

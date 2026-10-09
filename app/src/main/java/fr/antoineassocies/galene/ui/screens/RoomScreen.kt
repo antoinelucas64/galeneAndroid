@@ -41,11 +41,11 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 /**
- * Écran de salle : grille vidéo, barre de contrôles, et gestion des effets liés à
- * l'Activity (permissions, premier plan / arrière-plan, écran maintenu allumé).
+ * Room screen: video grid, control bar, and the Activity-bound effects
+ * (permissions, foreground / background, keeping the screen on).
  *
- * Toute la logique d'appel est dans [RoomViewModel] ; cet écran ne fait qu'afficher
- * son état et lui transmettre les actions et événements système.
+ * All call logic lives in [RoomViewModel]; this screen only renders its state and
+ * forwards user actions and system events to it.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +61,7 @@ fun RoomScreen(
     val localTrack by viewModel.localVideoTrack.collectAsStateWithLifecycle()
     val remoteTracks by viewModel.remoteVideoTracks.collectAsStateWithLifecycle()
 
-    // ─── Permissions micro + caméra ────────────────────────────────────────
+    // ─── Microphone + camera permissions ──────────────────────────────────
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
@@ -71,7 +71,7 @@ fun RoomScreen(
         )
     }
     LaunchedEffect(Unit) {
-        // Seulement ce qu'exige le choix « publier » du formulaire ; écoute seule → rien à demander
+        // Only what the login form's "publish" choice requires; listen only → nothing to ask
         val present = request.present
         if (present == PresentMode.NONE) {
             viewModel.onPermissionsResult(mic = false, camera = false)
@@ -80,12 +80,12 @@ fun RoomScreen(
         permissionLauncher.launch(buildList {
             add(Manifest.permission.RECORD_AUDIO)
             if (present.usesCamera) add(Manifest.permission.CAMERA)
-            // Notification « appel en cours » ; facultative, le service tourne même si refusée
+            // "Call in progress" notification; optional, the service runs even if it is denied
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) add(Manifest.permission.POST_NOTIFICATIONS)
         }.toTypedArray())
     }
 
-    // ─── Entrée refusée → retour au formulaire avec la raison ─────────────
+    // ─── Join refused → back to the login form with the reason ────────────
     LaunchedEffect(uiState.joinFailure) {
         uiState.joinFailure?.let { failure ->
             viewModel.leave()
@@ -93,7 +93,7 @@ fun RoomScreen(
         }
     }
 
-    // ─── Premier plan / arrière-plan → caméra coupée puis rallumée ────────
+    // ─── Foreground / background → camera off, then back on ───────────────
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -107,28 +107,28 @@ fun RoomScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // ─── Écran allumé tant qu'on est dans la salle ────────────────────────
+    // ─── Screen kept on while in the room ─────────────────────────────────
     val view = LocalView.current
     DisposableEffect(view) {
         view.keepScreenOn = true
         onDispose { view.keepScreenOn = false }
     }
 
-    // ─── Tuiles : moi, flux reçus, participants sans flux ─────────────────
+    // ─── Tiles: me, received streams, participants without streams ────────
     val selfLabel = stringResource(R.string.label_me)
     val tiles = buildList {
         add(VideoTile("self", selfLabel, localTrack.takeIf { !uiState.videoMuted }, mirror = uiState.frontCamera))
         uiState.remoteStreams.forEach { add(VideoTile(it.id, it.username, remoteTracks[it.id])) }
-        // Participants sans flux (écoute seule) : tuile avatar
+        // Participants without a stream (listen only): avatar tile
         val publishing = uiState.remoteStreams.mapNotNull { it.sourceId }.toSet()
         uiState.participants
             .filter { it.id != uiState.selfId && it.id !in publishing }
             .forEach { add(VideoTile(it.id, it.username, null)) }
     }
 
-    // ─── Plein écran sur une tuile (appui), retour par appui ou bouton retour ─
+    // ─── Fullscreen on a tile (tap); back with a tap or the back button ───
     var focusedKey by rememberSaveable { mutableStateOf<String?>(null) }
-    // La personne est partie ou a cessé de publier : on revient à la grille
+    // The person left or stopped publishing: back to the grid
     val focused = tiles.firstOrNull { it.key == focusedKey }
         .takeIf { uiState.connectionState == ConnectionState.Connected }
     BackHandler(enabled = focused != null) { focusedKey = null }
@@ -138,7 +138,7 @@ fun RoomScreen(
         return
     }
 
-    // ─── Erreur (JoinFailed / Disconnected avec raison) ───────────────────
+    // ─── Error (connection lost with a reason) ────────────────────────────
     uiState.errorMessage?.let { msg ->
         AlertDialog(
             onDismissRequest = {},
@@ -180,7 +180,7 @@ fun RoomScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // ─── Barre d'état connexion ───────────────────────────────────
+            // ─── Connection status bar ────────────────────────────────────
             when (uiState.connectionState) {
                 ConnectionState.Connecting    -> LinearProgressIndicator(Modifier.fillMaxWidth())
                 ConnectionState.Connected     -> {}
@@ -195,7 +195,7 @@ fun RoomScreen(
                 }
             }
 
-            // ─── Ligne de statut debug ────────────────────────────────────
+            // ─── Debug status line ────────────────────────────────────────
             if (uiState.statusText.isNotEmpty()) {
                 Text(
                     text = uiState.statusText,
@@ -208,7 +208,7 @@ fun RoomScreen(
                 )
             }
 
-            // ─── Contenu principal ────────────────────────────────────────
+            // ─── Main content ─────────────────────────────────────────────
             if (uiState.connectionState == ConnectionState.Connected) {
                 VideoGrid(
                     tiles, viewModel.eglContext,
@@ -240,7 +240,7 @@ fun RoomScreen(
     }
 }
 
-/** Barre du bas : micro, caméra, bascule de caméra, raccrocher. */
+/** Bottom bar: microphone, camera, camera switch, hang up. */
 @Composable
 private fun RoomControls(
     audioMuted: Boolean,
@@ -259,7 +259,7 @@ private fun RoomControls(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Grisés quand on ne publie pas ce média (écoute seule, permission refusée)
+            // Disabled when this media is not published (listen only, permission denied)
             IconButton(onClick = onToggleAudio, enabled = micAvailable) {
                 Icon(
                     imageVector = if (audioMuted) Icons.Default.MicOff else Icons.Default.Mic,
@@ -292,8 +292,8 @@ private fun RoomControls(
 }
 
 /**
- * Masque les barres système (état, navigation) tant que [enabled] : vrai plein écran.
- * Un balayage depuis le bord les fait réapparaître temporairement.
+ * Hides the system bars (status, navigation) while [enabled]: true fullscreen.
+ * A swipe from the edge brings them back temporarily.
  */
 @Composable
 private fun ImmersiveMode(enabled: Boolean) {

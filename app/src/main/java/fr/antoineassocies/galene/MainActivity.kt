@@ -8,10 +8,10 @@ import fr.antoineassocies.galene.ui.GaleneNavHost
 import fr.antoineassocies.galene.ui.theme.GaleneTheme
 
 /**
- * Unique Activity de l'app : héberge la navigation Compose ([GaleneNavHost]).
+ * The app's single Activity: hosts the Compose navigation ([GaleneNavHost]).
  *
- * Déclarée `singleTop` au manifeste, pour que la notification d'appel en cours ramène
- * dans l'appel existant au lieu d'ouvrir une seconde instance.
+ * Declared `singleTop` in the manifest, so that the call notification brings the user
+ * back to the ongoing call instead of opening a second instance.
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

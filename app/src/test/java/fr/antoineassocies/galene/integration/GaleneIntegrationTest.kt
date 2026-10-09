@@ -8,22 +8,22 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * Integration tests contre le serveur Galène réel.
+ * Integration tests against a real Galène server.
  *
- * Ces tests valident le chemin complet de signaling : connexion WS → handshake → authentification
- * par token → présence multi-clients → échange SDP (offer/answer).
+ * They validate the whole signaling path: WS connection → handshake → token
+ * authentication → multi-client presence → SDP exchange (offer/answer).
  *
- * Ils sont exécutables depuis la JVM sans device Android.
- * La couche WebRTC réelle (flux audio/vidéo) nécessite un test instrumenté sur appareil physique.
+ * They run on the JVM, without an Android device. The real WebRTC layer (audio/video
+ * streams) requires an instrumented test on a physical device.
  *
- * Le serveur de test est fourni par l'environnement (aucun secret dans le dépôt) :
+ * The test server comes from the environment (no secret in the repository):
  *
  *     export GALENE_TEST_URL=wss://galene.example.org/ws
- *     export GALENE_TEST_TOKEN=<token d'invitation du groupe>
- *     export GALENE_TEST_GROUP=public        # optionnel, « public » par défaut
+ *     export GALENE_TEST_TOKEN=<the group's invitation token>
+ *     export GALENE_TEST_GROUP=public        # optional, "public" by default
  *     ./gradlew :app:test --tests "*.GaleneIntegrationTest"
  *
- * Sans GALENE_TEST_URL ni GALENE_TEST_TOKEN, les tests sont ignorés (pas en échec).
+ * Without GALENE_TEST_URL and GALENE_TEST_TOKEN, the tests are skipped (not failed).
  */
 class GaleneIntegrationTest {
 
@@ -34,7 +34,7 @@ class GaleneIntegrationTest {
         const val USER_A = "claude-test-a"
         const val USER_B = "claude-test-b"
 
-        // SDP audio-only minimal mais syntaxiquement valide pour pion/webrtc (serveur Galène)
+        // Minimal audio-only SDP, syntactically valid for pion/webrtc (Galène server)
         val OFFER_SDP = """
             v=0
             o=- 1000000000 1 IN IP4 127.0.0.1
@@ -57,18 +57,18 @@ class GaleneIntegrationTest {
         """.trimIndent()
     }
 
-    // ─── 1. Connexion WebSocket ────────────────────────────────────────────────
+    // ─── 1. WebSocket connection ───────────────────────────────────────────────
 
     @Before
     fun requireServer() {
         assumeTrue(
-            "GALENE_TEST_URL et GALENE_TEST_TOKEN non définis : tests d'intégration ignorés",
+            "GALENE_TEST_URL and GALENE_TEST_TOKEN not set: integration tests skipped",
             WS_URL.isNotEmpty() && TOKEN.isNotEmpty(),
         )
     }
 
     @Test
-    fun `handshake avec le serveur reussit`() = runBlocking {
+    fun `handshake with the server succeeds`() = runBlocking {
         GaleneTestClient(WS_URL).use { client ->
             client.connect()
             val event = client.awaitEvent { it is SignalingEvent.Connected }
@@ -76,10 +76,10 @@ class GaleneIntegrationTest {
         }
     }
 
-    // ─── 2. Authentification par token ────────────────────────────────────────
+    // ─── 2. Token authentication ──────────────────────────────────────────────
 
     @Test
-    fun `rejoindre avec token valide accorde permission present`() = runBlocking {
+    fun `joining with a valid token grants the present permission`() = runBlocking {
         GaleneTestClient(WS_URL).use { client ->
             client.connect()
             client.awaitEvent { it is SignalingEvent.Connected }
@@ -87,68 +87,68 @@ class GaleneIntegrationTest {
             client.sendJoin(GROUP, USER_A, token = TOKEN)
             val event = client.awaitEvent { it is SignalingEvent.Joined || it is SignalingEvent.JoinFailed }
 
-            assertTrue("Attendu Joined, reçu : $event", event is SignalingEvent.Joined)
+            assertTrue("Expected Joined, got: $event", event is SignalingEvent.Joined)
             val joined = event as SignalingEvent.Joined
             assertEquals(GROUP, joined.group)
             assertEquals(USER_A, joined.username)
-            assertTrue("Permission 'present' requise", "present" in joined.permissions)
+            assertTrue("'present' permission required", "present" in joined.permissions)
         }
     }
 
     @Test
-    fun `rejoindre sans token est refuse`() = runBlocking {
+    fun `joining without a token is refused`() = runBlocking {
         GaleneTestClient(WS_URL).use { client ->
             client.connect()
             client.awaitEvent { it is SignalingEvent.Connected }
 
-            client.sendJoin(GROUP, "intrus-sans-auth")  // pas de token
+            client.sendJoin(GROUP, "intruder-no-auth")  // no token
             val event = client.awaitEvent { it is SignalingEvent.Joined || it is SignalingEvent.JoinFailed }
 
-            assertTrue("Attendu JoinFailed, reçu : $event", event is SignalingEvent.JoinFailed)
+            assertTrue("Expected JoinFailed, got: $event", event is SignalingEvent.JoinFailed)
             val failed = event as SignalingEvent.JoinFailed
             assertNotNull(failed.message ?: failed.error)
         }
     }
 
-    // ─── 3. Présence multi-clients ─────────────────────────────────────────────
+    // ─── 3. Multi-client presence ──────────────────────────────────────────────
 
     @Test
-    fun `deux clients dans la meme salle se voient via user events`() = runBlocking {
+    fun `two clients in the same group see each other through user events`() = runBlocking {
         GaleneTestClient(WS_URL).use { clientA ->
         GaleneTestClient(WS_URL).use { clientB ->
-            // Client A rejoint
+            // Client A joins
             clientA.connect()
             clientA.awaitEvent { it is SignalingEvent.Connected }
             clientA.sendJoin(GROUP, USER_A, token = TOKEN)
             val joinedA = clientA.awaitEvent { it is SignalingEvent.Joined } as SignalingEvent.Joined
             assertEquals(USER_A, joinedA.username)
 
-            // Client B rejoint
+            // Client B joins
             clientB.connect()
             clientB.awaitEvent { it is SignalingEvent.Connected }
             clientB.sendJoin(GROUP, USER_B, token = TOKEN)
             val joinedB = clientB.awaitEvent { it is SignalingEvent.Joined } as SignalingEvent.Joined
             assertEquals(USER_B, joinedB.username)
 
-            // A doit recevoir un événement "user add" pour B
-            val aVoitB = clientA.awaitEvent(timeoutMs = 5_000) { e ->
+            // A must receive a "user add" event for B
+            val aSeesB = clientA.awaitEvent(timeoutMs = 5_000) { e ->
                 e is SignalingEvent.UserUpdate && e.kind == "add" && e.username == USER_B
             } as SignalingEvent.UserUpdate
-            assertEquals(USER_B, aVoitB.username)
+            assertEquals(USER_B, aSeesB.username)
 
-            // B doit voir A (déjà présent quand B a rejoint — événement arrivé juste après joined)
-            val bVoitA = clientB.awaitEvent(timeoutMs = 5_000) { e ->
+            // B must see A (already present when B joined — event arrives right after joined)
+            val bSeesA = clientB.awaitEvent(timeoutMs = 5_000) { e ->
                 e is SignalingEvent.UserUpdate && e.kind == "add" && e.username == USER_A
             } as SignalingEvent.UserUpdate
-            assertEquals(USER_A, bVoitA.username)
+            assertEquals(USER_A, bSeesA.username)
         }}
     }
 
     @Test
-    fun `quitter la salle envoie un user delete aux autres clients`() = runBlocking {
+    fun `leaving the group sends a user delete to the other clients`() = runBlocking {
         GaleneTestClient(WS_URL).use { clientA ->
         GaleneTestClient(WS_URL).use { clientB ->
-            // Les deux rejoignent
+            // Both join
             clientA.connect()
             clientA.awaitEvent { it is SignalingEvent.Connected }
             clientA.sendJoin(GROUP, USER_A, token = TOKEN)
@@ -159,26 +159,26 @@ class GaleneIntegrationTest {
             clientB.sendJoin(GROUP, USER_B, token = TOKEN)
             clientB.awaitEvent { it is SignalingEvent.Joined }
 
-            // Attendre que A voit B
+            // Wait until A sees B
             clientA.awaitEvent(5_000) { e ->
                 e is SignalingEvent.UserUpdate && e.kind == "add" && e.username == USER_B
             }
 
-            // B quitte explicitement
+            // B leaves explicitly
             clientB.close()
 
-            // A doit recevoir un "user delete" pour B
-            val aVoitDepartB = clientA.awaitEvent(timeoutMs = 8_000) { e ->
+            // A must receive a "user delete" for B
+            val aSeesBLeave = clientA.awaitEvent(timeoutMs = 8_000) { e ->
                 e is SignalingEvent.UserUpdate && e.kind == "delete" && e.username == USER_B
             } as SignalingEvent.UserUpdate
-            assertEquals("delete", aVoitDepartB.kind)
+            assertEquals("delete", aSeesBLeave.kind)
         }}
     }
 
-    // ─── 4. Configuration RTC ─────────────────────────────────────────────────
+    // ─── 4. RTC configuration ─────────────────────────────────────────────────
 
     @Test
-    fun `serveur fournit une configuration RTC avec serveur TURN`() = runBlocking {
+    fun `server provides an RTC configuration with a TURN server`() = runBlocking {
         GaleneTestClient(WS_URL).use { client ->
             client.connect()
             client.awaitEvent { it is SignalingEvent.Connected }
@@ -187,32 +187,32 @@ class GaleneIntegrationTest {
             val joined = client.awaitEvent { it is SignalingEvent.Joined } as SignalingEvent.Joined
 
             val rtcConfig = joined.rtcConfiguration
-            assertNotNull("Le serveur doit renvoyer rtcConfiguration", rtcConfig)
+            assertNotNull("The server must send rtcConfiguration", rtcConfig)
 
             val iceServers = rtcConfig!!.iceServers
-            assertNotNull("iceServers doit être présent", iceServers)
-            assertTrue("Au moins un ICE server requis", iceServers!!.isNotEmpty())
+            assertNotNull("iceServers must be present", iceServers)
+            assertTrue("At least one ICE server required", iceServers!!.isNotEmpty())
 
-            // Vérifie qu'il y a au moins un TURN avec credentials (nécessaire derrière NAT symétrique)
+            // Check there is at least one TURN server with credentials (needed behind symmetric NAT)
             val turnServers = iceServers.filter { it.urls.any { u -> u.startsWith("turn:") } }
-            assertTrue("Au moins un serveur TURN attendu", turnServers.isNotEmpty())
+            assertTrue("At least one TURN server expected", turnServers.isNotEmpty())
 
             val hasCreds = turnServers.any { it.username != null && it.credential != null }
-            assertTrue("Les serveurs TURN doivent avoir des credentials", hasCreds)
+            assertTrue("TURN servers must have credentials", hasCreds)
         }
     }
 
-    // ─── 5. Échange SDP (signaling WebRTC) ────────────────────────────────────
+    // ─── 5. SDP exchange (WebRTC signaling) ───────────────────────────────────
 
     /**
-     * Valide que le SFU Galène accepte un SDP offer du présentateur et renvoie un answer.
-     * Si ce test passe, la négociation WebRTC peut démarrer — la visio peut s'établir.
+     * Checks that Galène's SFU accepts an SDP offer from the presenter and sends an answer.
+     * If this passes, WebRTC negotiation can start — the call can be established.
      *
-     * Note : L'ICE utilisé ici est fictif, donc la connexion media échouera ensuite.
-     * Mais le chemin de signaling (offer → answer du SFU) est vérifié.
+     * Note: the ICE data used here is fake, so the media connection fails afterwards.
+     * But the signaling path (offer → SFU answer) is verified.
      */
     @Test
-    fun `sfu repond avec un SDP answer a l offer du presentateur`() = runBlocking {
+    fun `sfu answers the presenter's offer with an SDP answer`() = runBlocking {
         val streamId = "test-${System.currentTimeMillis()}"
 
         GaleneTestClient(WS_URL).use { presenter ->
@@ -223,7 +223,7 @@ class GaleneIntegrationTest {
 
             presenter.sendOffer(streamId, "audio", OFFER_SDP)
 
-            // Le SFU doit répondre : soit un answer (SDP valide), soit un abort (SDP rejeté)
+            // The SFU must reply: either an answer (valid SDP) or an abort (SDP rejected)
             val response = presenter.awaitEvent(timeoutMs = 15_000) { e ->
                 (e is SignalingEvent.RemoteAnswer && e.id == streamId) ||
                 (e is SignalingEvent.StreamAbort && e.id == streamId)
@@ -232,68 +232,68 @@ class GaleneIntegrationTest {
             when (response) {
                 is SignalingEvent.RemoteAnswer -> {
                     assertEquals(streamId, response.id)
-                    assertTrue("L'answer SDP ne doit pas être vide", response.sdp.isNotBlank())
-                    // Un answer WebRTC valide contient toujours une ligne audio
-                    assertTrue("L'answer SDP doit contenir une section audio", response.sdp.contains("m=audio"))
+                    assertTrue("The SDP answer must not be empty", response.sdp.isNotBlank())
+                    // A valid WebRTC answer always contains an audio section
+                    assertTrue("The SDP answer must contain an audio section", response.sdp.contains("m=audio"))
                 }
                 is SignalingEvent.StreamAbort -> {
-                    // Le SFU a rejeté le SDP (fingerprint inconnu ou codec non supporté).
-                    // Le signaling fonctionne : le serveur a traité l'offer et répondu.
+                    // The SFU rejected the SDP (unknown fingerprint or unsupported codec).
+                    // Signaling works: the server processed the offer and replied.
                     assertEquals(streamId, response.id)
                 }
-                else -> fail("Réponse inattendue : $response")
+                else -> fail("Unexpected response: $response")
             }
         }
     }
 
     /**
-     * Valide le relai complet : présentateur envoie un offer → SFU répond → observateur reçoit
-     * un offer du SFU (preuve que le SFU peut router les streams entre les deux clients).
+     * Checks the full relay: presenter sends an offer → SFU answers → observer receives an
+     * offer from the SFU (proof that the SFU can route streams between the two clients).
      */
     @Test
-    fun `sfu relaie le stream vers l observateur`() = runBlocking {
+    fun `sfu relays the stream to the observer`() = runBlocking {
         val streamId = "relay-${System.currentTimeMillis()}"
 
         GaleneTestClient(WS_URL).use { presenter ->
         GaleneTestClient(WS_URL).use { observer ->
-            // Présentateur rejoint et envoie un offer
+            // Presenter joins and sends an offer
             presenter.connect()
             presenter.awaitEvent { it is SignalingEvent.Connected }
             presenter.sendJoin(GROUP, USER_A, token = TOKEN)
             presenter.awaitEvent { it is SignalingEvent.Joined }
             presenter.sendOffer(streamId, "audio", OFFER_SDP)
 
-            // Attendre la réponse du SFU au présentateur (answer ou abort)
+            // Wait for the SFU's reply to the presenter (answer or abort)
             val sfuResponse = presenter.awaitEvent(timeoutMs = 15_000) { e ->
                 (e is SignalingEvent.RemoteAnswer && e.id == streamId) ||
                 (e is SignalingEvent.StreamAbort && e.id == streamId)
             }
 
-            // Si le SFU a aborté l'offer (SDP de test rejeté), le test ne peut pas continuer
+            // If the SFU aborted the offer (test SDP rejected), the test cannot go on
             if (sfuResponse is SignalingEvent.StreamAbort) {
-                // Le signaling fonctionne mais le SDP minimal a été rejeté.
-                // Ce cas ne bloque pas la production (des SDPs réels viennent du stack WebRTC Android).
+                // Signaling works but the minimal SDP was rejected.
+                // Not a production problem (real SDPs come from the Android WebRTC stack).
                 return@runBlocking
             }
 
-            // L'observateur rejoint et demande les streams
+            // The observer joins and requests the streams
             observer.connect()
             observer.awaitEvent { it is SignalingEvent.Connected }
             observer.sendJoin(GROUP, USER_B, token = TOKEN)
             observer.awaitEvent { it is SignalingEvent.Joined }
             observer.sendRequest(mapOf("" to listOf("audio", "video")))
 
-            // Le SFU doit envoyer un offer à l'observateur pour le stream du présentateur
+            // The SFU must send the observer an offer for the presenter's stream
             val offerForObserver = observer.awaitEvent(timeoutMs = 15_000) { e ->
                 e is SignalingEvent.RemoteOffer
             } as SignalingEvent.RemoteOffer
 
-            assertTrue("L'offer SDP envoyé à l'observateur ne doit pas être vide", offerForObserver.sdp.isNotBlank())
-            assertTrue("L'offer pour l'observateur doit contenir une section audio",
+            assertTrue("The SDP offer sent to the observer must not be empty", offerForObserver.sdp.isNotBlank())
+            assertTrue("The observer's offer must contain an audio section",
                 offerForObserver.sdp.contains("m=audio"))
 
-            // L'observateur envoie un answer minimal pour terminer proprement la négociation
-            // (ICE échouera ensuite faute de candidates réels — comportement attendu en test JVM)
+            // The observer would answer to complete negotiation; ICE would then fail for lack
+            // of real candidates — expected in a JVM test
         }}
     }
 }

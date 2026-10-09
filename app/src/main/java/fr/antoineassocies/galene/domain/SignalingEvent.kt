@@ -4,15 +4,15 @@ import fr.antoineassocies.galene.domain.protocol.IceCandidateJson
 import fr.antoineassocies.galene.domain.protocol.RtcConfigurationJson
 
 /**
- * Événements de haut niveau produits par [GaleneClient] à partir des messages du serveur.
+ * High-level events produced by [GaleneClient] from the server's messages.
  *
- * Le ViewModel ne voit jamais le JSON du protocole : il réagit uniquement à ces événements.
+ * The ViewModel never sees the protocol's JSON: it only reacts to these events.
  */
 sealed class SignalingEvent {
-    /** Handshake accepté ; on peut envoyer le `join`. */
+    /** Handshake accepted; the `join` can be sent. */
     data class Connected(val serverId: String?) : SignalingEvent()
 
-    /** Entrée dans le groupe acceptée (`joined` kind=join), ou droits modifiés (kind=change). */
+    /** Group join accepted (`joined` kind=join), or permissions changed (kind=change). */
     data class Joined(
         val group: String,
         val username: String,
@@ -21,18 +21,18 @@ sealed class SignalingEvent {
     ) : SignalingEvent()
 
     /**
-     * Entrée refusée.
-     * @property error code machine éventuel, ex. `need-username` (le lien d'invitation exige un nom)
-     * @property message explication lisible envoyée par le serveur (« not authorised »…)
+     * Join refused.
+     * @property error optional machine-readable code, e.g. `need-username` (the invitation link requires a name)
+     * @property message human-readable explanation sent by the server ("not authorised"…)
      */
     data class JoinFailed(val error: String?, val message: String?) : SignalingEvent() {
         val needsUsername: Boolean get() = error == "need-username"
     }
 
-    /** Le serveur nous a fait sortir du groupe. */
+    /** The server made us leave the group. */
     data class JoinLeft(val group: String) : SignalingEvent()
 
-    /** Arrivée, modification ou départ d'un participant. */
+    /** A participant arrived, changed or left. */
     data class UserUpdate(
         val kind: String,       // "add" | "change" | "delete"
         val id: String,
@@ -41,8 +41,8 @@ sealed class SignalingEvent {
     ) : SignalingEvent()
 
     /**
-     * Le serveur propose un flux descendant (média publié par un autre participant).
-     * [replace] désigne un ancien flux que celui-ci remplace.
+     * The server offers a down stream (media published by another participant).
+     * [replace] names an older stream that this one replaces.
      */
     data class RemoteOffer(
         val id: String,
@@ -53,21 +53,21 @@ sealed class SignalingEvent {
         val replace: String?,
     ) : SignalingEvent()
 
-    /** Réponse du serveur à notre offre de flux montant. */
+    /** The server's answer to our up stream offer. */
     data class RemoteAnswer(val id: String, val sdp: String) : SignalingEvent()
 
-    /** Candidat ICE du serveur pour le stream [id]. */
+    /** Server ICE candidate for stream [id]. */
     data class RemoteIce(val id: String, val candidate: IceCandidateJson) : SignalingEvent()
 
-    /** Le serveur ferme un flux descendant (l'émetteur a arrêté de publier ou est parti). */
+    /** The server closes a down stream (the sender stopped publishing or left). */
     data class StreamClose(val id: String) : SignalingEvent()
 
-    /** Le serveur refuse ou interrompt notre flux montant. */
+    /** The server refuses or interrupts our up stream. */
     data class StreamAbort(val id: String) : SignalingEvent()
 
-    /** Le serveur constate un échec ICE sur notre flux montant et demande un ICE restart. */
+    /** The server saw an ICE failure on our up stream and asks for an ICE restart. */
     data class Renegotiate(val id: String) : SignalingEvent()
 
-    /** WebSocket fermé ; [reason] est null pour une fermeture normale demandée par nous. */
+    /** WebSocket closed; [reason] is null for a normal closure that we requested. */
     data class Disconnected(val reason: String? = null) : SignalingEvent()
 }

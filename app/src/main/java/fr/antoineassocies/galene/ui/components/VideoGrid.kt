@@ -23,7 +23,7 @@ import org.webrtc.VideoTrack
 import kotlin.math.ceil
 import kotlin.math.sqrt
 
-/** Une case de la grille : un participant, avec ou sans vidéo. */
+/** One grid cell: a participant, with or without video. */
 data class VideoTile(
     val key: String,
     val label: String,
@@ -32,9 +32,9 @@ data class VideoTile(
 )
 
 /**
- * Grille qui remplit tout l'espace disponible : n tuiles → ⌈√n⌉ colonnes.
- * Pas de scroll : au-delà d'une dizaine de participants les tuiles deviennent petites,
- * acceptable pour l'usage visé (petites réunions).
+ * Grid filling all available space: n tiles → ⌈√n⌉ columns.
+ * No scrolling: beyond a dozen participants tiles get small, which is acceptable
+ * for the intended use (small meetings).
  */
 @Composable
 fun VideoGrid(
@@ -55,7 +55,7 @@ fun VideoGrid(
                         TileView(tile, eglContext, Modifier.weight(1f).fillMaxHeight(), onClick = { onTileClick(tile) })
                     }
                 }
-                // Cases vides pour garder des tuiles de même largeur sur la dernière ligne
+                // Empty cells keep tiles the same width on the last row
                 repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
@@ -63,8 +63,8 @@ fun VideoGrid(
 }
 
 /**
- * Un participant seul sur tout l'espace disponible. La vidéo est affichée entière
- * (bandes noires si besoin) plutôt que recadrée : on veut tout voir, ex. un tableau.
+ * A single participant over all available space. The video is shown whole
+ * (letterboxed if needed) rather than cropped: everything should be visible, e.g. a whiteboard.
  */
 @Composable
 fun FullscreenTile(
@@ -124,16 +124,16 @@ private fun TileView(
                 .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
                 .padding(horizontal = 6.dp, vertical = 2.dp)
         )
-        // Calque transparent au-dessus du SurfaceView : les touchers arrivent à Compose,
-        // pas à la vue native qui les ignorerait ou les avalerait selon les versions
+        // Transparent layer above the SurfaceView: touches reach Compose, not the native
+        // view, which would ignore or swallow them depending on the version
         Box(Modifier.matchParentSize().clickable(onClick = onClick))
     }
 }
 
 /**
- * Affiche une piste WebRTC dans un SurfaceViewRenderer.
- * Le `key(track)` recrée la vue si la piste change, pour ne jamais garder un sink orphelin.
- * Les runCatching couvrent le cas où la PeerConnection a déjà libéré la piste (stream fermé).
+ * Renders a WebRTC track in a SurfaceViewRenderer.
+ * `key(track)` recreates the view if the track changes, so no orphan sink is ever kept.
+ * The runCatching calls cover a PeerConnection that already released the track (stream closed).
  */
 @Composable
 fun VideoRenderer(

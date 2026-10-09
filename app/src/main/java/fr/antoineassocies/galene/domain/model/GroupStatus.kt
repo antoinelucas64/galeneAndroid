@@ -3,17 +3,17 @@ package fr.antoineassocies.galene.domain.model
 import kotlinx.serialization.Serializable
 
 /**
- * Description publique d'un groupe Galène, telle que servie par `/group/<nom>/.status`
- * et, sous forme de liste, par `/public-groups.json`.
+ * Public description of a Galène group, as served by `/group/<name>/.status`
+ * and, as a list, by `/public-groups.json`.
  *
- * Seuls [name] et [location] sont garantis ; le reste dépend de la configuration du groupe.
+ * Only [name] and [location] are guaranteed; the rest depends on the group's configuration.
  *
- * @property location URL web du groupe (`https://hôte/group/<nom>/`)
- * @property endpoint URL du WebSocket de signaling à utiliser (`wss://hôte/ws`)
- * @property authServer si présent, le mot de passe est vérifié par ce serveur
- *   (ex. comptes YunoHost), qui délivre un jeton pour le `join`
- * @property authPortal si présent, l'authentification se fait sur ce portail web (SSO)
- * @property locked groupe verrouillé par un opérateur : seuls les opérateurs peuvent entrer
+ * @property location web URL of the group (`https://host/group/<name>/`)
+ * @property endpoint URL of the signaling WebSocket to use (`wss://host/ws`)
+ * @property authServer if present, the password is checked by this server
+ *   (e.g. YunoHost accounts), which issues a token for the `join`
+ * @property authPortal if present, authentication happens on this web portal (SSO)
+ * @property locked group locked by an operator: only operators may join
  */
 @Serializable
 data class GroupStatus(
@@ -27,6 +27,6 @@ data class GroupStatus(
     val locked: Boolean = false,
     val clientCount: Int? = null,
 ) {
-    /** Nom à afficher : celui choisi par l'administrateur, sinon le nom technique. */
+    /** Name to display: the one chosen by the administrator, or else the technical name. */
     val title: String get() = displayName?.takeIf { it.isNotBlank() } ?: name
 }

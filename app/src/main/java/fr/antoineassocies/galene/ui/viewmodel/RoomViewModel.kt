@@ -21,14 +21,14 @@ import org.webrtc.EglBase
 import org.webrtc.VideoTrack
 import java.util.UUID
 
-/** Flux descendant reçu du serveur (un par média publié par un autre participant). */
+/** Down stream received from the server (one per media published by another participant). */
 data class RemoteStream(
     val id: String,
     val sourceId: String?,
     val username: String,
 )
 
-/** État complet de l'écran de salle, observé par [fr.antoineassocies.galene.ui.screens.RoomScreen]. */
+/** Complete state of the room screen, observed by [fr.antoineassocies.galene.ui.screens.RoomScreen]. */
 data class RoomUiState(
     val connectionState: ConnectionState = ConnectionState.Disconnected,
     val audioMuted: Boolean = false,
@@ -36,29 +36,29 @@ data class RoomUiState(
     val participants: List<Participant> = emptyList(),
     val remoteStreams: List<RemoteStream> = emptyList(),
     val selfId: String = "",
-    val sendingAudio: Boolean = false,      // le micro est publié
-    val sendingVideo: Boolean = false,      // une caméra est ouverte et publiée
-    val frontCamera: Boolean = true,        // pour le miroir de l'aperçu local
+    val sendingAudio: Boolean = false,      // the microphone is published
+    val sendingVideo: Boolean = false,      // a camera is open and published
+    val frontCamera: Boolean = true,        // to mirror the local preview
     val selfUsername: String = "",
     val errorMessage: String? = null,
-    /** Entrée refusée par le serveur : l'écran revient au formulaire de connexion. */
+    /** Join refused by the server: the screen goes back to the login form. */
     val joinFailure: SignalingEvent.JoinFailed? = null,
-    val statusText: String = "",            // info debug visible dans l'UI
+    val statusText: String = "",            // debug line shown in the UI
 )
 
 /**
- * Chef d'orchestre d'un appel : relie le signaling ([GaleneClient]), les médias
- * ([WebRTCManager]) et le routage audio ([AudioRouter]), et expose l'état à l'UI.
+ * Conductor of a call: ties together signaling ([GaleneClient]), media ([WebRTCManager])
+ * and audio routing ([AudioRouter]), and exposes the state to the UI.
  *
- * Déroulé d'un appel :
- * 1. `init` : connexion WebSocket ;
- * 2. handshake → `join` ; `joined` → configuration ICE, requête des flux à recevoir ;
- * 3. une fois joint ET les permissions répondues → publication du flux montant ;
- * 4. chaque `offer` du serveur → un flux descendant affiché dans la grille ;
- * 5. [leave] (ou destruction du ViewModel) → tout est libéré.
+ * Course of a call:
+ * 1. `init`: WebSocket connection;
+ * 2. handshake → `join`; `joined` → ICE configuration, request for the streams to receive;
+ * 3. once joined AND permissions answered → the up stream is published;
+ * 4. each server `offer` → a down stream shown in the grid;
+ * 5. [leave] (or ViewModel destruction) → everything is released.
  *
- * Le ViewModel vit aussi longtemps que l'appel : il survit aux rotations d'écran
- * et au passage en arrière-plan (couvert par [CallForegroundService]).
+ * The ViewModel lives as long as the call: it survives screen rotations and going
+ * to the background (covered by [CallForegroundService]).
  */
 class RoomViewModel(
     private val appContext: Context,
@@ -71,36 +71,36 @@ class RoomViewModel(
     private val _uiState = MutableStateFlow(RoomUiState(selfId = galeneClient.clientId))
     val uiState: StateFlow<RoomUiState> = _uiState.asStateFlow()
 
-    // Exposés tels quels pour les renderers vidéo de l'UI
+    // Exposed as-is for the UI's video renderers
     val eglContext: EglBase.Context get() = webRTCManager.eglContext
     val localVideoTrack: StateFlow<VideoTrack?> = webRTCManager.localVideoTrack
     val remoteVideoTracks: StateFlow<Map<String, VideoTrack>> = webRTCManager.remoteVideoTracks
 
-    // Maintenu localement pour savoir si on a le droit d'émettre
+    // Kept locally to know whether we are allowed to publish
     private var selfPermissions: List<String> = emptyList()
 
-    // ID du stream uplink actif
+    // ID of the active up stream
     private var uplinkStreamId: String? = null
 
-    // L'uplink démarre seulement quand on est joint ET que les permissions ont été répondues,
-    // quel que soit l'ordre d'arrivée des deux (le joined précède souvent la réponse à la popup)
+    // The uplink starts only once joined AND permissions have been answered, in whichever
+    // order these arrive (`joined` often comes before the answer to the permission dialog)
     private var joined = false
     private var permissionsAnswered = false
     private var micGranted = false
     private var cameraGranted = false
     private var uplinkRequested = false
 
-    // Caméra coupée par le passage en arrière-plan (et non par l'utilisateur) → à rallumer au retour
+    // Camera turned off by going to the background (not by the user) → turn back on when returning
     private var videoPausedByBackground = false
 
     init {
-        _uiState.update { it.copy(statusText = "Connexion à ${request.endpoint}…") }
+        _uiState.update { it.copy(statusText = "Connecting to ${request.endpoint}…") }
         observeSignaling()
         observeConnectionState()
         webRTCManager.onLocalIceCandidate = { streamId, candidate ->
             galeneClient.sendIce(streamId, candidate)
         }
-        // Même stratégie que le client web : on relance sans attendre le renegotiate du serveur
+        // Same strategy as the web client: restart without waiting for the server's renegotiate
         webRTCManager.onIceFailed = { streamId, up ->
             if (up) restartUplinkIce(streamId) else galeneClient.sendRenegotiate(streamId)
         }
@@ -112,7 +112,7 @@ class RoomViewModel(
         viewModelScope.launch {
             delay(15_000)
             if (_uiState.value.connectionState == ConnectionState.Connecting) {
-                val msg = "Pas de réponse après 15 s — vérifier l'URL et le réseau\n${request.endpoint}"
+                val msg = "Pas de réponse après 15 s — vérifiez l'adresse et le réseau\n${request.endpoint}"
                 _uiState.update { it.copy(statusText = msg, errorMessage = msg) }
                 galeneClient.disconnect()
             }
@@ -131,13 +131,13 @@ class RoomViewModel(
                     }
 
                     is SignalingEvent.Joined -> {
-                        _uiState.update { it.copy(statusText = "Connecté · ${event.permissions.joinToString()}") }
+                        _uiState.update { it.copy(statusText = "Joined · ${event.permissions.joinToString()}") }
                         selfPermissions = event.permissions
                         webRTCManager.applyRtcConfiguration(event.rtcConfiguration)
                         audioRouter.start()
                         _uiState.update { it.copy(selfUsername = event.username) }
 
-                        // Déclarer ce qu'on veut recevoir (audio pour Phase 1)
+                        // Declare what we want to receive
                         galeneClient.sendRequest(mapOf("" to listOf("audio", "video")))
 
                         joined = true
@@ -157,10 +157,10 @@ class RoomViewModel(
                     is SignalingEvent.RemoteOffer -> handleRemoteOffer(event)
 
                     is SignalingEvent.RemoteAnswer -> {
-                        // launch sur Main.immediate : settingRemote est posé avant que l'ICE suivant soit traité
+                        // launch on Main.immediate: settingRemote is set before the next ICE event is handled
                         viewModelScope.launch {
                             runCatching { webRTCManager.handleUpstreamAnswer(event.id, event.sdp) }
-                                .onFailure { _uiState.update { s -> s.copy(statusText = "Answer rejetée : ${it.message}") } }
+                                .onFailure { _uiState.update { s -> s.copy(statusText = "Answer rejected: ${it.message}") } }
                         }
                     }
 
@@ -183,7 +183,7 @@ class RoomViewModel(
                     }
 
                     is SignalingEvent.Renegotiate -> {
-                        // Galène signale un échec ICE sur ce stream → ICE restart
+                        // Galène reports an ICE failure on this stream → ICE restart
                         restartUplinkIce(event.id)
                     }
 
@@ -191,7 +191,7 @@ class RoomViewModel(
                         val msg = event.reason ?: "Connexion fermée"
                         _uiState.update {
                             it.copy(
-                                statusText = "Déconnecté : $msg",
+                                statusText = "Disconnected: $msg",
                                 errorMessage = if (event.reason != null) "Connexion perdue : $msg" else null
                             )
                         }
@@ -209,7 +209,7 @@ class RoomViewModel(
         }
     }
 
-    // ─── Gestion participants ──────────────────────────────────────────────
+    // ─── Participants ──────────────────────────────────────────────────────
 
     private fun handleUserUpdate(event: SignalingEvent.UserUpdate) {
         _uiState.update { state ->
@@ -240,30 +240,30 @@ class RoomViewModel(
     // ─── WebRTC uplink ─────────────────────────────────────────────────────
 
     /**
-     * Réponse de l'utilisateur à la demande de permissions. Démarre le service de premier plan
-     * si le micro est autorisé, et la publication dès qu'on est joint.
+     * The user's answer to the permission request. Starts the foreground service if the
+     * microphone is allowed, and publishing as soon as we are joined.
      */
     fun onPermissionsResult(mic: Boolean, camera: Boolean) {
         permissionsAnswered = true
-        // On ne publie que ce que l'utilisateur a choisi au formulaire, même si plus est autorisé
+        // Only publish what the user chose in the login form, even if more is allowed
         micGranted = mic && request.present.usesMic
         cameraGranted = camera && request.present.usesCamera
         val refused = listOfNotNull(
-            "micro".takeIf { request.present.usesMic && !mic },
-            "caméra".takeIf { request.present.usesCamera && !camera },
+            "microphone".takeIf { request.present.usesMic && !mic },
+            "camera".takeIf { request.present.usesCamera && !camera },
         )
         if (refused.isNotEmpty()) {
-            _uiState.update { it.copy(statusText = "Refusé : ${refused.joinToString()}") }
+            _uiState.update { it.copy(statusText = "Denied: ${refused.joinToString()}") }
         }
-        // Le micro est autorisé et l'app est visible : seul moment où Android 14 accepte
-        // de démarrer un service de premier plan « microphone »
+        // The microphone is allowed and the app is visible: the only moment Android 14
+        // accepts starting a "microphone" foreground service
         if (micGranted) CallForegroundService.start(appContext)
         maybeStartUplink()
     }
 
     private fun maybeStartUplink() {
         if (!joined || !permissionsAnswered || "present" !in selfPermissions || uplinkRequested) return
-        if (!micGranted && !cameraGranted) return   // rien à publier → écoute seule
+        if (!micGranted && !cameraGranted) return   // nothing to publish → listen only
         uplinkRequested = true
         startUplink()
     }
@@ -292,7 +292,7 @@ class RoomViewModel(
                 val sdp = webRTCManager.restartUpstreamIce(streamId) ?: return@launch
                 galeneClient.sendOffer(streamId, "camera", sdp, kind = "renegotiate")
             }.onFailure {
-                _uiState.update { s -> s.copy(statusText = "Échec ICE restart : ${it.message}") }
+                _uiState.update { s -> s.copy(statusText = "ICE restart failed: ${it.message}") }
             }
         }
     }
@@ -314,23 +314,23 @@ class RoomViewModel(
         }
     }
 
-    // ─── Contrôles UI ─────────────────────────────────────────────────────
+    // ─── UI controls ──────────────────────────────────────────────────────
 
-    /** Coupe / rétablit le micro. */
+    /** Mutes / unmutes the microphone. */
     fun toggleAudio() {
         val muted = !_uiState.value.audioMuted
         webRTCManager.setLocalAudioEnabled(!muted)
         _uiState.update { it.copy(audioMuted = muted) }
     }
 
-    /** Coupe / rétablit la caméra (arrêt réel de la capture). */
+    /** Turns the camera off / on (capture really stops). */
     fun toggleVideo() {
         val muted = !_uiState.value.videoMuted
         webRTCManager.setLocalVideoEnabled(!muted)
         _uiState.update { it.copy(videoMuted = muted) }
     }
 
-    /** L'app n'est plus visible : on coupe la caméra (le son continue grâce au service). */
+    /** The app is no longer visible: turn the camera off (sound goes on thanks to the service). */
     fun onAppBackground() {
         val state = _uiState.value
         if (state.sendingVideo && !state.videoMuted) {
@@ -339,7 +339,7 @@ class RoomViewModel(
         }
     }
 
-    /** Retour au premier plan : on rallume la caméra si c'est nous qui l'avions coupée. */
+    /** Back to the foreground: turn the camera back on if we were the ones who turned it off. */
     fun onAppForeground() {
         if (videoPausedByBackground) {
             videoPausedByBackground = false
@@ -347,12 +347,12 @@ class RoomViewModel(
         }
     }
 
-    /** Bascule entre caméra avant et arrière. */
+    /** Switches between front and back cameras. */
     fun switchCamera() {
         webRTCManager.switchCamera { isFront -> _uiState.update { it.copy(frontCamera = isFront) } }
     }
 
-    /** Quitte la salle et libère tout. Idempotent (appelé aussi par [onCleared]). */
+    /** Leaves the room and releases everything. Idempotent (also called by [onCleared]). */
     fun leave() {
         galeneClient.disconnect()
         webRTCManager.release()

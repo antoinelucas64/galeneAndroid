@@ -1,11 +1,11 @@
 package fr.antoineassocies.galene.domain.model
 
 /**
- * Ce que l'utilisateur publie en entrant dans le groupe — le choix
- * « Rien / Micro / Caméra et micro » du formulaire de connexion de Galène.
+ * What the user publishes on joining the group — the "Nothing / Microphone /
+ * Camera and microphone" choice of Galène's login form.
  */
 enum class PresentMode {
-    /** Écoute seule : aucune permission demandée, aucun flux publié. */
+    /** Listen only: no permission requested, no stream published. */
     NONE,
     MIC,
     MIC_AND_CAMERA;

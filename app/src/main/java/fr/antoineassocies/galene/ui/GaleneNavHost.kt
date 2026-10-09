@@ -24,29 +24,29 @@ object Routes {
 }
 
 /**
- * Porte les données qui passent d'un écran à l'autre, à l'échelle de l'Activity.
+ * Carries data from one screen to the next, scoped to the Activity.
  *
- * Rien ne passe par les routes : les tokens et mots de passe n'ont rien à faire dans
- * l'état sauvegardé du back stack, et un argument vide ne matche pas une route.
- * Survit aux changements de configuration, pas à la mort du process (voulu : aucun
- * secret n'est persisté, et l'appel ne survit de toute façon pas à la mort du process).
+ * Nothing goes through routes: tokens and passwords have no business in the back stack's
+ * saved state, and an empty argument does not match a route.
+ * Survives configuration changes, not process death (on purpose: no secret is persisted,
+ * and the call would not survive process death anyway).
  */
 class NavigationHolder : ViewModel() {
-    /** Groupe choisi sur l'écran d'accueil (avec son éventuel token d'invitation). */
+    /** Group picked on the home screen (with its invitation token, if any). */
     var target: GroupTarget? = null
 
-    /** Demande d'entrée complète, authentification résolue. */
+    /** Complete join request, authentication resolved. */
     var request: JoinRequest? = null
 
-    /** Refus du serveur, à afficher une fois sur le formulaire du groupe. */
+    /** Server refusal, to be shown once on the group's login form. */
     var joinFailure by mutableStateOf<SignalingEvent.JoinFailed?>(null)
 }
 
 /**
- * Navigation de l'app, calquée sur le client web Galène :
- * accueil (serveur et groupes publics) → page du groupe (connexion) → salle.
+ * App navigation, modelled on Galène's web client:
+ * home (server and public groups) → group page (login) → room.
  *
- * Un refus du serveur dans la salle ramène au formulaire du groupe avec la raison.
+ * A server refusal in the room goes back to the group's login form with the reason.
  */
 @Composable
 fun GaleneNavHost() {
@@ -67,7 +67,7 @@ fun GaleneNavHost() {
         composable(Routes.GROUP) {
             val target = holder.target
             if (target == null) {
-                // Process recréé sans les paramètres : retour à l'accueil
+                // Process recreated without parameters: back to the home screen
                 LaunchedEffect(Unit) { navController.popBackStack(Routes.SERVER, inclusive = false) }
             } else {
                 GroupLoginScreen(

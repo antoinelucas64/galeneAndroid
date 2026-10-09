@@ -18,23 +18,23 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl
 
-/** État de l'écran d'accueil (choix du serveur et du groupe). */
+/** State of the home screen (server and group choice). */
 data class ServerUiState(
     val input: String = "",
     val loading: Boolean = false,
-    /** Serveur dont les groupes publics sont affichés. */
+    /** Server whose public groups are shown. */
     val server: HttpUrl? = null,
-    /** null tant que la liste n'a pas été chargée ; vide si le serveur n'en publie aucun. */
+    /** null until the list is loaded; empty if the server publishes none. */
     val groups: List<GroupStatus>? = null,
     val error: String? = null,
 )
 
 /**
- * Écran d'accueil, équivalent de la page d'accueil du client web Galène :
- * on saisit un serveur (→ liste de ses groupes publics) ou on colle directement
- * un lien de groupe / d'invitation (→ écran de connexion du groupe).
+ * Home screen, the equivalent of the Galène web client's landing page: type a server
+ * (→ list of its public groups) or paste a group / invitation link directly
+ * (→ the group's login screen).
  *
- * Le dernier serveur utilisé est mémorisé et ses groupes rechargés à l'ouverture.
+ * The last server used is remembered and its groups reloaded on start.
  */
 class ServerViewModel(
     private val directory: GaleneDirectory,
@@ -44,7 +44,7 @@ class ServerViewModel(
     private val _uiState = MutableStateFlow(ServerUiState(input = prefs.lastServer))
     val uiState: StateFlow<ServerUiState> = _uiState.asStateFlow()
 
-    // Événement de navigation à consommer une seule fois (pas un état : pas de rejeu après rotation)
+    // Navigation event consumed once (not state: no replay after rotation)
     private val _openGroup = Channel<GroupTarget>(Channel.BUFFERED)
     val openGroup: Flow<GroupTarget> = _openGroup.receiveAsFlow()
 
@@ -58,7 +58,7 @@ class ServerViewModel(
         _uiState.update { it.copy(input = value, error = null) }
     }
 
-    /** Valide la saisie : un serveur affiche ses groupes, un lien de groupe ouvre directement celui-ci. */
+    /** Validates the input: a server shows its groups, a group link opens that group directly. */
     fun submit() {
         when (val link = GaleneLink.parse(_uiState.value.input)) {
             null -> _uiState.update { it.copy(error = "Adresse invalide") }
@@ -70,13 +70,13 @@ class ServerViewModel(
         }
     }
 
-    /** Ouvre un groupe de la liste publique. */
+    /** Opens a group from the public list. */
     fun openGroup(group: GroupStatus) {
         val server = _uiState.value.server ?: return
         _openGroup.trySend(GroupTarget(group.location ?: GroupTarget.of(server, group.name).location, token = null))
     }
 
-    /** Ouvre un groupe non public dont on connaît le nom. */
+    /** Opens a non-public group by name. */
     fun openGroupByName(name: String) {
         val server = _uiState.value.server ?: return
         val trimmed = name.trim().trim('/')
@@ -93,13 +93,13 @@ class ServerViewModel(
                     _uiState.update { it.copy(loading = false, groups = groups.sortedBy { g -> g.title.lowercase() }) }
                 }
                 .onFailure { e ->
-                    // Le serveur peut exister sans publier de liste : on garde la saisie d'un nom de groupe
+                    // The server may exist without publishing a list: keep the group-name field available
                     _uiState.update { it.copy(loading = false, groups = emptyList(), error = e.message) }
                 }
         }
     }
 
-    /** Mémorise le serveur (sans chemin ni token) pour la prochaine ouverture. */
+    /** Remembers the server (without path or token) for next time. */
     private fun remember(base: HttpUrl) {
         prefs.lastServer = base.toString().removeSuffix("/")
     }

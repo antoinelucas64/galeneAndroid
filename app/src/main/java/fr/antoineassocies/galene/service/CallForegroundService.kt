@@ -16,19 +16,19 @@ import fr.antoineassocies.galene.MainActivity
 import fr.antoineassocies.galene.R
 
 /**
- * Service de premier plan qui maintient l'appel actif quand l'app passe en arrière-plan.
+ * Foreground service that keeps the call alive when the app goes to the background.
  *
- * Depuis Android 11, une app non visible perd l'accès au micro, sauf si elle fait tourner
- * un service de premier plan de type `microphone`. Ce service ne fait rien d'autre :
- * il n'exécute aucune logique d'appel (qui reste dans le ViewModel), il signale simplement
- * au système qu'un appel est en cours et affiche la notification correspondante.
+ * Since Android 11, an app that is not visible loses microphone access unless it runs a
+ * foreground service of type `microphone`. This service does nothing else: it runs no
+ * call logic (which stays in the ViewModel), it merely tells the system a call is in
+ * progress and shows the matching notification.
  *
- * Contraintes Android 14+ respectées par l'appelant ([start]) :
- * - le service doit être démarré pendant que l'app est au premier plan ;
- * - la permission RECORD_AUDIO doit être accordée au moment du démarrage.
+ * Android 14+ constraints, honoured by the caller ([start]):
+ * - the service must be started while the app is in the foreground;
+ * - the RECORD_AUDIO permission must be granted when it starts.
  *
- * La caméra n'est volontairement pas couverte : elle est coupée en arrière-plan
- * (économie de batterie, et personne ne regarde l'aperçu).
+ * The camera is deliberately not covered: it is turned off in the background
+ * (saves battery, and nobody is looking at the preview).
  */
 class CallForegroundService : Service() {
 
@@ -36,12 +36,12 @@ class CallForegroundService : Service() {
         private const val CHANNEL_ID = "galene_call"
         private const val NOTIFICATION_ID = 1
 
-        /** Démarre le service. À appeler app visible et micro autorisé. */
+        /** Starts the service. Call it while the app is visible and the microphone allowed. */
         fun start(context: Context) {
             ContextCompat.startForegroundService(context, Intent(context, CallForegroundService::class.java))
         }
 
-        /** Arrête le service ; sans effet s'il ne tourne pas. */
+        /** Stops the service; no effect if it is not running. */
         fun stop(context: Context) {
             context.stopService(Intent(context, CallForegroundService::class.java))
         }
@@ -53,20 +53,20 @@ class CallForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Type explicite : sans lui, Android 14 vérifie tous les types déclarés au manifeste
+        // Explicit type: without it, Android 14 checks every type declared in the manifest
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
             buildNotification(),
             ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
         )
-        // Pas de redémarrage automatique : un appel ne se reprend pas tout seul après la mort du process
+        // No automatic restart: a call does not resume by itself after the process dies
         return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    /** L'utilisateur a balayé l'app depuis les tâches récentes : l'appel s'arrête avec elle. */
+    /** The user swiped the app away from recent tasks: the call ends with it. */
     override fun onTaskRemoved(rootIntent: Intent?) {
         stopSelf()
         super.onTaskRemoved(rootIntent)
@@ -81,7 +81,7 @@ class CallForegroundService : Service() {
         val channel = NotificationChannel(
             CHANNEL_ID,
             getString(R.string.notification_channel_call),
-            NotificationManager.IMPORTANCE_LOW,     // pas de son ni de pop-up : simple rappel
+            NotificationManager.IMPORTANCE_LOW,     // no sound, no pop-up: just a reminder
         ).apply {
             setShowBadge(false)
         }
@@ -89,7 +89,7 @@ class CallForegroundService : Service() {
     }
 
     private fun buildNotification(): Notification {
-        // Toucher la notification ramène dans l'appel (l'Activity existante, pas une nouvelle)
+        // Tapping the notification goes back to the call (the existing Activity, not a new one)
         val openApp = PendingIntent.getActivity(
             this,
             0,

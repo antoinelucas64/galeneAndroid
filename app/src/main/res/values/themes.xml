@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Thème de base requis par le Manifest — Compose prend la main ensuite -->
+    <!-- Base theme required by the manifest — Compose takes over afterwards -->
     <style name="Theme.GaleneAndroid" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

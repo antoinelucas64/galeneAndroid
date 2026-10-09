@@ -4,23 +4,23 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /**
- * Ce que l'utilisateur a saisi sur l'écran d'accueil, une fois interprété.
+ * What the user typed on the home screen, once interpreted.
  */
 sealed class GaleneLink {
-    /** Adresse d'un serveur seul : on affichera ses groupes publics. */
+    /** A bare server address: its public groups will be listed. */
     data class Server(val base: HttpUrl) : GaleneLink()
 
-    /** Lien vers un groupe précis du serveur [base], éventuellement avec un token d'invitation. */
+    /** Link to a specific group on server [base], possibly with an invitation token. */
     data class Group(val base: HttpUrl, val target: GroupTarget) : GaleneLink()
 
     companion object {
         /**
-         * Interprète une saisie libre :
-         * - `galene.example.org` ou `https://galene.example.org` → [Server] ;
-         * - `https://galene.example.org/group/salle/` → [Group] ;
-         * - `https://galene.example.org/group/salle/?token=ABC` → [Group] avec token.
+         * Interprets free-form input:
+         * - `galene.example.org` or `https://galene.example.org` → [Server];
+         * - `https://galene.example.org/group/room/` → [Group];
+         * - `https://galene.example.org/group/room/?token=ABC` → [Group] with a token.
          *
-         * Sans schéma, `https://` est supposé. Renvoie null si ce n'est pas une URL exploitable.
+         * Without a scheme, `https://` is assumed. Returns null if this is not a usable URL.
          */
         fun parse(input: String): GaleneLink? {
             val raw = input.trim()
@@ -34,7 +34,7 @@ sealed class GaleneLink {
 
             if (groupIdx < 0 || groupIdx == segments.lastIndex) return Server(base)
 
-            // Les sous-groupes s'écrivent avec des / : tout ce qui suit « group » forme le nom
+            // Subgroups are written with slashes: everything after "group" is the name
             val name = segments.drop(groupIdx + 1).joinToString("/")
             val token = url.queryParameter("token")?.takeIf { it.isNotBlank() }
             return Group(base, GroupTarget.of(base, name, token))
@@ -43,25 +43,25 @@ sealed class GaleneLink {
 }
 
 /**
- * Un groupe à rejoindre : son URL web (base de `.status` et `location` pour l'authServer)
- * et, s'il vient d'un lien d'invitation, le token associé.
+ * A group to join: its web URL (base for `.status`, and `location` for the authServer)
+ * and, if it comes from an invitation link, the associated token.
  */
 data class GroupTarget(
     val location: String,
     val token: String?,
 ) {
-    /** URL du statut du groupe (`<location>.status`). */
+    /** URL of the group status (`<location>.status`). */
     val statusUrl: String get() = location + ".status"
 
-    // Le token est un secret : jamais dans les logs
+    // The token is a secret: never in logs
     override fun toString() = "GroupTarget(location=$location, token=${if (token != null) "***" else "null"})"
 
     companion object {
-        /** Construit la cible du groupe [name] sur le serveur [base]. */
+        /** Builds the target for group [name] on server [base]. */
         fun of(base: HttpUrl, name: String, token: String? = null): GroupTarget {
             val url = base.newBuilder().addPathSegment("group")
                 .apply { name.split('/').filter { it.isNotEmpty() }.forEach { addPathSegment(it) } }
-                .addPathSegment("")     // barre finale, comme les URL de groupe de Galène
+                .addPathSegment("")     // trailing slash, like Galène's group URLs
                 .build()
             return GroupTarget(url.toString(), token)
         }

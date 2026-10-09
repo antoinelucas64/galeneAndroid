@@ -43,7 +43,7 @@
     <string name="label_connected">Connecté</string>
     <string name="label_disconnected">Déconnecté</string>
 
-    <!-- Notification d'appel en cours -->
+    <!-- Call-in-progress notification -->
     <string name="notification_channel_call">Appel en cours</string>
     <string name="notification_call_ongoing">Appel en cours — touchez pour revenir</string>
 </resources>

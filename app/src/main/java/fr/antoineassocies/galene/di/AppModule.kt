@@ -22,31 +22,31 @@ import org.webrtc.PeerConnectionFactory
 import java.util.concurrent.TimeUnit
 
 /**
- * Graphe de dépendances Koin.
+ * Koin dependency graph.
  *
- * - `single` : objets coûteux ou sans état, partagés par tout le process
- *   (client HTTP, JSON, contexte EGL, factory WebRTC).
- * - `factory` : objets porteurs d'état d'appel, recréés à chaque entrée en salle pour
- *   qu'aucun état ne survive d'un appel à l'autre.
+ * - `single`: expensive or stateless objects, shared by the whole process
+ *   (HTTP client, JSON, EGL context, WebRTC factory).
+ * - `factory`: objects holding call state, recreated each time a room is entered so
+ *   that no state survives from one call to the next.
  */
 val appModule = module {
 
     single {
         OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.SECONDS)   // WebSocket — pas de timeout lecture
+            .readTimeout(0, TimeUnit.SECONDS)   // WebSocket — no read timeout
             .writeTimeout(10, TimeUnit.SECONDS)
             .build()
     }
 
     single {
         Json {
-            ignoreUnknownKeys = true        // tolérance aux champs futurs du protocole
-            encodeDefaults = true           // les champs type/kind ont des defaults — sans ça ils sont omis
+            ignoreUnknownKeys = true        // tolerate future protocol fields
+            encodeDefaults = true           // type/kind fields have defaults — without this they are omitted
         }
     }
 
-    // Contexte EGL partagé entre capture, encodeur/décodeur matériels et renderers
+    // EGL context shared by capture, hardware encoder/decoder and renderers
     single { EglBase.create() }
 
     single {
@@ -65,7 +65,7 @@ val appModule = module {
 
     viewModel { (target: GroupTarget) -> GroupLoginViewModel(target, get(), get()) }
 
-    // factory = nouvelle instance par session (une instance partagée causerait des leaks)
+    // factory = new instance per session (a shared instance would leak state)
     factory { GaleneClient(get(), get()) }
 
     factory { WebRTCManager(androidContext(), get(), get()) }

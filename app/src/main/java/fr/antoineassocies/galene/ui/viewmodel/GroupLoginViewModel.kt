@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
-/** État du formulaire de connexion à un groupe. */
+/** State of a group's login form. */
 data class GroupLoginUiState(
     val loading: Boolean = true,
     val status: GroupStatus? = null,
@@ -27,18 +27,18 @@ data class GroupLoginUiState(
     val username: String = "",
     val password: String = "",
     val present: PresentMode = PresentMode.MIC_AND_CAMERA,
-    /** Token d'invitation en cours d'usage ; abandonné après un refus, comme sur le web. */
+    /** Invitation token in use; dropped after a refusal, as on the web. */
     val token: String? = null,
-    /** Le serveur a répondu `need-username` : le lien d'invitation exige un nom. */
+    /** The server answered `need-username`: the invitation link requires a name. */
     val usernameRequiredByToken: Boolean = false,
     val joining: Boolean = false,
     val error: String? = null,
 ) {
-    /** Avec un token, le nom est facultatif (le lien peut le fixer) ; sinon il est obligatoire. */
+    /** With a token the name is optional (the link may set it); otherwise it is required. */
     val usernameRequired: Boolean get() = token == null || usernameRequiredByToken
     val showPassword: Boolean get() = token == null
 
-    /** Authentification par portail web (SSO) : pas encore prise en charge par l'app. */
+    /** Web portal authentication (SSO): not supported by the app yet. */
     val portalOnly: Boolean get() = token == null && status?.authPortal != null
 
     val canJoin: Boolean get() =
@@ -46,18 +46,18 @@ data class GroupLoginUiState(
 }
 
 /**
- * Connexion à un groupe, équivalent de la page de groupe du client web Galène :
+ * Logging into a group, the equivalent of the Galène web client's group page:
  *
- * 1. lecture du statut du groupe (`.status`) : nom, description, endpoint, mode d'authentification ;
- * 2. formulaire nom / mot de passe / « que publier » ;
- * 3. résolution de l'authentification :
- *    - token d'invitation → envoyé tel quel au `join` ;
- *    - `authServer` (ex. YunoHost) → échange du mot de passe contre un jeton ;
- *    - sinon → mot de passe Galène envoyé au `join` ;
- * 4. une [JoinRequest] complète est émise sur [join] pour l'écran de salle.
+ * 1. read the group status (`.status`): name, description, endpoint, authentication mode;
+ * 2. form: name / password / "what to publish";
+ * 3. resolve authentication:
+ *    - invitation token → sent as-is in the `join`;
+ *    - `authServer` (e.g. YunoHost) → the password is exchanged for a token;
+ *    - otherwise → the Galène password is sent in the `join`;
+ * 4. a complete [JoinRequest] is emitted on [join] for the room screen.
  *
- * Si le serveur refuse l'entrée, l'écran de salle revient ici et [onJoinFailed]
- * affiche la raison (ou demande un nom si le lien d'invitation l'exige).
+ * If the server refuses the join, the room screen comes back here and [onJoinFailed]
+ * shows the reason (or asks for a name if the invitation link requires one).
  */
 class GroupLoginViewModel(
     private val target: GroupTarget,
@@ -90,7 +90,7 @@ class GroupLoginViewModel(
     fun onPasswordChange(value: String) = _uiState.update { it.copy(password = value, error = null) }
     fun onPresentChange(value: PresentMode) = _uiState.update { it.copy(present = value) }
 
-    /** Résout l'authentification puis émet la demande d'entrée en salle. */
+    /** Resolves authentication, then emits the join request. */
     fun submit() {
         val state = _uiState.value
         val status = state.status ?: return
@@ -123,7 +123,7 @@ class GroupLoginViewModel(
                     present = state.present,
                 )
             }.onSuccess { request ->
-                // Le mot de passe ne reste pas en mémoire de l'écran une fois utilisé
+                // The password does not stay in the screen's memory once used
                 _uiState.update { it.copy(joining = false, password = "") }
                 _join.trySend(request)
             }.onFailure { e ->
@@ -132,13 +132,13 @@ class GroupLoginViewModel(
         }
     }
 
-    /** L'écran de salle a été refusé par le serveur : on affiche pourquoi. */
+    /** The server refused the join: show why. */
     fun onJoinFailed(failure: SignalingEvent.JoinFailed) {
         _uiState.update { s ->
             if (failure.needsUsername) {
                 s.copy(usernameRequiredByToken = true, error = "Ce lien d'invitation demande un nom d'utilisateur")
             } else {
-                // Comme le client web : un token refusé est abandonné, on repasse au mot de passe
+                // As the web client does: a refused token is dropped, back to password login
                 s.copy(
                     token = null,
                     error = "Le serveur a refusé l'entrée : ${failure.message ?: failure.error ?: "raison inconnue"}",
@@ -147,7 +147,7 @@ class GroupLoginViewModel(
         }
     }
 
-    /** Endpoint par défaut quand le statut n'en donne pas : `wss://hôte/ws`, comme le client web. */
+    /** Default endpoint when the status gives none: `wss://host/ws`, as the web client does. */
     private fun defaultEndpoint(location: String): String {
         val url = location.toHttpUrlOrNull() ?: return location
         val scheme = if (url.isHttps) "wss" else "ws"

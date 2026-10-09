@@ -18,17 +18,17 @@ import kotlin.coroutines.resumeWithException
 typealias IceCallback = (streamId: String, candidate: IceCandidateJson) -> Unit
 
 /**
- * Gère toutes les connexions WebRTC d'une session Galène.
+ * Manages every WebRTC connection of a Galène session.
  *
- * Galène est un SFU : chaque flux est une PeerConnection distincte avec le serveur.
- * - un flux **montant** ([upStream]) : notre micro et notre caméra, label `camera` ;
- * - un flux **descendant** par média publié par les autres ([downStreams]).
+ * Galène is an SFU: each stream is a separate PeerConnection with the server.
+ * - one **up** stream ([upStream]): our microphone and camera, label `camera`;
+ * - one **down** stream per media published by the others ([downStreams]).
  *
- * Threads : les méthodes publiques sont appelées depuis le thread principal (ViewModel) ;
- * les callbacks de l'Observer WebRTC arrivent sur le thread signaling de libwebrtc,
- * d'où l'usage de StateFlow pour tout ce qui en sort vers l'UI.
+ * Threads: public methods are called from the main thread (ViewModel); WebRTC Observer
+ * callbacks arrive on libwebrtc's signaling thread, hence StateFlow for everything
+ * that flows out to the UI.
  *
- * Cycle de vie : une instance par appel, libérée par [release].
+ * Lifecycle: one instance per call, released by [release].
  */
 class WebRTCManager(
     private val context: Context,
@@ -39,32 +39,32 @@ class WebRTCManager(
     companion object {
         private const val TAG = "WebRTCManager"
 
-        // 640×480 : bon compromis qualité / débit mobile, comme le client web en résolution normale
+        // 640×480: good quality / mobile bandwidth trade-off, like the web client's normal resolution
         private const val CAPTURE_WIDTH = 640
         private const val CAPTURE_HEIGHT = 480
         private const val CAPTURE_FPS = 30
     }
 
-    /** Contexte EGL partagé, nécessaire aux renderers vidéo de l'UI. */
+    /** Shared EGL context, needed by the UI's video renderers. */
     val eglContext: EglBase.Context = eglBase.eglBaseContext
 
-    // ─── Streams actifs ───────────────────────────────────────────────────
+    // ─── Active streams ───────────────────────────────────────────────────
 
     private val downStreams = mutableMapOf<String, DownStream>()
     private var upStream: UpStream? = null
 
-    // Candidats ICE mis en buffer avant que la remote description soit posée
+    // ICE candidates buffered until the remote description is set
     private val pendingCandidates = mutableMapOf<String, MutableList<IceCandidateJson>>()
 
-    // Streams dont une remote description est en cours d'application. Les candidats reçus
-    // pendant ce temps appartiennent à la nouvelle description : ajoutés trop tôt, ils seraient
-    // rattachés à l'ancienne (ICE restart, renégociation) ou à aucune, et perdus.
+    // Streams whose remote description is being applied. Candidates received meanwhile belong
+    // to the new description: added too early, they would be attached to the old one (ICE
+    // restart, renegotiation) or to none at all, and lost.
     private val settingRemote = mutableSetOf<String>()
 
-    /** Candidat ICE local à transmettre au serveur. Appelé depuis le thread signaling. */
+    /** Local ICE candidate to forward to the server. Called from the signaling thread. */
     var onLocalIceCandidate: IceCallback = { _, _ -> }
 
-    /** ICE en échec sur un stream ; [up] = stream montant. Appelé depuis le thread signaling. */
+    /** ICE failed on a stream; [up] = up stream. Called from the signaling thread. */
     var onIceFailed: (streamId: String, up: Boolean) -> Unit = { _, _ -> }
 
     private var rtcConfig: PeerConnection.RTCConfiguration = defaultRtcConfig()
@@ -76,17 +76,17 @@ class WebRTCManager(
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
     private var capturing = false
 
-    // Pistes vidéo exposées à l'UI (les renderers s'y abonnent via addSink)
+    // Video tracks exposed to the UI (renderers subscribe through addSink)
     private val _localVideoTrack = MutableStateFlow<VideoTrack?>(null)
     val localVideoTrack: StateFlow<VideoTrack?> = _localVideoTrack.asStateFlow()
 
-    // Clé = id du stream descendant ; alimenté depuis le thread signaling de WebRTC
+    // Key = down stream id; fed from WebRTC's signaling thread
     private val _remoteVideoTracks = MutableStateFlow<Map<String, VideoTrack>>(emptyMap())
     val remoteVideoTracks: StateFlow<Map<String, VideoTrack>> = _remoteVideoTracks.asStateFlow()
 
     // ─── Config RTC ────────────────────────────────────────────────────────
 
-    /** Applique les serveurs STUN/TURN reçus dans `joined` ; vaut pour les PeerConnections créées ensuite. */
+    /** Applies the STUN/TURN servers received in `joined`; affects PeerConnections created afterwards. */
     fun applyRtcConfiguration(config: RtcConfigurationJson?) {
         config?.iceServers.orEmpty().forEach {
             Log.d(TAG, "iceServer urls=${it.urls} username=${it.username != null} credential=${it.credential != null}")
@@ -94,9 +94,9 @@ class WebRTCManager(
         rtcConfig = buildRtcConfig(config)
     }
 
-    // ─── Audio local ──────────────────────────────────────────────────────
+    // ─── Local audio ──────────────────────────────────────────────────────
 
-    /** Crée la piste micro, avec annulation d'écho, réduction de bruit et contrôle de gain. */
+    /** Creates the microphone track, with echo cancellation, noise suppression and gain control. */
     fun createLocalAudioTrack(): AudioTrack {
         val constraints = MediaConstraints().apply {
             optional.add(MediaConstraints.KeyValuePair("googEchoCancellation", "true"))
@@ -110,14 +110,14 @@ class WebRTCManager(
         }
     }
 
-    /** Coupe / rétablit le micro (la piste reste négociée, elle envoie du silence). */
+    /** Mutes / unmutes the microphone (the track stays negotiated and sends silence). */
     fun setLocalAudioEnabled(enabled: Boolean) {
         localAudioTrack?.setEnabled(enabled)
     }
 
-    // ─── Vidéo locale ─────────────────────────────────────────────────────
+    // ─── Local video ──────────────────────────────────────────────────────
 
-    /** Ouvre la caméra frontale (à défaut, la première trouvée). Null si l'appareil n'a pas de caméra. */
+    /** Opens the front camera (or the first one found). Null if the device has no camera. */
     private fun createLocalVideoTrack(): VideoTrack? {
         val enumerator = if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context)
                          else Camera1Enumerator(true)
@@ -141,7 +141,7 @@ class WebRTCManager(
         }
     }
 
-    /** Coupe la caméra pour de vrai (voyant éteint), pas seulement des images noires. */
+    /** Really turns the camera off (indicator light off), rather than sending black frames. */
     fun setLocalVideoEnabled(enabled: Boolean) {
         val capturer = videoCapturer ?: return
         _localVideoTrack.value?.setEnabled(enabled)
@@ -154,7 +154,7 @@ class WebRTCManager(
         }
     }
 
-    /** [onDone] reçoit true si la caméra active est désormais la frontale. Appelé hors thread principal. */
+    /** [onDone] receives true if the active camera is now the front one. Called off the main thread. */
     fun switchCamera(onDone: (isFront: Boolean) -> Unit) {
         videoCapturer?.switchCamera(object : CameraVideoCapturer.CameraSwitchHandler {
             override fun onCameraSwitchDone(isFrontCamera: Boolean) = onDone(isFrontCamera)
@@ -164,11 +164,11 @@ class WebRTCManager(
         })
     }
 
-    // ─── Uplink (client → serveur) ────────────────────────────────────────
+    // ─── Uplink (client → server) ─────────────────────────────────────────
 
     /**
-     * Crée le flux montant et renvoie l'offre SDP à envoyer au serveur.
-     * Les pistes absentes (permission refusée, pas de caméra) ne sont simplement pas ajoutées.
+     * Creates the up stream and returns the SDP offer to send to the server.
+     * Missing tracks (permission denied, no camera) are simply not added.
      */
     suspend fun startUpstream(streamId: String, label: String, withAudio: Boolean, withVideo: Boolean): String {
         val pc = createPeerConnection(streamId, up = true) ?: throw IOException("Could not create PeerConnection")
@@ -188,7 +188,7 @@ class WebRTCManager(
         return offer.description
     }
 
-    /** Réponse à un `renegotiate` de Galène : ICE restart sur le même stream, pas un nouveau stream. */
+    /** Answer to Galène's `renegotiate`: ICE restart on the same stream, not a new stream. */
     suspend fun restartUpstreamIce(streamId: String): String? {
         val stream = upStream?.takeIf { it.id == streamId } ?: return null
         val constraints = MediaConstraints().apply {
@@ -199,7 +199,7 @@ class WebRTCManager(
         return offer.description
     }
 
-    /** Applique la réponse du serveur à notre offre, puis les candidats ICE arrivés entre-temps. */
+    /** Applies the server's answer to our offer, then the ICE candidates received meanwhile. */
     suspend fun handleUpstreamAnswer(streamId: String, sdp: String) {
         val stream = upStream?.takeIf { it.id == streamId } ?: return
         val remoteSdp = SessionDescription(SessionDescription.Type.ANSWER, sdp)
@@ -212,18 +212,18 @@ class WebRTCManager(
         drainPendingCandidates(streamId, stream.pc)
     }
 
-    // ─── Downlink (serveur → client) ──────────────────────────────────────
+    // ─── Downlink (server → client) ───────────────────────────────────────
 
     /**
-     * Traite une offre de flux descendant et renvoie la réponse SDP.
-     * Si le stream existe déjà, c'est une renégociation (ex. ICE restart) sur la même PeerConnection.
+     * Handles a down stream offer and returns the SDP answer.
+     * If the stream already exists, this is a renegotiation (e.g. ICE restart) on the same PeerConnection.
      */
     suspend fun handleRemoteOffer(
         streamId: String,
         sdp: String,
         replace: String?,
     ): String {
-        // Ferme le stream remplacé si présent
+        // Close the replaced stream, if any
         replace?.let { closeDownStream(it) }
 
         val existing = downStreams[streamId]
@@ -232,7 +232,7 @@ class WebRTCManager(
         } else {
             createPeerConnection(streamId, up = false) ?: throw IOException("Could not create PeerConnection")
         }
-        // Enregistré tout de suite : les candidats arrivant pendant createAnswer doivent trouver la PC
+        // Registered right away: candidates arriving during createAnswer must find the PC
         downStreams[streamId] = DownStream(id = streamId, pc = pc)
 
         val remoteSdp = SessionDescription(SessionDescription.Type.OFFER, sdp)
@@ -249,7 +249,7 @@ class WebRTCManager(
         return answer.description
     }
 
-    /** Ajoute un candidat du serveur, ou le met en attente si la remote description n'est pas encore posée. */
+    /** Adds a server candidate, or buffers it if the remote description is not set yet. */
     fun addRemoteIceCandidate(streamId: String, candidate: IceCandidateJson) {
         val iceCandidate = candidate.toIceCandidate()
         val pc = downStreams[streamId]?.pc ?: upStream?.takeIf { it.id == streamId }?.pc
@@ -261,23 +261,23 @@ class WebRTCManager(
         }
     }
 
-    // ─── Fermeture de streams ─────────────────────────────────────────────
+    // ─── Closing streams ──────────────────────────────────────────────────
 
-    /** Ferme un flux descendant ; l'UI est prévenue avant la libération de la piste. */
+    /** Closes a down stream; the UI is notified before the track is released. */
     fun closeDownStream(streamId: String) {
         _remoteVideoTracks.update { it - streamId }
         downStreams.remove(streamId)?.pc?.dispose()
         pendingCandidates.remove(streamId)
     }
 
-    /** Ferme le flux montant (les pistes locales restent ouvertes, réutilisables). */
+    /** Closes the up stream (local tracks stay open and reusable). */
     fun closeUpStream() {
         upStream?.let { pendingCandidates.remove(it.id) }
         upStream?.pc?.dispose()
         upStream = null
     }
 
-    /** Libère toutes les ressources natives : PeerConnections, pistes, caméra. Fin d'appel. */
+    /** Releases all native resources: PeerConnections, tracks, camera. End of call. */
     fun release() {
         _remoteVideoTracks.value = emptyMap()
         downStreams.values.forEach { it.pc.dispose() }
@@ -301,24 +301,24 @@ class WebRTCManager(
         surfaceTextureHelper = null
     }
 
-    // ─── Création PeerConnection ──────────────────────────────────────────
+    // ─── PeerConnection creation ──────────────────────────────────────────
 
     private fun createPeerConnection(streamId: String, up: Boolean): PeerConnection? =
         factory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
             override fun onIceCandidate(candidate: IceCandidate) {
-                Log.d(TAG, "[$streamId] candidat local: ${candidate.sdp}")
+                Log.d(TAG, "[$streamId] local candidate: ${candidate.sdp}")
                 onLocalIceCandidate(streamId, candidate.toJson())
             }
             override fun onTrack(transceiver: RtpTransceiver) {
                 val track = transceiver.receiver.track() ?: return
                 track.setEnabled(true)
                 if (track is VideoTrack) {
-                    Log.d(TAG, "[$streamId] piste vidéo distante reçue")
+                    Log.d(TAG, "[$streamId] remote video track received")
                     _remoteVideoTracks.update { it + (streamId to track) }
                 }
             }
             override fun onConnectionChange(state: PeerConnection.PeerConnectionState) {
-                Log.d(TAG, "[$streamId] connexion: $state")
+                Log.d(TAG, "[$streamId] connection: $state")
             }
             override fun onSignalingChange(state: PeerConnection.SignalingState) {}
             override fun onIceConnectionChange(state: PeerConnection.IceConnectionState) {
@@ -327,7 +327,7 @@ class WebRTCManager(
             }
             override fun onIceConnectionReceivingChange(receiving: Boolean) {}
             override fun onIceGatheringChange(state: PeerConnection.IceGatheringState) {
-                Log.d(TAG, "[$streamId] collecte ICE: $state")
+                Log.d(TAG, "[$streamId] ICE gathering: $state")
             }
             override fun onIceCandidatesRemoved(candidates: Array<IceCandidate>) {}
             override fun onAddStream(stream: MediaStream) {}
@@ -363,7 +363,7 @@ class WebRTCManager(
         val servers = cfg?.iceServers?.map { it.toPeerConnectionIceServer() } ?: emptyList()
         return PeerConnection.RTCConfiguration(servers).apply {
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-            // Un seul transport pour audio + vidéo : moitié moins de ports à traverser
+            // A single transport for audio + video: half as many ports to get through
             bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
             continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
         }
@@ -381,13 +381,13 @@ class WebRTCManager(
             }
             .createIceServer()
 
-    // ─── Données internes ────────────────────────────────────────────────
+    // ─── Internal data ────────────────────────────────────────────────────
 
     private data class DownStream(val id: String, val pc: PeerConnection)
     private data class UpStream(val id: String, val label: String, val pc: PeerConnection)
 }
 
-// ─── Extensions coroutines pour SDP ──────────────────────────────────────────
+// ─── Coroutine extensions for SDP ────────────────────────────────────────────
 
 private suspend fun PeerConnection.createOfferSuspend(constraints: MediaConstraints): SessionDescription =
     suspendCancellableCoroutine { cont ->

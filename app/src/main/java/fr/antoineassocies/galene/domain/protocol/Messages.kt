@@ -1,17 +1,17 @@
 /**
- * Messages JSON du protocole de signaling Galène (version 2).
+ * JSON messages of Galène's signaling protocol (version 2).
  *
- * Référence : https://galene.org/README.PROTOCOL.html et static/protocol.js du dépôt Galène.
- * Côté client, les champs `type`/`kind` ont des valeurs par défaut : le [kotlinx.serialization.json.Json]
- * injecté doit avoir `encodeDefaults = true`, sinon ils sont omis et le serveur ignore le message.
- * Côté serveur, `ignoreUnknownKeys = true` tolère les champs ajoutés par les futures versions.
+ * Reference: https://galene.org/README.PROTOCOL.html and static/protocol.js in the Galène repository.
+ * Client side, the `type`/`kind` fields have default values: the injected [kotlinx.serialization.json.Json]
+ * must have `encodeDefaults = true`, otherwise they are omitted and the server ignores the message.
+ * Server side, `ignoreUnknownKeys = true` tolerates fields added by future versions.
  */
 package fr.antoineassocies.galene.domain.protocol
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
-// ─── Client → Serveur ────────────────────────────────────────────────────────
+// ─── Client → Server ─────────────────────────────────────────────────────────
 
 @Serializable
 data class HandshakeMsg(
@@ -27,7 +27,7 @@ data class JoinMsg(
     val group: String,
     val username: String? = null,
     val password: String? = null,
-    val token: String? = null,      // exclusif avec password — invitation link
+    val token: String? = null,      // exclusive with password — invitation link or auth server token
 )
 
 @Serializable
@@ -46,7 +46,7 @@ data class RequestMsg(
 @Serializable
 data class OfferMsg(
     val type: String = "offer",
-    val kind: String? = null,       // "renegotiate" pour une re-offre sur un stream existant
+    val kind: String? = null,       // "renegotiate" for a new offer on an existing stream
     val id: String,
     val label: String,
     val sdp: String,
@@ -70,7 +70,7 @@ data class IceMsg(
 @Serializable
 data class PongMsg(val type: String = "pong")
 
-// ─── ICE candidate (partagé up/down) ────────────────────────────────────────
+// ─── ICE candidate (shared up/down) ─────────────────────────────────────────
 
 @Serializable
 data class IceCandidateJson(
@@ -80,12 +80,12 @@ data class IceCandidateJson(
     val usernameFragment: String? = null,
 )
 
-// ─── Serveur → Client ────────────────────────────────────────────────────────
+// ─── Server → Client ─────────────────────────────────────────────────────────
 
 @Serializable
 data class ServerHandshakeMsg(
     val type: String,
-    val version: JsonElement,   // ["2"] (tableau) selon impl réelle du serveur
+    val version: JsonElement,   // ["2"] (array) in the actual server implementation
     val id: String? = null,
 )
 
@@ -94,7 +94,7 @@ data class JoinedMsg(
     val type: String,
     val kind: String,           // "join" | "fail" | "change" | "leave"
     val error: String? = null,
-    val value: String? = null,  // message d'erreur humain (ex: "not authorised")
+    val value: String? = null,  // human-readable error message (e.g. "not authorised")
     val group: String? = null,
     val username: String? = null,
     val permissions: List<String>? = null,
