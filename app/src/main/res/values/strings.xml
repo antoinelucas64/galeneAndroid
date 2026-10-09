@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Galène</string>
+
+    <!-- ConnectScreen -->
+    <string name="label_invite_link">Lien d\'invitation (optionnel)</string>
+    <string name="label_server_url">URL du serveur</string>
+    <string name="label_room">Salle</string>
+    <string name="label_display_name">Nom d\'affichage</string>
+    <string name="label_password">Mot de passe (optionnel)</string>
+    <string name="action_join">Rejoindre</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Couper micro</string>
+    <string name="action_unmute">Activer micro</string>
+    <string name="action_video_off">Couper caméra</string>
+    <string name="action_video_on">Activer caméra</string>
+    <string name="action_switch_camera">Changer de caméra</string>
+    <string name="action_leave">Quitter</string>
+    <string name="label_me">Moi</string>
+    <string name="label_connecting">Connexion en cours…</string>
+    <string name="label_connected">Connecté</string>
+    <string name="label_disconnected">Déconnecté</string>
+
+    <!-- Notification d'appel en cours -->
+    <string name="notification_channel_call">Appel en cours</string>
+    <string name="notification_call_ongoing">Appel en cours — touchez pour revenir</string>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+        Autorise cleartext uniquement pour localhost (dev local).
+        Les plages IP CIDR ne sont pas valides comme <domain> sur Android —
+        on utilisait 10.0.0.0/8 etc. qui causaient des erreurs silencieuses.
+        Pour un serveur Galène en WSS (TLS), aucune config spéciale n'est nécessaire.
+    -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>
