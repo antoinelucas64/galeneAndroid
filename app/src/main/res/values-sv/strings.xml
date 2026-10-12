@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Server eller inbjudningslänk</string>
+    <string name="hint_server_or_link">Adress till Galène-servern, eller länk till en grupp</string>
+    <string name="label_public_groups">Offentliga grupper på %1$s</string>
+    <string name="label_no_public_groups">Inga offentliga grupper på den här servern.</string>
+    <string name="label_other_group">Annan grupp (namn)</string>
+    <string name="label_locked">Låst</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d deltagare</item>
+        <item quantity="other">%d deltagare</item>
+    </plurals>
+    <string name="action_continue">Fortsätt</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Användarnamn</string>
+    <string name="label_username_optional">Användarnamn (valfritt)</string>
+    <string name="label_password">Lösenord</string>
+    <string name="hint_auth_server">Kontrolleras av gruppens autentiseringsserver</string>
+    <string name="label_present">Vid inträde, sänd</string>
+    <string name="present_none">Ingenting</string>
+    <string name="present_mic">Mikrofon</string>
+    <string name="present_both">Kamera + mikrofon</string>
+    <string name="label_group_locked">Gruppen är låst: endast operatörer får gå in.</string>
+    <string name="label_invitation_link">Inloggning via inbjudningslänk</string>
+    <string name="label_portal_unsupported">Den här gruppen autentiserar via en webbportal, som appen ännu inte stöder. Använd en inbjudningslänk.</string>
+    <string name="action_join">Gå med</string>
+    <string name="action_back">Tillbaka</string>
+    <string name="action_retry">Försök igen</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Stäng av mikrofon</string>
+    <string name="action_unmute">Slå på mikrofon</string>
+    <string name="action_video_off">Stäng av kamera</string>
+    <string name="action_video_on">Slå på kamera</string>
+    <string name="action_switch_camera">Byt kamera</string>
+    <string name="action_leave">Lämna</string>
+    <string name="label_me">Jag</string>
+    <string name="label_connecting">Ansluter…</string>
+    <string name="label_connected">Ansluten</string>
+    <string name="label_disconnected">Frånkopplad</string>
+    <string name="label_error">Fel</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Pågående samtal</string>
+    <string name="notification_call_ongoing">Pågående samtal — tryck för att återvända</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Okänt fel</string>
+    <string name="error_invalid_address">Ogiltig adress</string>
+    <string name="error_no_public_list">Den här servern publicerar ingen grupplista</string>
+    <string name="error_no_such_group">Den här gruppen finns inte</string>
+    <string name="error_bad_credentials">Fel användarnamn eller lösenord</string>
+    <string name="error_auth_server_http">Autentiseringsservern svarade %1$d</string>
+    <string name="error_auth_empty_token">Autentiseringsservern returnerade en tom token</string>
+    <string name="error_auth_unexpected">Oväntat svar från autentiseringsservern</string>
+    <string name="error_unreachable">Servern kan inte nås: %1$s</string>
+    <string name="error_server_http">Servern svarade %1$d</string>
+    <string name="error_empty_response">Tomt svar från servern</string>
+    <string name="error_token_needs_username">Den här inbjudningslänken kräver ett användarnamn</string>
+    <string name="error_join_refused">Servern nekade inträde: %1$s</string>
+    <string name="error_timeout">Inget svar efter 15 s — kontrollera adressen och nätverket\n%1$s</string>
+    <string name="error_connection_lost">Anslutningen förlorades: %1$s</string>
+    <string name="error_microphone">Kan inte skicka ljud/video: %1$s</string>
+    <string name="error_downstream">Kan inte ta emot en ström: %1$s</string>
+</resources>

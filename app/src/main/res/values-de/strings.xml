@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Server oder Einladungslink</string>
+    <string name="hint_server_or_link">Adresse des Galène-Servers oder Link zu einer Gruppe</string>
+    <string name="label_public_groups">Öffentliche Gruppen auf %1$s</string>
+    <string name="label_no_public_groups">Keine öffentlichen Gruppen auf diesem Server.</string>
+    <string name="label_other_group">Andere Gruppe (Name)</string>
+    <string name="label_locked">Gesperrt</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d Teilnehmer</item>
+        <item quantity="other">%d Teilnehmer</item>
+    </plurals>
+    <string name="action_continue">Weiter</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Benutzername</string>
+    <string name="label_username_optional">Benutzername (optional)</string>
+    <string name="label_password">Passwort</string>
+    <string name="hint_auth_server">Wird vom Authentifizierungsserver der Gruppe geprüft</string>
+    <string name="label_present">Beim Betreten senden</string>
+    <string name="present_none">Nichts</string>
+    <string name="present_mic">Mikrofon</string>
+    <string name="present_both">Kamera + Mikrofon</string>
+    <string name="label_group_locked">Gruppe gesperrt: Nur Operatoren dürfen eintreten.</string>
+    <string name="label_invitation_link">Anmeldung per Einladungslink</string>
+    <string name="label_portal_unsupported">Diese Gruppe authentifiziert über ein Webportal, das die App noch nicht unterstützt. Verwende einen Einladungslink.</string>
+    <string name="action_join">Beitreten</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_retry">Erneut versuchen</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Mikrofon stumm</string>
+    <string name="action_unmute">Mikrofon an</string>
+    <string name="action_video_off">Kamera aus</string>
+    <string name="action_video_on">Kamera an</string>
+    <string name="action_switch_camera">Kamera wechseln</string>
+    <string name="action_leave">Verlassen</string>
+    <string name="label_me">Ich</string>
+    <string name="label_connecting">Verbindung wird hergestellt…</string>
+    <string name="label_connected">Verbunden</string>
+    <string name="label_disconnected">Getrennt</string>
+    <string name="label_error">Fehler</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Laufender Anruf</string>
+    <string name="notification_call_ongoing">Laufender Anruf — tippen, um zurückzukehren</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Unbekannter Fehler</string>
+    <string name="error_invalid_address">Ungültige Adresse</string>
+    <string name="error_no_public_list">Dieser Server veröffentlicht keine Gruppenliste</string>
+    <string name="error_no_such_group">Diese Gruppe existiert nicht</string>
+    <string name="error_bad_credentials">Benutzername oder Passwort falsch</string>
+    <string name="error_auth_server_http">Der Authentifizierungsserver antwortete %1$d</string>
+    <string name="error_auth_empty_token">Der Authentifizierungsserver lieferte ein leeres Token</string>
+    <string name="error_auth_unexpected">Unerwartete Antwort des Authentifizierungsservers</string>
+    <string name="error_unreachable">Server nicht erreichbar: %1$s</string>
+    <string name="error_server_http">Der Server antwortete %1$d</string>
+    <string name="error_empty_response">Leere Antwort vom Server</string>
+    <string name="error_token_needs_username">Dieser Einladungslink erfordert einen Benutzernamen</string>
+    <string name="error_join_refused">Der Server hat den Zutritt verweigert: %1$s</string>
+    <string name="error_timeout">Keine Antwort nach 15 s — Adresse und Netzwerk prüfen\n%1$s</string>
+    <string name="error_connection_lost">Verbindung verloren: %1$s</string>
+    <string name="error_microphone">Audio/Video kann nicht gesendet werden: %1$s</string>
+    <string name="error_downstream">Ein Stream kann nicht empfangen werden: %1$s</string>
+</resources>

@@ -1,0 +1,1 @@
+Première version publique : liste des groupes, connexion (mot de passe, lien d'invitation, serveur d'authentification), audio et vidéo bidirectionnels, appel en arrière-plan, interface en 19 langues.

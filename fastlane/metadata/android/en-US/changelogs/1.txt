@@ -1,0 +1,1 @@
+First public release: group list, login (password, invitation link, authentication server), two-way audio and video, background calls, 19 interface languages.

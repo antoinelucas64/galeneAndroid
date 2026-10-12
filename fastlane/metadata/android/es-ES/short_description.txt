@@ -1,0 +1,1 @@
+Cliente independiente para el servidor de videoconferencia Galène

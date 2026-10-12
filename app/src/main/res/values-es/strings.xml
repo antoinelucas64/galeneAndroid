@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Servidor o enlace de invitación</string>
+    <string name="hint_server_or_link">Dirección del servidor Galène, o enlace a un grupo</string>
+    <string name="label_public_groups">Grupos públicos de %1$s</string>
+    <string name="label_no_public_groups">No hay grupos públicos en este servidor.</string>
+    <string name="label_other_group">Otro grupo (nombre)</string>
+    <string name="label_locked">Bloqueado</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d participante</item>
+        <item quantity="many">%d participantes</item>
+        <item quantity="other">%d participantes</item>
+    </plurals>
+    <string name="action_continue">Continuar</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Nombre de usuario</string>
+    <string name="label_username_optional">Nombre de usuario (opcional)</string>
+    <string name="label_password">Contraseña</string>
+    <string name="hint_auth_server">Verificado por el servidor de autenticación del grupo</string>
+    <string name="label_present">Al entrar, publicar</string>
+    <string name="present_none">Nada</string>
+    <string name="present_mic">Micrófono</string>
+    <string name="present_both">Cámara + micrófono</string>
+    <string name="label_group_locked">Grupo bloqueado: solo los operadores pueden entrar.</string>
+    <string name="label_invitation_link">Conexión mediante enlace de invitación</string>
+    <string name="label_portal_unsupported">Este grupo se autentica mediante un portal web, que la aplicación aún no admite. Usa un enlace de invitación.</string>
+    <string name="action_join">Unirse</string>
+    <string name="action_back">Volver</string>
+    <string name="action_retry">Reintentar</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Silenciar micrófono</string>
+    <string name="action_unmute">Activar micrófono</string>
+    <string name="action_video_off">Apagar cámara</string>
+    <string name="action_video_on">Encender cámara</string>
+    <string name="action_switch_camera">Cambiar de cámara</string>
+    <string name="action_leave">Salir</string>
+    <string name="label_me">Yo</string>
+    <string name="label_connecting">Conectando…</string>
+    <string name="label_connected">Conectado</string>
+    <string name="label_disconnected">Desconectado</string>
+    <string name="label_error">Error</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Llamada en curso</string>
+    <string name="notification_call_ongoing">Llamada en curso — toca para volver</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Error desconocido</string>
+    <string name="error_invalid_address">Dirección no válida</string>
+    <string name="error_no_public_list">Este servidor no publica una lista de grupos</string>
+    <string name="error_no_such_group">Este grupo no existe</string>
+    <string name="error_bad_credentials">Nombre de usuario o contraseña incorrectos</string>
+    <string name="error_auth_server_http">El servidor de autenticación respondió %1$d</string>
+    <string name="error_auth_empty_token">El servidor de autenticación devolvió un token vacío</string>
+    <string name="error_auth_unexpected">Respuesta inesperada del servidor de autenticación</string>
+    <string name="error_unreachable">Servidor inaccesible: %1$s</string>
+    <string name="error_server_http">El servidor respondió %1$d</string>
+    <string name="error_empty_response">Respuesta vacía del servidor</string>
+    <string name="error_token_needs_username">Este enlace de invitación requiere un nombre de usuario</string>
+    <string name="error_join_refused">El servidor rechazó la entrada: %1$s</string>
+    <string name="error_timeout">Sin respuesta tras 15 s — comprueba la dirección y la red\n%1$s</string>
+    <string name="error_connection_lost">Conexión perdida: %1$s</string>
+    <string name="error_microphone">No se puede enviar audio/vídeo: %1$s</string>
+    <string name="error_downstream">No se puede recibir un flujo: %1$s</string>
+</resources>

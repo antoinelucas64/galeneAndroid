@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Serwer lub link z zaproszeniem</string>
+    <string name="hint_server_or_link">Adres serwera Galène lub link do grupy</string>
+    <string name="label_public_groups">Grupy publiczne na %1$s</string>
+    <string name="label_no_public_groups">Brak grup publicznych na tym serwerze.</string>
+    <string name="label_other_group">Inna grupa (nazwa)</string>
+    <string name="label_locked">Zablokowana</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d uczestnik</item>
+        <item quantity="few">%d uczestników</item>
+        <item quantity="many">%d uczestników</item>
+        <item quantity="other">%d uczestnika</item>
+    </plurals>
+    <string name="action_continue">Dalej</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Nazwa użytkownika</string>
+    <string name="label_username_optional">Nazwa użytkownika (opcjonalnie)</string>
+    <string name="label_password">Hasło</string>
+    <string name="hint_auth_server">Weryfikowane przez serwer uwierzytelniania grupy</string>
+    <string name="label_present">Po wejściu publikuj</string>
+    <string name="present_none">Nic</string>
+    <string name="present_mic">Mikrofon</string>
+    <string name="present_both">Kamera + mikrofon</string>
+    <string name="label_group_locked">Grupa zablokowana: wejść mogą tylko operatorzy.</string>
+    <string name="label_invitation_link">Logowanie przez link z zaproszeniem</string>
+    <string name="label_portal_unsupported">Ta grupa uwierzytelnia przez portal WWW, którego aplikacja jeszcze nie obsługuje. Użyj linku z zaproszeniem.</string>
+    <string name="action_join">Dołącz</string>
+    <string name="action_back">Wstecz</string>
+    <string name="action_retry">Ponów</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Wycisz mikrofon</string>
+    <string name="action_unmute">Włącz mikrofon</string>
+    <string name="action_video_off">Wyłącz kamerę</string>
+    <string name="action_video_on">Włącz kamerę</string>
+    <string name="action_switch_camera">Przełącz kamerę</string>
+    <string name="action_leave">Opuść</string>
+    <string name="label_me">Ja</string>
+    <string name="label_connecting">Łączenie…</string>
+    <string name="label_connected">Połączono</string>
+    <string name="label_disconnected">Rozłączono</string>
+    <string name="label_error">Błąd</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Trwające połączenie</string>
+    <string name="notification_call_ongoing">Trwające połączenie — dotknij, aby wrócić</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Nieznany błąd</string>
+    <string name="error_invalid_address">Nieprawidłowy adres</string>
+    <string name="error_no_public_list">Ten serwer nie publikuje listy grup</string>
+    <string name="error_no_such_group">Ta grupa nie istnieje</string>
+    <string name="error_bad_credentials">Nieprawidłowa nazwa użytkownika lub hasło</string>
+    <string name="error_auth_server_http">Serwer uwierzytelniania odpowiedział %1$d</string>
+    <string name="error_auth_empty_token">Serwer uwierzytelniania zwrócił pusty token</string>
+    <string name="error_auth_unexpected">Nieoczekiwana odpowiedź serwera uwierzytelniania</string>
+    <string name="error_unreachable">Serwer nieosiągalny: %1$s</string>
+    <string name="error_server_http">Serwer odpowiedział %1$d</string>
+    <string name="error_empty_response">Pusta odpowiedź serwera</string>
+    <string name="error_token_needs_username">Ten link z zaproszeniem wymaga nazwy użytkownika</string>
+    <string name="error_join_refused">Serwer odmówił wejścia: %1$s</string>
+    <string name="error_timeout">Brak odpowiedzi po 15 s — sprawdź adres i sieć\n%1$s</string>
+    <string name="error_connection_lost">Utracono połączenie: %1$s</string>
+    <string name="error_microphone">Nie można wysłać dźwięku/obrazu: %1$s</string>
+    <string name="error_downstream">Nie można odebrać strumienia: %1$s</string>
+</resources>

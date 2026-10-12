@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">الخادم أو رابط الدعوة</string>
+    <string name="hint_server_or_link">عنوان خادم Galène، أو رابط إلى مجموعة</string>
+    <string name="label_public_groups">المجموعات العامة على %1$s</string>
+    <string name="label_no_public_groups">لا توجد مجموعات عامة على هذا الخادم.</string>
+    <string name="label_other_group">مجموعة أخرى (الاسم)</string>
+    <string name="label_locked">مقفلة</string>
+    <plurals name="label_participants">
+        <item quantity="zero">لا مشاركين</item>
+        <item quantity="one">مشارك واحد</item>
+        <item quantity="two">مشاركان</item>
+        <item quantity="few">%d مشاركين</item>
+        <item quantity="many">%d مشاركًا</item>
+        <item quantity="other">%d مشارك</item>
+    </plurals>
+    <string name="action_continue">متابعة</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">اسم المستخدم</string>
+    <string name="label_username_optional">اسم المستخدم (اختياري)</string>
+    <string name="label_password">كلمة المرور</string>
+    <string name="hint_auth_server">يتحقق منه خادم المصادقة الخاص بالمجموعة</string>
+    <string name="label_present">عند الدخول، بث</string>
+    <string name="present_none">لا شيء</string>
+    <string name="present_mic">الميكروفون</string>
+    <string name="present_both">الكاميرا + الميكروفون</string>
+    <string name="label_group_locked">المجموعة مقفلة: يمكن للمشرفين فقط الدخول.</string>
+    <string name="label_invitation_link">تسجيل الدخول برابط دعوة</string>
+    <string name="label_portal_unsupported">تستخدم هذه المجموعة المصادقة عبر بوابة ويب، وهي غير مدعومة بعد في التطبيق. استخدم رابط دعوة.</string>
+    <string name="action_join">انضمام</string>
+    <string name="action_back">رجوع</string>
+    <string name="action_retry">إعادة المحاولة</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">كتم الميكروفون</string>
+    <string name="action_unmute">تشغيل الميكروفون</string>
+    <string name="action_video_off">إيقاف الكاميرا</string>
+    <string name="action_video_on">تشغيل الكاميرا</string>
+    <string name="action_switch_camera">تبديل الكاميرا</string>
+    <string name="action_leave">مغادرة</string>
+    <string name="label_me">أنا</string>
+    <string name="label_connecting">جارٍ الاتصال…</string>
+    <string name="label_connected">متصل</string>
+    <string name="label_disconnected">غير متصل</string>
+    <string name="label_error">خطأ</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">مكالمة جارية</string>
+    <string name="notification_call_ongoing">مكالمة جارية — انقر للعودة</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">خطأ غير معروف</string>
+    <string name="error_invalid_address">عنوان غير صالح</string>
+    <string name="error_no_public_list">لا ينشر هذا الخادم قائمة بالمجموعات</string>
+    <string name="error_no_such_group">هذه المجموعة غير موجودة</string>
+    <string name="error_bad_credentials">اسم المستخدم أو كلمة المرور غير صحيحة</string>
+    <string name="error_auth_server_http">أجاب خادم المصادقة بالرمز %1$d</string>
+    <string name="error_auth_empty_token">أعاد خادم المصادقة رمزًا فارغًا</string>
+    <string name="error_auth_unexpected">استجابة غير متوقعة من خادم المصادقة</string>
+    <string name="error_unreachable">تعذّر الوصول إلى الخادم: %1$s</string>
+    <string name="error_server_http">أجاب الخادم بالرمز %1$d</string>
+    <string name="error_empty_response">استجابة فارغة من الخادم</string>
+    <string name="error_token_needs_username">يتطلب رابط الدعوة هذا اسم مستخدم</string>
+    <string name="error_join_refused">رفض الخادم الدخول: %1$s</string>
+    <string name="error_timeout">لا استجابة بعد 15 ثانية — تحقق من العنوان والشبكة\n%1$s</string>
+    <string name="error_connection_lost">انقطع الاتصال: %1$s</string>
+    <string name="error_microphone">تعذّر إرسال الصوت/الفيديو: %1$s</string>
+    <string name="error_downstream">تعذّر استقبال بث: %1$s</string>
+</resources>

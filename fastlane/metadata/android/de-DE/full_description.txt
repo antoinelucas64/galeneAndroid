@@ -1,0 +1,10 @@
+<p>Ein unabhängiger, quelloffener nativer Client für den Videokonferenz-Server <a href="https://galene.org">Galène</a>. Nicht mit dem Galène-Projekt verbunden.</p>
+<p>Anders als der Web-Client im Browser hält die App das Gespräch auch im Hintergrund aufrecht.</p>
+<ul>
+<li>Liste der öffentlichen Gruppen eines Servers oder direkter Gruppen-/Einladungslink</li>
+<li>Anmeldung per Passwort, Einladungslink oder Authentifizierungsserver (z. B. YunoHost)</li>
+<li>Audio und Video in beide Richtungen, Front-/Rückkamera</li>
+<li>Gespräch läuft im Hintergrund weiter</li>
+<li>Oberfläche in der Sprache des Telefons</li>
+</ul>
+<p><b>Datenschutz</b>: keine Telemetrie, kein Tracking, keine Google Play Services.</p>

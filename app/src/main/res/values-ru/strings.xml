@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Сервер или ссылка-приглашение</string>
+    <string name="hint_server_or_link">Адрес сервера Galène или ссылка на группу</string>
+    <string name="label_public_groups">Публичные группы на %1$s</string>
+    <string name="label_no_public_groups">На этом сервере нет публичных групп.</string>
+    <string name="label_other_group">Другая группа (название)</string>
+    <string name="label_locked">Закрыта</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d участник</item>
+        <item quantity="few">%d участника</item>
+        <item quantity="many">%d участников</item>
+        <item quantity="other">%d участника</item>
+    </plurals>
+    <string name="action_continue">Продолжить</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Имя пользователя</string>
+    <string name="label_username_optional">Имя пользователя (необязательно)</string>
+    <string name="label_password">Пароль</string>
+    <string name="hint_auth_server">Проверяется сервером аутентификации группы</string>
+    <string name="label_present">При входе транслировать</string>
+    <string name="present_none">Ничего</string>
+    <string name="present_mic">Микрофон</string>
+    <string name="present_both">Камера + микрофон</string>
+    <string name="label_group_locked">Группа закрыта: войти могут только операторы.</string>
+    <string name="label_invitation_link">Вход по ссылке-приглашению</string>
+    <string name="label_portal_unsupported">Эта группа использует аутентификацию через веб-портал, которая пока не поддерживается приложением. Используйте ссылку-приглашение.</string>
+    <string name="action_join">Войти</string>
+    <string name="action_back">Назад</string>
+    <string name="action_retry">Повторить</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Выключить микрофон</string>
+    <string name="action_unmute">Включить микрофон</string>
+    <string name="action_video_off">Выключить камеру</string>
+    <string name="action_video_on">Включить камеру</string>
+    <string name="action_switch_camera">Сменить камеру</string>
+    <string name="action_leave">Выйти</string>
+    <string name="label_me">Я</string>
+    <string name="label_connecting">Подключение…</string>
+    <string name="label_connected">Подключено</string>
+    <string name="label_disconnected">Отключено</string>
+    <string name="label_error">Ошибка</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Текущий звонок</string>
+    <string name="notification_call_ongoing">Идёт звонок — нажмите, чтобы вернуться</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="error_invalid_address">Неверный адрес</string>
+    <string name="error_no_public_list">Этот сервер не публикует список групп</string>
+    <string name="error_no_such_group">Такой группы не существует</string>
+    <string name="error_bad_credentials">Неверное имя пользователя или пароль</string>
+    <string name="error_auth_server_http">Сервер аутентификации ответил %1$d</string>
+    <string name="error_auth_empty_token">Сервер аутентификации вернул пустой токен</string>
+    <string name="error_auth_unexpected">Неожиданный ответ сервера аутентификации</string>
+    <string name="error_unreachable">Сервер недоступен: %1$s</string>
+    <string name="error_server_http">Сервер ответил %1$d</string>
+    <string name="error_empty_response">Пустой ответ сервера</string>
+    <string name="error_token_needs_username">Для этой ссылки-приглашения нужно имя пользователя</string>
+    <string name="error_join_refused">Сервер отказал во входе: %1$s</string>
+    <string name="error_timeout">Нет ответа в течение 15 с — проверьте адрес и сеть\n%1$s</string>
+    <string name="error_connection_lost">Соединение потеряно: %1$s</string>
+    <string name="error_microphone">Не удалось передать звук/видео: %1$s</string>
+    <string name="error_downstream">Не удалось принять поток: %1$s</string>
+</resources>

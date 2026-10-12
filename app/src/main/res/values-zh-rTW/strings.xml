@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">伺服器或邀請連結</string>
+    <string name="hint_server_or_link">Galène 伺服器位址，或群組連結</string>
+    <string name="label_public_groups">%1$s 上的公開群組</string>
+    <string name="label_no_public_groups">此伺服器上沒有公開群組。</string>
+    <string name="label_other_group">其他群組（名稱）</string>
+    <string name="label_locked">已鎖定</string>
+    <plurals name="label_participants">
+        <item quantity="other">%d 位參與者</item>
+    </plurals>
+    <string name="action_continue">繼續</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">使用者名稱</string>
+    <string name="label_username_optional">使用者名稱（選填）</string>
+    <string name="label_password">密碼</string>
+    <string name="hint_auth_server">由群組的驗證伺服器檢查</string>
+    <string name="label_present">進入時發布</string>
+    <string name="present_none">無</string>
+    <string name="present_mic">麥克風</string>
+    <string name="present_both">相機 + 麥克風</string>
+    <string name="label_group_locked">群組已鎖定：只有管理員可以進入。</string>
+    <string name="label_invitation_link">透過邀請連結登入</string>
+    <string name="label_portal_unsupported">此群組透過網頁入口驗證，應用程式尚不支援。請使用邀請連結。</string>
+    <string name="action_join">加入</string>
+    <string name="action_back">返回</string>
+    <string name="action_retry">重試</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">關閉麥克風</string>
+    <string name="action_unmute">開啟麥克風</string>
+    <string name="action_video_off">關閉相機</string>
+    <string name="action_video_on">開啟相機</string>
+    <string name="action_switch_camera">切換相機</string>
+    <string name="action_leave">離開</string>
+    <string name="label_me">我</string>
+    <string name="label_connecting">連線中…</string>
+    <string name="label_connected">已連線</string>
+    <string name="label_disconnected">已中斷連線</string>
+    <string name="label_error">錯誤</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">通話中</string>
+    <string name="notification_call_ongoing">通話中 — 輕觸以返回</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">未知錯誤</string>
+    <string name="error_invalid_address">位址無效</string>
+    <string name="error_no_public_list">此伺服器未公開群組清單</string>
+    <string name="error_no_such_group">此群組不存在</string>
+    <string name="error_bad_credentials">使用者名稱或密碼錯誤</string>
+    <string name="error_auth_server_http">驗證伺服器回應 %1$d</string>
+    <string name="error_auth_empty_token">驗證伺服器傳回空白權杖</string>
+    <string name="error_auth_unexpected">驗證伺服器傳回非預期的回應</string>
+    <string name="error_unreachable">無法連線至伺服器：%1$s</string>
+    <string name="error_server_http">伺服器回應 %1$d</string>
+    <string name="error_empty_response">伺服器回應為空</string>
+    <string name="error_token_needs_username">此邀請連結需要使用者名稱</string>
+    <string name="error_join_refused">伺服器拒絕進入：%1$s</string>
+    <string name="error_timeout">15 秒內無回應 — 請檢查位址與網路\n%1$s</string>
+    <string name="error_connection_lost">連線中斷：%1$s</string>
+    <string name="error_microphone">無法傳送音訊/視訊：%1$s</string>
+    <string name="error_downstream">無法接收串流：%1$s</string>
+</resources>

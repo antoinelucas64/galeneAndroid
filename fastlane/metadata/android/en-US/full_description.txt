@@ -1,0 +1,13 @@
+<p>An independent, open-source native client for the <a href="https://galene.org">Galène</a> videoconferencing server. It is not affiliated with the Galène project.</p>
+<p>On a phone, Galène is normally used through its web client, which loses audio and video as soon as the screen turns off or you switch apps. This app keeps your call alive in the background.</p>
+<p><b>Features</b></p>
+<ul>
+<li>List of a server's public groups, or direct opening of a group / invitation link</li>
+<li>Login by password, invitation link or authentication server (e.g. YunoHost)</li>
+<li>Two-way audio with echo cancellation, two-way video, front/back camera</li>
+<li>Adaptive participant grid, tap a participant for fullscreen</li>
+<li>Call kept alive in the background, with a notification</li>
+<li>Interface in the phone's language (19 languages)</li>
+</ul>
+<p><b>Privacy</b>: no telemetry, no tracking, no Google Play Services. The app only talks to the Galène server you choose.</p>
+<p>You need access to a Galène server (version 2 of the protocol).</p>

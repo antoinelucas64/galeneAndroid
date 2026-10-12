@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Сервер або посилання-запрошення</string>
+    <string name="hint_server_or_link">Адреса сервера Galène або посилання на групу</string>
+    <string name="label_public_groups">Публічні групи на %1$s</string>
+    <string name="label_no_public_groups">На цьому сервері немає публічних груп.</string>
+    <string name="label_other_group">Інша група (назва)</string>
+    <string name="label_locked">Закрита</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d учасник</item>
+        <item quantity="few">%d учасники</item>
+        <item quantity="many">%d учасників</item>
+        <item quantity="other">%d учасника</item>
+    </plurals>
+    <string name="action_continue">Продовжити</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Ім\'я користувача</string>
+    <string name="label_username_optional">Ім\'я користувача (необов\'язково)</string>
+    <string name="label_password">Пароль</string>
+    <string name="hint_auth_server">Перевіряється сервером автентифікації групи</string>
+    <string name="label_present">Під час входу транслювати</string>
+    <string name="present_none">Нічого</string>
+    <string name="present_mic">Мікрофон</string>
+    <string name="present_both">Камера + мікрофон</string>
+    <string name="label_group_locked">Групу закрито: увійти можуть лише оператори.</string>
+    <string name="label_invitation_link">Вхід за посиланням-запрошенням</string>
+    <string name="label_portal_unsupported">Ця група використовує автентифікацію через вебпортал, яку застосунок поки не підтримує. Скористайтеся посиланням-запрошенням.</string>
+    <string name="action_join">Увійти</string>
+    <string name="action_back">Назад</string>
+    <string name="action_retry">Повторити</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Вимкнути мікрофон</string>
+    <string name="action_unmute">Увімкнути мікрофон</string>
+    <string name="action_video_off">Вимкнути камеру</string>
+    <string name="action_video_on">Увімкнути камеру</string>
+    <string name="action_switch_camera">Змінити камеру</string>
+    <string name="action_leave">Вийти</string>
+    <string name="label_me">Я</string>
+    <string name="label_connecting">Підключення…</string>
+    <string name="label_connected">Підключено</string>
+    <string name="label_disconnected">Відключено</string>
+    <string name="label_error">Помилка</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Поточний дзвінок</string>
+    <string name="notification_call_ongoing">Триває дзвінок — торкніться, щоб повернутися</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Невідома помилка</string>
+    <string name="error_invalid_address">Неправильна адреса</string>
+    <string name="error_no_public_list">Цей сервер не публікує список груп</string>
+    <string name="error_no_such_group">Такої групи не існує</string>
+    <string name="error_bad_credentials">Неправильне ім\'я користувача або пароль</string>
+    <string name="error_auth_server_http">Сервер автентифікації відповів %1$d</string>
+    <string name="error_auth_empty_token">Сервер автентифікації повернув порожній токен</string>
+    <string name="error_auth_unexpected">Неочікувана відповідь сервера автентифікації</string>
+    <string name="error_unreachable">Сервер недоступний: %1$s</string>
+    <string name="error_server_http">Сервер відповів %1$d</string>
+    <string name="error_empty_response">Порожня відповідь сервера</string>
+    <string name="error_token_needs_username">Для цього посилання-запрошення потрібне ім\'я користувача</string>
+    <string name="error_join_refused">Сервер відмовив у вході: %1$s</string>
+    <string name="error_timeout">Немає відповіді протягом 15 с — перевірте адресу та мережу\n%1$s</string>
+    <string name="error_connection_lost">З\'єднання втрачено: %1$s</string>
+    <string name="error_microphone">Не вдалося передати звук/відео: %1$s</string>
+    <string name="error_downstream">Не вдалося отримати потік: %1$s</string>
+</resources>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">सर्वर या आमंत्रण लिंक</string>
+    <string name="hint_server_or_link">Galène सर्वर का पता, या किसी समूह का लिंक</string>
+    <string name="label_public_groups">%1$s पर सार्वजनिक समूह</string>
+    <string name="label_no_public_groups">इस सर्वर पर कोई सार्वजनिक समूह नहीं है।</string>
+    <string name="label_other_group">अन्य समूह (नाम)</string>
+    <string name="label_locked">लॉक है</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d प्रतिभागी</item>
+        <item quantity="other">%d प्रतिभागी</item>
+    </plurals>
+    <string name="action_continue">जारी रखें</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">उपयोगकर्ता नाम</string>
+    <string name="label_username_optional">उपयोगकर्ता नाम (वैकल्पिक)</string>
+    <string name="label_password">पासवर्ड</string>
+    <string name="hint_auth_server">समूह के प्रमाणीकरण सर्वर द्वारा जाँचा जाता है</string>
+    <string name="label_present">प्रवेश करते समय भेजें</string>
+    <string name="present_none">कुछ नहीं</string>
+    <string name="present_mic">माइक्रोफ़ोन</string>
+    <string name="present_both">कैमरा + माइक्रोफ़ोन</string>
+    <string name="label_group_locked">समूह लॉक है: केवल ऑपरेटर प्रवेश कर सकते हैं।</string>
+    <string name="label_invitation_link">आमंत्रण लिंक से लॉग इन</string>
+    <string name="label_portal_unsupported">यह समूह वेब पोर्टल से प्रमाणीकरण करता है, जो ऐप अभी समर्थित नहीं करता। आमंत्रण लिंक का उपयोग करें।</string>
+    <string name="action_join">शामिल हों</string>
+    <string name="action_back">वापस</string>
+    <string name="action_retry">फिर से कोशिश करें</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">माइक बंद करें</string>
+    <string name="action_unmute">माइक चालू करें</string>
+    <string name="action_video_off">कैमरा बंद करें</string>
+    <string name="action_video_on">कैमरा चालू करें</string>
+    <string name="action_switch_camera">कैमरा बदलें</string>
+    <string name="action_leave">छोड़ें</string>
+    <string name="label_me">मैं</string>
+    <string name="label_connecting">कनेक्ट हो रहा है…</string>
+    <string name="label_connected">कनेक्ट हो गया</string>
+    <string name="label_disconnected">डिस्कनेक्ट हो गया</string>
+    <string name="label_error">त्रुटि</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">जारी कॉल</string>
+    <string name="notification_call_ongoing">कॉल जारी है — वापस जाने के लिए टैप करें</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">अज्ञात त्रुटि</string>
+    <string name="error_invalid_address">अमान्य पता</string>
+    <string name="error_no_public_list">यह सर्वर समूहों की सूची प्रकाशित नहीं करता</string>
+    <string name="error_no_such_group">यह समूह मौजूद नहीं है</string>
+    <string name="error_bad_credentials">गलत उपयोगकर्ता नाम या पासवर्ड</string>
+    <string name="error_auth_server_http">प्रमाणीकरण सर्वर ने %1$d उत्तर दिया</string>
+    <string name="error_auth_empty_token">प्रमाणीकरण सर्वर ने खाली टोकन लौटाया</string>
+    <string name="error_auth_unexpected">प्रमाणीकरण सर्वर से अनपेक्षित उत्तर</string>
+    <string name="error_unreachable">सर्वर तक नहीं पहुँचा जा सका: %1$s</string>
+    <string name="error_server_http">सर्वर ने %1$d उत्तर दिया</string>
+    <string name="error_empty_response">सर्वर से खाली उत्तर</string>
+    <string name="error_token_needs_username">इस आमंत्रण लिंक के लिए उपयोगकर्ता नाम आवश्यक है</string>
+    <string name="error_join_refused">सर्वर ने प्रवेश अस्वीकार कर दिया: %1$s</string>
+    <string name="error_timeout">15 सेकंड तक कोई उत्तर नहीं — पता और नेटवर्क जाँचें\n%1$s</string>
+    <string name="error_connection_lost">कनेक्शन टूट गया: %1$s</string>
+    <string name="error_microphone">ऑडियो/वीडियो नहीं भेजा जा सका: %1$s</string>
+    <string name="error_downstream">स्ट्रीम प्राप्त नहीं की जा सकी: %1$s</string>
+</resources>

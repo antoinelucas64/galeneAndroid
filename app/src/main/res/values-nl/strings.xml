@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Server of uitnodigingslink</string>
+    <string name="hint_server_or_link">Adres van de Galène-server, of link naar een groep</string>
+    <string name="label_public_groups">Openbare groepen op %1$s</string>
+    <string name="label_no_public_groups">Geen openbare groepen op deze server.</string>
+    <string name="label_other_group">Andere groep (naam)</string>
+    <string name="label_locked">Vergrendeld</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d deelnemer</item>
+        <item quantity="other">%d deelnemers</item>
+    </plurals>
+    <string name="action_continue">Doorgaan</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Gebruikersnaam</string>
+    <string name="label_username_optional">Gebruikersnaam (optioneel)</string>
+    <string name="label_password">Wachtwoord</string>
+    <string name="hint_auth_server">Gecontroleerd door de authenticatieserver van de groep</string>
+    <string name="label_present">Bij binnenkomst publiceren</string>
+    <string name="present_none">Niets</string>
+    <string name="present_mic">Microfoon</string>
+    <string name="present_both">Camera + microfoon</string>
+    <string name="label_group_locked">Groep vergrendeld: alleen operators mogen binnenkomen.</string>
+    <string name="label_invitation_link">Aanmelden via uitnodigingslink</string>
+    <string name="label_portal_unsupported">Deze groep authenticeert via een webportaal, dat de app nog niet ondersteunt. Gebruik een uitnodigingslink.</string>
+    <string name="action_join">Deelnemen</string>
+    <string name="action_back">Terug</string>
+    <string name="action_retry">Opnieuw proberen</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Microfoon dempen</string>
+    <string name="action_unmute">Microfoon aan</string>
+    <string name="action_video_off">Camera uit</string>
+    <string name="action_video_on">Camera aan</string>
+    <string name="action_switch_camera">Camera wisselen</string>
+    <string name="action_leave">Verlaten</string>
+    <string name="label_me">Ik</string>
+    <string name="label_connecting">Verbinden…</string>
+    <string name="label_connected">Verbonden</string>
+    <string name="label_disconnected">Verbinding verbroken</string>
+    <string name="label_error">Fout</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Gesprek bezig</string>
+    <string name="notification_call_ongoing">Gesprek bezig — tik om terug te gaan</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Onbekende fout</string>
+    <string name="error_invalid_address">Ongeldig adres</string>
+    <string name="error_no_public_list">Deze server publiceert geen groepenlijst</string>
+    <string name="error_no_such_group">Deze groep bestaat niet</string>
+    <string name="error_bad_credentials">Onjuiste gebruikersnaam of wachtwoord</string>
+    <string name="error_auth_server_http">De authenticatieserver antwoordde %1$d</string>
+    <string name="error_auth_empty_token">De authenticatieserver gaf een leeg token terug</string>
+    <string name="error_auth_unexpected">Onverwacht antwoord van de authenticatieserver</string>
+    <string name="error_unreachable">Server onbereikbaar: %1$s</string>
+    <string name="error_server_http">De server antwoordde %1$d</string>
+    <string name="error_empty_response">Leeg antwoord van de server</string>
+    <string name="error_token_needs_username">Deze uitnodigingslink vereist een gebruikersnaam</string>
+    <string name="error_join_refused">De server weigerde de toegang: %1$s</string>
+    <string name="error_timeout">Geen antwoord na 15 s — controleer het adres en het netwerk\n%1$s</string>
+    <string name="error_connection_lost">Verbinding verloren: %1$s</string>
+    <string name="error_microphone">Kan geen audio/video verzenden: %1$s</string>
+    <string name="error_downstream">Kan geen stream ontvangen: %1$s</string>
+</resources>

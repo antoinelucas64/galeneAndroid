@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">サーバーまたは招待リンク</string>
+    <string name="hint_server_or_link">Galène サーバーのアドレス、またはグループへのリンク</string>
+    <string name="label_public_groups">%1$s の公開グループ</string>
+    <string name="label_no_public_groups">このサーバーには公開グループがありません。</string>
+    <string name="label_other_group">その他のグループ（名前）</string>
+    <string name="label_locked">ロック中</string>
+    <plurals name="label_participants">
+        <item quantity="other">参加者 %d 人</item>
+    </plurals>
+    <string name="action_continue">続ける</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">ユーザー名</string>
+    <string name="label_username_optional">ユーザー名（任意）</string>
+    <string name="label_password">パスワード</string>
+    <string name="hint_auth_server">グループの認証サーバーで確認されます</string>
+    <string name="label_present">入室時に送信</string>
+    <string name="present_none">なし</string>
+    <string name="present_mic">マイク</string>
+    <string name="present_both">カメラ + マイク</string>
+    <string name="label_group_locked">グループはロックされています：オペレーターのみ入室できます。</string>
+    <string name="label_invitation_link">招待リンクでログイン</string>
+    <string name="label_portal_unsupported">このグループはウェブポータルで認証しますが、アプリはまだ対応していません。招待リンクを使用してください。</string>
+    <string name="action_join">参加</string>
+    <string name="action_back">戻る</string>
+    <string name="action_retry">再試行</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">マイクをオフ</string>
+    <string name="action_unmute">マイクをオン</string>
+    <string name="action_video_off">カメラをオフ</string>
+    <string name="action_video_on">カメラをオン</string>
+    <string name="action_switch_camera">カメラを切り替え</string>
+    <string name="action_leave">退出</string>
+    <string name="label_me">自分</string>
+    <string name="label_connecting">接続中…</string>
+    <string name="label_connected">接続済み</string>
+    <string name="label_disconnected">切断されました</string>
+    <string name="label_error">エラー</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">通話中</string>
+    <string name="notification_call_ongoing">通話中 — タップして戻る</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">不明なエラー</string>
+    <string name="error_invalid_address">無効なアドレス</string>
+    <string name="error_no_public_list">このサーバーはグループ一覧を公開していません</string>
+    <string name="error_no_such_group">このグループは存在しません</string>
+    <string name="error_bad_credentials">ユーザー名またはパスワードが正しくありません</string>
+    <string name="error_auth_server_http">認証サーバーの応答: %1$d</string>
+    <string name="error_auth_empty_token">認証サーバーが空のトークンを返しました</string>
+    <string name="error_auth_unexpected">認証サーバーから予期しない応答がありました</string>
+    <string name="error_unreachable">サーバーに接続できません: %1$s</string>
+    <string name="error_server_http">サーバーの応答: %1$d</string>
+    <string name="error_empty_response">サーバーの応答が空です</string>
+    <string name="error_token_needs_username">この招待リンクにはユーザー名が必要です</string>
+    <string name="error_join_refused">サーバーが入室を拒否しました: %1$s</string>
+    <string name="error_timeout">15 秒間応答がありません — アドレスとネットワークを確認してください\n%1$s</string>
+    <string name="error_connection_lost">接続が切れました: %1$s</string>
+    <string name="error_microphone">音声/映像を送信できません: %1$s</string>
+    <string name="error_downstream">ストリームを受信できません: %1$s</string>
+</resources>

@@ -1,0 +1,13 @@
+<p>Un client natif indépendant et libre pour le serveur de visioconférence <a href="https://galene.org">Galène</a>. Il n'est pas affilié au projet Galène.</p>
+<p>Sur téléphone, Galène s'utilise normalement via son client web, qui coupe le son et l'image dès que l'écran s'éteint ou que l'on change d'application. Cette application maintient l'appel en arrière-plan.</p>
+<p><b>Fonctionnalités</b></p>
+<ul>
+<li>Liste des groupes publics d'un serveur, ou ouverture directe d'un lien de groupe / d'invitation</li>
+<li>Connexion par mot de passe, lien d'invitation ou serveur d'authentification (ex. YunoHost)</li>
+<li>Audio bidirectionnel avec annulation d'écho, vidéo bidirectionnelle, caméra avant/arrière</li>
+<li>Grille de participants adaptative, plein écran d'un participant d'un toucher</li>
+<li>Appel maintenu en arrière-plan, avec notification</li>
+<li>Interface dans la langue du téléphone (19 langues)</li>
+</ul>
+<p><b>Vie privée</b> : aucune télémétrie, aucun pistage, pas de Google Play Services. L'application ne communique qu'avec le serveur Galène que vous choisissez.</p>
+<p>Il faut avoir accès à un serveur Galène (version 2 du protocole).</p>

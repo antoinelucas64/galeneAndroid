@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">服务器或邀请链接</string>
+    <string name="hint_server_or_link">Galène 服务器地址，或群组链接</string>
+    <string name="label_public_groups">%1$s 上的公开群组</string>
+    <string name="label_no_public_groups">此服务器上没有公开群组。</string>
+    <string name="label_other_group">其他群组（名称）</string>
+    <string name="label_locked">已锁定</string>
+    <plurals name="label_participants">
+        <item quantity="other">%d 位参与者</item>
+    </plurals>
+    <string name="action_continue">继续</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">用户名</string>
+    <string name="label_username_optional">用户名（可选）</string>
+    <string name="label_password">密码</string>
+    <string name="hint_auth_server">由群组的认证服务器验证</string>
+    <string name="label_present">进入时发布</string>
+    <string name="present_none">无</string>
+    <string name="present_mic">麦克风</string>
+    <string name="present_both">摄像头 + 麦克风</string>
+    <string name="label_group_locked">群组已锁定：只有管理员可以进入。</string>
+    <string name="label_invitation_link">通过邀请链接登录</string>
+    <string name="label_portal_unsupported">此群组通过网页门户认证，应用暂不支持。请使用邀请链接。</string>
+    <string name="action_join">加入</string>
+    <string name="action_back">返回</string>
+    <string name="action_retry">重试</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">关闭麦克风</string>
+    <string name="action_unmute">打开麦克风</string>
+    <string name="action_video_off">关闭摄像头</string>
+    <string name="action_video_on">打开摄像头</string>
+    <string name="action_switch_camera">切换摄像头</string>
+    <string name="action_leave">离开</string>
+    <string name="label_me">我</string>
+    <string name="label_connecting">正在连接…</string>
+    <string name="label_connected">已连接</string>
+    <string name="label_disconnected">已断开</string>
+    <string name="label_error">错误</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">通话中</string>
+    <string name="notification_call_ongoing">通话中 — 点按返回</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">未知错误</string>
+    <string name="error_invalid_address">地址无效</string>
+    <string name="error_no_public_list">此服务器未公布群组列表</string>
+    <string name="error_no_such_group">此群组不存在</string>
+    <string name="error_bad_credentials">用户名或密码错误</string>
+    <string name="error_auth_server_http">认证服务器返回 %1$d</string>
+    <string name="error_auth_empty_token">认证服务器返回了空令牌</string>
+    <string name="error_auth_unexpected">认证服务器返回了意外的响应</string>
+    <string name="error_unreachable">无法连接服务器：%1$s</string>
+    <string name="error_server_http">服务器返回 %1$d</string>
+    <string name="error_empty_response">服务器响应为空</string>
+    <string name="error_token_needs_username">此邀请链接需要用户名</string>
+    <string name="error_join_refused">服务器拒绝进入：%1$s</string>
+    <string name="error_timeout">15 秒内无响应 — 请检查地址和网络\n%1$s</string>
+    <string name="error_connection_lost">连接已断开：%1$s</string>
+    <string name="error_microphone">无法发送音频/视频：%1$s</string>
+    <string name="error_downstream">无法接收媒体流：%1$s</string>
+</resources>

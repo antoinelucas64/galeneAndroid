@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated translation; corrections welcome. -->
+<resources>
+
+    <!-- ServerScreen -->
+    <string name="label_server_or_link">Sunucu veya davet bağlantısı</string>
+    <string name="hint_server_or_link">Galène sunucusunun adresi veya bir grubun bağlantısı</string>
+    <string name="label_public_groups">%1$s üzerindeki herkese açık gruplar</string>
+    <string name="label_no_public_groups">Bu sunucuda herkese açık grup yok.</string>
+    <string name="label_other_group">Başka grup (ad)</string>
+    <string name="label_locked">Kilitli</string>
+    <plurals name="label_participants">
+        <item quantity="one">%d katılımcı</item>
+        <item quantity="other">%d katılımcı</item>
+    </plurals>
+    <string name="action_continue">Devam</string>
+
+    <!-- GroupLoginScreen -->
+    <string name="label_username">Kullanıcı adı</string>
+    <string name="label_username_optional">Kullanıcı adı (isteğe bağlı)</string>
+    <string name="label_password">Parola</string>
+    <string name="hint_auth_server">Grubun kimlik doğrulama sunucusu tarafından denetlenir</string>
+    <string name="label_present">Girişte yayınla</string>
+    <string name="present_none">Hiçbir şey</string>
+    <string name="present_mic">Mikrofon</string>
+    <string name="present_both">Kamera + mikrofon</string>
+    <string name="label_group_locked">Grup kilitli: yalnızca operatörler girebilir.</string>
+    <string name="label_invitation_link">Davet bağlantısıyla giriş</string>
+    <string name="label_portal_unsupported">Bu grup, uygulamanın henüz desteklemediği bir web portalı üzerinden kimlik doğruluyor. Bir davet bağlantısı kullanın.</string>
+    <string name="action_join">Katıl</string>
+    <string name="action_back">Geri</string>
+    <string name="action_retry">Yeniden dene</string>
+
+    <!-- RoomScreen -->
+    <string name="action_mute">Mikrofonu kapat</string>
+    <string name="action_unmute">Mikrofonu aç</string>
+    <string name="action_video_off">Kamerayı kapat</string>
+    <string name="action_video_on">Kamerayı aç</string>
+    <string name="action_switch_camera">Kamerayı değiştir</string>
+    <string name="action_leave">Ayrıl</string>
+    <string name="label_me">Ben</string>
+    <string name="label_connecting">Bağlanıyor…</string>
+    <string name="label_connected">Bağlandı</string>
+    <string name="label_disconnected">Bağlantı kesildi</string>
+    <string name="label_error">Hata</string>
+
+    <!-- Call-in-progress notification -->
+    <string name="notification_channel_call">Devam eden arama</string>
+    <string name="notification_call_ongoing">Arama sürüyor — geri dönmek için dokunun</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Bilinmeyen hata</string>
+    <string name="error_invalid_address">Geçersiz adres</string>
+    <string name="error_no_public_list">Bu sunucu bir grup listesi yayınlamıyor</string>
+    <string name="error_no_such_group">Bu grup mevcut değil</string>
+    <string name="error_bad_credentials">Kullanıcı adı veya parola hatalı</string>
+    <string name="error_auth_server_http">Kimlik doğrulama sunucusu %1$d yanıtını verdi</string>
+    <string name="error_auth_empty_token">Kimlik doğrulama sunucusu boş bir belirteç döndürdü</string>
+    <string name="error_auth_unexpected">Kimlik doğrulama sunucusundan beklenmeyen yanıt</string>
+    <string name="error_unreachable">Sunucuya ulaşılamıyor: %1$s</string>
+    <string name="error_server_http">Sunucu %1$d yanıtını verdi</string>
+    <string name="error_empty_response">Sunucudan boş yanıt</string>
+    <string name="error_token_needs_username">Bu davet bağlantısı bir kullanıcı adı gerektiriyor</string>
+    <string name="error_join_refused">Sunucu girişi reddetti: %1$s</string>
+    <string name="error_timeout">15 sn sonra yanıt yok — adresi ve ağı kontrol edin\n%1$s</string>
+    <string name="error_connection_lost">Bağlantı koptu: %1$s</string>
+    <string name="error_microphone">Ses/görüntü gönderilemiyor: %1$s</string>
+    <string name="error_downstream">Bir akış alınamıyor: %1$s</string>
+</resources>
