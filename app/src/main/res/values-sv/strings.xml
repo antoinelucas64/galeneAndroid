@@ -42,7 +42,45 @@
     <string name="label_connecting">Ansluter…</string>
     <string name="label_connected">Ansluten</string>
     <string name="label_disconnected">Frånkopplad</string>
+    <string name="label_reconnecting">Återansluter…</string>
     <string name="label_error">Fel</string>
+    <string name="action_audio_output">Ljudutgång</string>
+    <string name="audio_route_speaker">Högtalare</string>
+    <string name="audio_route_earpiece">Telefonens hörlur</string>
+    <string name="audio_route_headset">Headset</string>
+    <string name="audio_route_bluetooth">Bluetooth</string>
+
+    <!-- Chat -->
+    <string name="action_chat">Chatt</string>
+    <string name="chat_title">Meddelanden</string>
+    <string name="chat_hint">Meddelande till alla</string>
+    <string name="action_send">Skicka</string>
+    <string name="chat_empty">Inga meddelanden än.\nMeddelanden syns för hela gruppen, även för dem som ansluter senare.</string>
+    <string name="chat_private">privat</string>
+    <string name="chat_server">servern</string>
+    <string name="chat_muted_by">%1$s stängde av din mikrofon</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">Räck upp handen</string>
+    <string name="action_lower_hand">Sänk handen</string>
+    <string name="label_hand_raised">Uppräckt hand</string>
+    <string name="notice_hand_raised">%1$s räcker upp handen</string>
+    <string name="chat_to_everyone">Alla</string>
+    <string name="chat_to">Till: %1$s</string>
+    <string name="chat_private_to">privat till %1$s</string>
+    <string name="chat_hint_private">Privat meddelande till %1$s</string>
+
+    <!-- Participants -->
+    <string name="action_participants">Deltagare</string>
+    <string name="label_operator">Operatör</string>
+    <string name="action_private_message">Privat meddelande</string>
+    <string name="action_kick">Ta bort från gruppen</string>
+    <string name="action_allow_present">Tillåt att presentera</string>
+    <string name="action_forbid_present">Förbjud att presentera</string>
+    <string name="action_make_op">Gör till operatör</string>
+    <string name="action_remove_op">Ta bort operatörsrättigheter</string>
+    <string name="confirm_kick">Ta bort %1$s från gruppen?</string>
+    <string name="action_more">Fler alternativ</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">Pågående samtal</string>
@@ -66,4 +104,6 @@
     <string name="error_connection_lost">Anslutningen förlorades: %1$s</string>
     <string name="error_microphone">Kan inte skicka ljud/video: %1$s</string>
     <string name="error_downstream">Kan inte ta emot en ström: %1$s</string>
+    <string name="error_left_group">Du är inte längre med i gruppen (borttagen av servern eller gruppen stängd)</string>
+    <string name="error_reconnect_failed">Det gick inte att återansluta till servern. Kontrollera nätverket och gå med igen.</string>
 </resources>

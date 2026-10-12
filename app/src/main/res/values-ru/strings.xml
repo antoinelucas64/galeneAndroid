@@ -44,7 +44,45 @@
     <string name="label_connecting">Подключение…</string>
     <string name="label_connected">Подключено</string>
     <string name="label_disconnected">Отключено</string>
+    <string name="label_reconnecting">Переподключение…</string>
     <string name="label_error">Ошибка</string>
+    <string name="action_audio_output">Аудиовыход</string>
+    <string name="audio_route_speaker">Динамик</string>
+    <string name="audio_route_earpiece">Разговорный динамик</string>
+    <string name="audio_route_headset">Гарнитура</string>
+    <string name="audio_route_bluetooth">Bluetooth</string>
+
+    <!-- Chat -->
+    <string name="action_chat">Чат</string>
+    <string name="chat_title">Сообщения</string>
+    <string name="chat_hint">Сообщение для всех</string>
+    <string name="action_send">Отправить</string>
+    <string name="chat_empty">Сообщений пока нет.\nСообщения видны всей группе, в том числе тем, кто присоединится позже.</string>
+    <string name="chat_private">личное</string>
+    <string name="chat_server">сервер</string>
+    <string name="chat_muted_by">%1$s выключил(а) ваш микрофон</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">Поднять руку</string>
+    <string name="action_lower_hand">Опустить руку</string>
+    <string name="label_hand_raised">Рука поднята</string>
+    <string name="notice_hand_raised">%1$s поднимает руку</string>
+    <string name="chat_to_everyone">Все</string>
+    <string name="chat_to">Кому: %1$s</string>
+    <string name="chat_private_to">лично для %1$s</string>
+    <string name="chat_hint_private">Личное сообщение для %1$s</string>
+
+    <!-- Participants -->
+    <string name="action_participants">Участники</string>
+    <string name="label_operator">Оператор</string>
+    <string name="action_private_message">Личное сообщение</string>
+    <string name="action_kick">Удалить из группы</string>
+    <string name="action_allow_present">Разрешить выступать</string>
+    <string name="action_forbid_present">Запретить выступать</string>
+    <string name="action_make_op">Сделать оператором</string>
+    <string name="action_remove_op">Снять права оператора</string>
+    <string name="confirm_kick">Удалить %1$s из группы?</string>
+    <string name="action_more">Другие действия</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">Текущий звонок</string>
@@ -68,4 +106,6 @@
     <string name="error_connection_lost">Соединение потеряно: %1$s</string>
     <string name="error_microphone">Не удалось передать звук/видео: %1$s</string>
     <string name="error_downstream">Не удалось принять поток: %1$s</string>
+    <string name="error_left_group">Вы больше не в группе (удалены сервером или группа закрыта)</string>
+    <string name="error_reconnect_failed">Не удалось переподключиться к серверу. Проверьте сеть и войдите снова.</string>
 </resources>

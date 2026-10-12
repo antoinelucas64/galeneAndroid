@@ -78,7 +78,7 @@ class GaleneTestClient(private val wsUrl: String) : AutoCloseable {
         }
 
         override fun onClosed(ws: WebSocket, code: Int, reason: String) {
-            events.trySend(SignalingEvent.Disconnected(if (code != 1000) reason else null))
+            events.trySend(SignalingEvent.Disconnected(reason.ifEmpty { "closed ($code)" }))
         }
     }
 

@@ -70,6 +70,39 @@ data class IceMsg(
 @Serializable
 data class PongMsg(val type: String = "pong")
 
+/** Chat message to the group (empty [dest]) or to one participant. The server echoes it back. */
+@Serializable
+data class ChatMsg(
+    val type: String = "chat",
+    val kind: String? = null,       // null | "me"
+    val source: String,
+    val username: String? = null,
+    val dest: String? = null,
+    val value: String,
+)
+
+/** Action on a user; `setdata` on ourselves publishes our user data (e.g. `raisehand`). */
+@Serializable
+data class UserActionMsg(
+    val type: String = "useraction",
+    val kind: String,
+    val source: String,
+    val dest: String,
+    val username: String? = null,
+    val value: JsonElement? = null,
+)
+
+/** Message to one user (or everyone) that is not kept in the chat history, e.g. `mute`. */
+@Serializable
+data class UserMessageMsg(
+    val type: String = "usermessage",
+    val kind: String,
+    val source: String,
+    val dest: String,
+    val username: String? = null,
+    val value: JsonElement? = null,
+)
+
 // ─── ICE candidate (shared up/down) ─────────────────────────────────────────
 
 @Serializable
@@ -123,6 +156,7 @@ data class UserMsg(
     val username: String? = null,
     val permissions: List<String>? = null,
     val status: JsonElement? = null,
+    val data: JsonElement? = null,  // user data, e.g. {"raisehand": true}
 )
 
 @Serializable
@@ -148,6 +182,32 @@ data class ServerIceMsg(
     val type: String,
     val id: String,
     val candidate: IceCandidateJson,
+)
+
+/** `chat` and `chathistory`. */
+@Serializable
+data class ServerChatMsg(
+    val type: String,
+    val id: String? = null,
+    val kind: String? = null,       // null / "" | "me" | "caption"
+    val source: String? = null,     // empty: sent by the server
+    val username: String? = null,
+    val dest: String? = null,
+    val privileged: Boolean = false,
+    val time: JsonElement? = null,  // ISO 8601 string (number in protocol v1)
+    val value: JsonElement? = null,
+)
+
+/** Not kept in the history: notices ("error", "warning", "info", "kicked") and commands ("mute", "clearchat"). */
+@Serializable
+data class ServerUserMsg(
+    val type: String,
+    val kind: String? = null,
+    val source: String? = null,
+    val username: String? = null,
+    val dest: String? = null,
+    val privileged: Boolean = false,
+    val value: JsonElement? = null,
 )
 
 @Serializable

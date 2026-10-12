@@ -41,7 +41,45 @@
     <string name="label_connecting">連線中…</string>
     <string name="label_connected">已連線</string>
     <string name="label_disconnected">已中斷連線</string>
+    <string name="label_reconnecting">正在重新連線…</string>
     <string name="label_error">錯誤</string>
+    <string name="action_audio_output">音訊輸出</string>
+    <string name="audio_route_speaker">擴音器</string>
+    <string name="audio_route_earpiece">聽筒</string>
+    <string name="audio_route_headset">耳機</string>
+    <string name="audio_route_bluetooth">藍牙</string>
+
+    <!-- Chat -->
+    <string name="action_chat">聊天</string>
+    <string name="chat_title">訊息</string>
+    <string name="chat_hint">傳送給所有人</string>
+    <string name="action_send">傳送</string>
+    <string name="chat_empty">目前沒有訊息。\n群組中的所有人都能看到訊息，包括之後加入的人。</string>
+    <string name="chat_private">私人</string>
+    <string name="chat_server">伺服器</string>
+    <string name="chat_muted_by">%1$s 關閉了你的麥克風</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">舉手</string>
+    <string name="action_lower_hand">放下手</string>
+    <string name="label_hand_raised">已舉手</string>
+    <string name="notice_hand_raised">%1$s 舉手了</string>
+    <string name="chat_to_everyone">所有人</string>
+    <string name="chat_to">傳送給：%1$s</string>
+    <string name="chat_private_to">私訊給 %1$s</string>
+    <string name="chat_hint_private">私訊給 %1$s</string>
+
+    <!-- Participants -->
+    <string name="action_participants">參與者</string>
+    <string name="label_operator">管理員</string>
+    <string name="action_private_message">私訊</string>
+    <string name="action_kick">移出群組</string>
+    <string name="action_allow_present">允許簡報</string>
+    <string name="action_forbid_present">禁止簡報</string>
+    <string name="action_make_op">設為管理員</string>
+    <string name="action_remove_op">取消管理員權限</string>
+    <string name="confirm_kick">將 %1$s 移出群組？</string>
+    <string name="action_more">更多選項</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">通話中</string>
@@ -65,4 +103,6 @@
     <string name="error_connection_lost">連線中斷：%1$s</string>
     <string name="error_microphone">無法傳送音訊/視訊：%1$s</string>
     <string name="error_downstream">無法接收串流：%1$s</string>
+    <string name="error_left_group">你已不在群組中（被伺服器移除或群組已關閉）</string>
+    <string name="error_reconnect_failed">無法重新連線至伺服器。請檢查網路後重新加入。</string>
 </resources>

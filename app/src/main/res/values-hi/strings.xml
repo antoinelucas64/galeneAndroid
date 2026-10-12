@@ -42,7 +42,45 @@
     <string name="label_connecting">कनेक्ट हो रहा है…</string>
     <string name="label_connected">कनेक्ट हो गया</string>
     <string name="label_disconnected">डिस्कनेक्ट हो गया</string>
+    <string name="label_reconnecting">फिर से कनेक्ट हो रहा है…</string>
     <string name="label_error">त्रुटि</string>
+    <string name="action_audio_output">ऑडियो आउटपुट</string>
+    <string name="audio_route_speaker">लाउडस्पीकर</string>
+    <string name="audio_route_earpiece">फ़ोन ईयरपीस</string>
+    <string name="audio_route_headset">हेडसेट</string>
+    <string name="audio_route_bluetooth">ब्लूटूथ</string>
+
+    <!-- Chat -->
+    <string name="action_chat">चैट</string>
+    <string name="chat_title">संदेश</string>
+    <string name="chat_hint">सभी को संदेश</string>
+    <string name="action_send">भेजें</string>
+    <string name="chat_empty">अभी कोई संदेश नहीं।\nसंदेश पूरे समूह को दिखते हैं, बाद में जुड़ने वालों को भी।</string>
+    <string name="chat_private">निजी</string>
+    <string name="chat_server">सर्वर</string>
+    <string name="chat_muted_by">%1$s ने आपका माइक बंद कर दिया</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">हाथ उठाएँ</string>
+    <string name="action_lower_hand">हाथ नीचे करें</string>
+    <string name="label_hand_raised">हाथ उठाया</string>
+    <string name="notice_hand_raised">%1$s ने हाथ उठाया</string>
+    <string name="chat_to_everyone">सभी</string>
+    <string name="chat_to">प्रति: %1$s</string>
+    <string name="chat_private_to">%1$s को निजी</string>
+    <string name="chat_hint_private">%1$s को निजी संदेश</string>
+
+    <!-- Participants -->
+    <string name="action_participants">प्रतिभागी</string>
+    <string name="label_operator">संचालक</string>
+    <string name="action_private_message">निजी संदेश</string>
+    <string name="action_kick">समूह से हटाएँ</string>
+    <string name="action_allow_present">प्रस्तुत करने दें</string>
+    <string name="action_forbid_present">प्रस्तुत करने से रोकें</string>
+    <string name="action_make_op">संचालक बनाएँ</string>
+    <string name="action_remove_op">संचालक अधिकार हटाएँ</string>
+    <string name="confirm_kick">%1$s को समूह से हटाएँ?</string>
+    <string name="action_more">और विकल्प</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">जारी कॉल</string>
@@ -66,4 +104,6 @@
     <string name="error_connection_lost">कनेक्शन टूट गया: %1$s</string>
     <string name="error_microphone">ऑडियो/वीडियो नहीं भेजा जा सका: %1$s</string>
     <string name="error_downstream">स्ट्रीम प्राप्त नहीं की जा सकी: %1$s</string>
+    <string name="error_left_group">आप अब समूह में नहीं हैं (सर्वर द्वारा हटाया गया या समूह बंद हुआ)</string>
+    <string name="error_reconnect_failed">सर्वर से फिर से कनेक्ट नहीं हो सका। नेटवर्क जाँचें और फिर से शामिल हों।</string>
 </resources>

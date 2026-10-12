@@ -43,7 +43,45 @@
     <string name="label_connecting">Conectando…</string>
     <string name="label_connected">Conectado</string>
     <string name="label_disconnected">Desconectado</string>
+    <string name="label_reconnecting">Reconectando…</string>
     <string name="label_error">Error</string>
+    <string name="action_audio_output">Salida de audio</string>
+    <string name="audio_route_speaker">Altavoz</string>
+    <string name="audio_route_earpiece">Auricular del teléfono</string>
+    <string name="audio_route_headset">Auriculares</string>
+    <string name="audio_route_bluetooth">Bluetooth</string>
+
+    <!-- Chat -->
+    <string name="action_chat">Chat</string>
+    <string name="chat_title">Mensajes</string>
+    <string name="chat_hint">Mensaje para todos</string>
+    <string name="action_send">Enviar</string>
+    <string name="chat_empty">Aún no hay mensajes.\nLos mensajes los ve todo el grupo, incluidas las personas que lleguen más tarde.</string>
+    <string name="chat_private">privado</string>
+    <string name="chat_server">el servidor</string>
+    <string name="chat_muted_by">%1$s ha silenciado tu micrófono</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">Levantar la mano</string>
+    <string name="action_lower_hand">Bajar la mano</string>
+    <string name="label_hand_raised">Mano levantada</string>
+    <string name="notice_hand_raised">%1$s ha levantado la mano</string>
+    <string name="chat_to_everyone">Todos</string>
+    <string name="chat_to">Para: %1$s</string>
+    <string name="chat_private_to">privado a %1$s</string>
+    <string name="chat_hint_private">Mensaje privado a %1$s</string>
+
+    <!-- Participants -->
+    <string name="action_participants">Participantes</string>
+    <string name="label_operator">Operador</string>
+    <string name="action_private_message">Mensaje privado</string>
+    <string name="action_kick">Expulsar del grupo</string>
+    <string name="action_allow_present">Permitir presentar</string>
+    <string name="action_forbid_present">Prohibir presentar</string>
+    <string name="action_make_op">Hacer operador</string>
+    <string name="action_remove_op">Quitar derechos de operador</string>
+    <string name="confirm_kick">¿Expulsar a %1$s del grupo?</string>
+    <string name="action_more">Más opciones</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">Llamada en curso</string>
@@ -67,4 +105,6 @@
     <string name="error_connection_lost">Conexión perdida: %1$s</string>
     <string name="error_microphone">No se puede enviar audio/vídeo: %1$s</string>
     <string name="error_downstream">No se puede recibir un flujo: %1$s</string>
+    <string name="error_left_group">Ya no estás en el grupo (expulsado por el servidor o grupo cerrado)</string>
+    <string name="error_reconnect_failed">No se pudo reconectar al servidor. Comprueba la red y vuelve a unirte.</string>
 </resources>

@@ -42,7 +42,45 @@
     <string name="label_connecting">Verbinden…</string>
     <string name="label_connected">Verbonden</string>
     <string name="label_disconnected">Verbinding verbroken</string>
+    <string name="label_reconnecting">Opnieuw verbinden…</string>
     <string name="label_error">Fout</string>
+    <string name="action_audio_output">Audio-uitvoer</string>
+    <string name="audio_route_speaker">Luidspreker</string>
+    <string name="audio_route_earpiece">Oorspeaker</string>
+    <string name="audio_route_headset">Headset</string>
+    <string name="audio_route_bluetooth">Bluetooth</string>
+
+    <!-- Chat -->
+    <string name="action_chat">Chat</string>
+    <string name="chat_title">Berichten</string>
+    <string name="chat_hint">Bericht aan iedereen</string>
+    <string name="action_send">Verzenden</string>
+    <string name="chat_empty">Nog geen berichten.\nBerichten zijn zichtbaar voor de hele groep, ook voor wie later binnenkomt.</string>
+    <string name="chat_private">privé</string>
+    <string name="chat_server">de server</string>
+    <string name="chat_muted_by">%1$s heeft je microfoon gedempt</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">Hand opsteken</string>
+    <string name="action_lower_hand">Hand laten zakken</string>
+    <string name="label_hand_raised">Hand opgestoken</string>
+    <string name="notice_hand_raised">%1$s steekt de hand op</string>
+    <string name="chat_to_everyone">Iedereen</string>
+    <string name="chat_to">Aan: %1$s</string>
+    <string name="chat_private_to">privé aan %1$s</string>
+    <string name="chat_hint_private">Privébericht aan %1$s</string>
+
+    <!-- Participants -->
+    <string name="action_participants">Deelnemers</string>
+    <string name="label_operator">Operator</string>
+    <string name="action_private_message">Privébericht</string>
+    <string name="action_kick">Uit de groep verwijderen</string>
+    <string name="action_allow_present">Presenteren toestaan</string>
+    <string name="action_forbid_present">Presenteren verbieden</string>
+    <string name="action_make_op">Operator maken</string>
+    <string name="action_remove_op">Operatorrechten intrekken</string>
+    <string name="confirm_kick">%1$s uit de groep verwijderen?</string>
+    <string name="action_more">Meer opties</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">Gesprek bezig</string>
@@ -66,4 +104,6 @@
     <string name="error_connection_lost">Verbinding verloren: %1$s</string>
     <string name="error_microphone">Kan geen audio/video verzenden: %1$s</string>
     <string name="error_downstream">Kan geen stream ontvangen: %1$s</string>
+    <string name="error_left_group">Je bent niet meer in de groep (verwijderd door de server of groep gesloten)</string>
+    <string name="error_reconnect_failed">Kan niet opnieuw verbinden met de server. Controleer het netwerk en neem opnieuw deel.</string>
 </resources>

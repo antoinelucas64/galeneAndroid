@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import fr.antoineassocies.galene.domain.protocol.IceCandidateJson
 import fr.antoineassocies.galene.domain.protocol.IceServerJson
 import fr.antoineassocies.galene.domain.protocol.RtcConfigurationJson
@@ -43,6 +44,9 @@ class WebRTCManager(
         private const val CAPTURE_WIDTH = 640
         private const val CAPTURE_HEIGHT = 480
         private const val CAPTURE_FPS = 30
+
+        // A disposed PeerConnection may never answer
+        private const val STATS_TIMEOUT_MS = 1_000L
     }
 
     /** Shared EGL context, needed by the UI's video renderers. */
@@ -261,6 +265,25 @@ class WebRTCManager(
         }
     }
 
+    // ─── Audio activity ───────────────────────────────────────────────────
+
+    /**
+     * Cumulative audio energy of each stream, read from the WebRTC statistics: the sound
+     * received on down streams, our microphone on the up stream. Comparing two readings
+     * tells who is speaking (see the web client's activity detection).
+     */
+    suspend fun audioEnergies(): Map<String, AudioEnergy> {
+        val streams = downStreams.values.map { Triple(it.id, it.pc, "inbound-rtp") } +
+            listOfNotNull(upStream?.let { Triple(it.id, it.pc, "media-source") })
+        return streams.mapNotNull { (id, pc, type) ->
+            val report = withTimeoutOrNull(STATS_TIMEOUT_MS) { pc.getStatsSuspend() } ?: return@mapNotNull null
+            val stats = report.statsMap.values.firstOrNull {
+                it.type == type && it.members["kind"] == "audio" && it.members["totalAudioEnergy"] is Double
+            } ?: return@mapNotNull null
+            id to AudioEnergy(stats.members["totalAudioEnergy"] as Double, stats.timestampUs)
+        }.toMap()
+    }
+
     // ─── Closing streams ──────────────────────────────────────────────────
 
     /** Closes a down stream; the UI is notified before the track is released. */
@@ -277,12 +300,22 @@ class WebRTCManager(
         upStream = null
     }
 
-    /** Releases all native resources: PeerConnections, tracks, camera. End of call. */
-    fun release() {
+    /**
+     * Closes every PeerConnection but keeps the microphone and camera open, so that a new
+     * session (after a reconnection) publishes them again without re-opening anything.
+     */
+    fun closeAllStreams() {
         _remoteVideoTracks.value = emptyMap()
         downStreams.values.forEach { it.pc.dispose() }
         downStreams.clear()
         closeUpStream()
+        pendingCandidates.clear()
+        settingRemote.clear()
+    }
+
+    /** Releases all native resources: PeerConnections, tracks, camera. End of call. */
+    fun release() {
+        closeAllStreams()
         localAudioTrack?.dispose()
         audioSource?.dispose()
         localAudioTrack = null
@@ -387,7 +420,13 @@ class WebRTCManager(
     private data class UpStream(val id: String, val label: String, val pc: PeerConnection)
 }
 
+/** Integral of the squared audio level (0–1) over time, in seconds, at [timestampUs]. */
+data class AudioEnergy(val total: Double, val timestampUs: Double)
+
 // ─── Coroutine extensions for SDP ────────────────────────────────────────────
+
+private suspend fun PeerConnection.getStatsSuspend(): RTCStatsReport =
+    suspendCancellableCoroutine { cont -> getStats { report -> if (cont.isActive) cont.resume(report) } }
 
 private suspend fun PeerConnection.createOfferSuspend(constraints: MediaConstraints): SessionDescription =
     suspendCancellableCoroutine { cont ->

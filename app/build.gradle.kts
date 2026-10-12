@@ -5,6 +5,14 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+/**
+ * One APK per processor family: WebRTC's native library is most of the app's size and
+ * a phone only needs one of them. Each APK gets `versionCode * 10 + code` (the universal
+ * APK `* 10 + 0`), the scheme F-Droid's `VercodeOperation` expects.
+ */
+val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)
+val appVersionCode = 2
+
 android {
     namespace = "fr.antoineassocies.galene"
     compileSdk = 35
@@ -13,8 +21,8 @@ android {
         applicationId = "fr.antoineassocies.galene"
         minSdk = 26  // Android 8.0 — covers 95%+ of active devices
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = appVersionCode
+        versionName = "0.2.0"
 
         // Languages of the app (res/values-*); the libraries' other translations are dropped
         resourceConfigurations += listOf(
@@ -54,11 +62,42 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include(*abiCodes.keys.toTypedArray())
+            isUniversalApk = true
+        }
     }
 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+        // Compressed native libraries: half the download size, extracted at install time
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
+    // Google-encrypted dependency list: unreadable by anyone else, refused by F-Droid
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            val abi = output.filters
+                .find { it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI }
+                ?.identifier
+            output.versionCode.set(appVersionCode * 10 + (abiCodes[abi] ?: 0))
         }
     }
 }

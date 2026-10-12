@@ -6,6 +6,7 @@ import fr.antoineassocies.galene.data.UserPreferences
 import fr.antoineassocies.galene.domain.AudioRouter
 import fr.antoineassocies.galene.domain.GaleneDirectory
 import fr.antoineassocies.galene.domain.GaleneClient
+import fr.antoineassocies.galene.domain.NetworkMonitor
 import fr.antoineassocies.galene.domain.WebRTCManager
 import fr.antoineassocies.galene.domain.model.GroupTarget
 import fr.antoineassocies.galene.domain.model.JoinRequest
@@ -36,6 +37,8 @@ val appModule = module {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.SECONDS)   // WebSocket — no read timeout
             .writeTimeout(10, TimeUnit.SECONDS)
+            // A WebSocket on a vanished network is otherwise only noticed by TCP, minutes later
+            .pingInterval(15, TimeUnit.SECONDS)
             .build()
     }
 
@@ -72,6 +75,8 @@ val appModule = module {
 
     factory { AudioRouter(androidContext()) }
 
+    single { NetworkMonitor(androidContext()) }
+
     viewModel { (request: JoinRequest) ->
         RoomViewModel(
             appContext = androidContext(),
@@ -79,6 +84,7 @@ val appModule = module {
             galeneClient = get(),
             webRTCManager = get(),
             audioRouter = get(),
+            networkMonitor = get(),
         )
     }
 }

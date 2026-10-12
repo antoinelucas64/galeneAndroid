@@ -42,7 +42,45 @@
     <string name="label_connecting">Bağlanıyor…</string>
     <string name="label_connected">Bağlandı</string>
     <string name="label_disconnected">Bağlantı kesildi</string>
+    <string name="label_reconnecting">Yeniden bağlanıyor…</string>
     <string name="label_error">Hata</string>
+    <string name="action_audio_output">Ses çıkışı</string>
+    <string name="audio_route_speaker">Hoparlör</string>
+    <string name="audio_route_earpiece">Telefon ahizesi</string>
+    <string name="audio_route_headset">Kulaklık</string>
+    <string name="audio_route_bluetooth">Bluetooth</string>
+
+    <!-- Chat -->
+    <string name="action_chat">Sohbet</string>
+    <string name="chat_title">Mesajlar</string>
+    <string name="chat_hint">Herkese mesaj</string>
+    <string name="action_send">Gönder</string>
+    <string name="chat_empty">Henüz mesaj yok.\nMesajları, sonradan katılanlar dahil tüm grup görür.</string>
+    <string name="chat_private">özel</string>
+    <string name="chat_server">sunucu</string>
+    <string name="chat_muted_by">%1$s mikrofonunuzu kapattı</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">El kaldır</string>
+    <string name="action_lower_hand">Eli indir</string>
+    <string name="label_hand_raised">El kaldırıldı</string>
+    <string name="notice_hand_raised">%1$s elini kaldırdı</string>
+    <string name="chat_to_everyone">Herkes</string>
+    <string name="chat_to">Alıcı: %1$s</string>
+    <string name="chat_private_to">%1$s için özel</string>
+    <string name="chat_hint_private">%1$s için özel mesaj</string>
+
+    <!-- Participants -->
+    <string name="action_participants">Katılımcılar</string>
+    <string name="label_operator">Operatör</string>
+    <string name="action_private_message">Özel mesaj</string>
+    <string name="action_kick">Gruptan çıkar</string>
+    <string name="action_allow_present">Sunmaya izin ver</string>
+    <string name="action_forbid_present">Sunmayı yasakla</string>
+    <string name="action_make_op">Operatör yap</string>
+    <string name="action_remove_op">Operatör yetkisini kaldır</string>
+    <string name="confirm_kick">%1$s gruptan çıkarılsın mı?</string>
+    <string name="action_more">Diğer seçenekler</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">Devam eden arama</string>
@@ -66,4 +104,6 @@
     <string name="error_connection_lost">Bağlantı koptu: %1$s</string>
     <string name="error_microphone">Ses/görüntü gönderilemiyor: %1$s</string>
     <string name="error_downstream">Bir akış alınamıyor: %1$s</string>
+    <string name="error_left_group">Artık grupta değilsiniz (sunucu tarafından çıkarıldınız veya grup kapandı)</string>
+    <string name="error_reconnect_failed">Sunucuya yeniden bağlanılamadı. Ağı kontrol edip tekrar katılın.</string>
 </resources>

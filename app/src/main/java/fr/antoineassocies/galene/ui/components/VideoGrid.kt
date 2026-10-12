@@ -1,10 +1,14 @@
 package fr.antoineassocies.galene.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PanTool
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -14,8 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import fr.antoineassocies.galene.R
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
@@ -29,6 +36,8 @@ data class VideoTile(
     val label: String,
     val track: VideoTrack?,
     val mirror: Boolean = false,
+    val speaking: Boolean = false,
+    val raisedHand: Boolean = false,
 )
 
 /**
@@ -72,12 +81,14 @@ fun FullscreenTile(
     eglContext: EglBase.Context,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Fill the space, cutting the edges (Picture-in-Picture), rather than show the whole picture. */
+    crop: Boolean = false,
 ) {
     TileView(
         tile, eglContext,
         modifier.background(Color.Black),
         onClick = onClick,
-        scaling = RendererCommon.ScalingType.SCALE_ASPECT_FIT,
+        scaling = if (crop) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT,
         rounded = false,
     )
 }
@@ -91,9 +102,10 @@ private fun TileView(
     scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL,
     rounded: Boolean = true,
 ) {
+    val shape = if (rounded) RoundedCornerShape(12.dp) else RectangleShape
     Box(
         modifier
-            .then(if (rounded) Modifier.clip(RoundedCornerShape(12.dp)) else Modifier)
+            .clip(shape)
             .background(if (rounded) MaterialTheme.colorScheme.surfaceVariant else Color.Black)
     ) {
         if (tile.track != null) {
@@ -124,6 +136,24 @@ private fun TileView(
                 .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
                 .padding(horizontal = 6.dp, vertical = 2.dp)
         )
+        if (tile.raisedHand) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                modifier = Modifier.align(Alignment.TopStart).padding(6.dp),
+            ) {
+                Icon(
+                    Icons.Default.PanTool,
+                    contentDescription = stringResource(R.string.label_hand_raised),
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier = Modifier.padding(6.dp).size(18.dp),
+                )
+            }
+        }
+        // Speaking: coloured outline, drawn over the video
+        if (tile.speaking) {
+            Box(Modifier.matchParentSize().border(3.dp, MaterialTheme.colorScheme.primary, shape))
+        }
         // Transparent layer above the SurfaceView: touches reach Compose, not the native
         // view, which would ignore or swallow them depending on the version
         Box(Modifier.matchParentSize().clickable(onClick = onClick))

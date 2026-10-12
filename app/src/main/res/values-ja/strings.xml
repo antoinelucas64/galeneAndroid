@@ -41,7 +41,45 @@
     <string name="label_connecting">接続中…</string>
     <string name="label_connected">接続済み</string>
     <string name="label_disconnected">切断されました</string>
+    <string name="label_reconnecting">再接続中…</string>
     <string name="label_error">エラー</string>
+    <string name="action_audio_output">音声出力</string>
+    <string name="audio_route_speaker">スピーカー</string>
+    <string name="audio_route_earpiece">受話口</string>
+    <string name="audio_route_headset">ヘッドセット</string>
+    <string name="audio_route_bluetooth">Bluetooth</string>
+
+    <!-- Chat -->
+    <string name="action_chat">チャット</string>
+    <string name="chat_title">メッセージ</string>
+    <string name="chat_hint">全員へのメッセージ</string>
+    <string name="action_send">送信</string>
+    <string name="chat_empty">まだメッセージはありません。\nメッセージは、後から参加する人を含むグループ全員に表示されます。</string>
+    <string name="chat_private">個別</string>
+    <string name="chat_server">サーバー</string>
+    <string name="chat_muted_by">%1$s があなたのマイクをオフにしました</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">手を挙げる</string>
+    <string name="action_lower_hand">手を下ろす</string>
+    <string name="label_hand_raised">挙手中</string>
+    <string name="notice_hand_raised">%1$s が手を挙げました</string>
+    <string name="chat_to_everyone">全員</string>
+    <string name="chat_to">宛先: %1$s</string>
+    <string name="chat_private_to">%1$s への個別メッセージ</string>
+    <string name="chat_hint_private">%1$s への個別メッセージ</string>
+
+    <!-- Participants -->
+    <string name="action_participants">参加者</string>
+    <string name="label_operator">オペレーター</string>
+    <string name="action_private_message">個別メッセージ</string>
+    <string name="action_kick">グループから削除</string>
+    <string name="action_allow_present">発表を許可</string>
+    <string name="action_forbid_present">発表を禁止</string>
+    <string name="action_make_op">オペレーターにする</string>
+    <string name="action_remove_op">オペレーター権限を外す</string>
+    <string name="confirm_kick">%1$s をグループから削除しますか？</string>
+    <string name="action_more">その他のオプション</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">通話中</string>
@@ -65,4 +103,6 @@
     <string name="error_connection_lost">接続が切れました: %1$s</string>
     <string name="error_microphone">音声/映像を送信できません: %1$s</string>
     <string name="error_downstream">ストリームを受信できません: %1$s</string>
+    <string name="error_left_group">グループから退出しました（サーバーによる削除、またはグループの終了）</string>
+    <string name="error_reconnect_failed">サーバーに再接続できませんでした。ネットワークを確認して、もう一度参加してください。</string>
 </resources>

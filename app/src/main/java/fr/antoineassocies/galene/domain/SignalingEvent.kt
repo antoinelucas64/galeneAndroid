@@ -1,7 +1,10 @@
 package fr.antoineassocies.galene.domain
 
+import fr.antoineassocies.galene.domain.model.ChatMessage
 import fr.antoineassocies.galene.domain.protocol.IceCandidateJson
 import fr.antoineassocies.galene.domain.protocol.RtcConfigurationJson
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 
 /**
  * High-level events produced by [GaleneClient] from the server's messages.
@@ -12,12 +15,13 @@ sealed class SignalingEvent {
     /** Handshake accepted; the `join` can be sent. */
     data class Connected(val serverId: String?) : SignalingEvent()
 
-    /** Group join accepted (`joined` kind=join), or permissions changed (kind=change). */
+    /** Group join accepted (`joined` kind=join), or permissions changed ([change], kind=change). */
     data class Joined(
         val group: String,
         val username: String,
         val permissions: List<String>,
         val rtcConfiguration: RtcConfigurationJson?,
+        val change: Boolean = false,
     ) : SignalingEvent()
 
     /**
@@ -38,6 +42,8 @@ sealed class SignalingEvent {
         val id: String,
         val username: String?,
         val permissions: List<String>?,
+        /** User data, replaced as a whole on each change; `raisehand` set when the hand is up. */
+        val data: JsonObject? = null,
     ) : SignalingEvent()
 
     /**
@@ -68,6 +74,21 @@ sealed class SignalingEvent {
     /** The server saw an ICE failure on our up stream and asks for an ICE restart. */
     data class Renegotiate(val id: String) : SignalingEvent()
 
-    /** WebSocket closed; [reason] is null for a normal closure that we requested. */
-    data class Disconnected(val reason: String? = null) : SignalingEvent()
+    /** Chat message, new or from the history; captions are not reported. */
+    data class Chat(val message: ChatMessage) : SignalingEvent()
+
+    /**
+     * Message from another client or the server that is not chat: [kind] `error`, `warning`,
+     * `info`, `kicked` (shown to the user), `mute` (we are asked to mute), `clearchat`.
+     * Only honoured when [privileged] (sent by an operator or the server), as the web client does.
+     */
+    data class UserMessage(
+        val kind: String,
+        val username: String?,
+        val privileged: Boolean,
+        val value: JsonElement?,
+    ) : SignalingEvent()
+
+    /** Connection lost or closed by the server (never emitted for our own [GaleneClient.disconnect]). */
+    data class Disconnected(val reason: String) : SignalingEvent()
 }

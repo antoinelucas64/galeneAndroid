@@ -1,0 +1,1 @@
+Chat (history, private messages, links, unread badge), raise hand, highlight of who is speaking, participant list with operator actions, Picture-in-Picture, lighter video on mobile data, audio output picker with Bluetooth headset microphone, automatic reconnection after network loss, smaller APK per processor (~7 MB).

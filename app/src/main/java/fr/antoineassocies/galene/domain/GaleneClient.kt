@@ -9,16 +9,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import android.util.Log
+import fr.antoineassocies.galene.domain.model.ChatMessage
 import fr.antoineassocies.galene.domain.protocol.*
+import java.time.OffsetDateTime
 import java.util.UUID
 
 /**
@@ -42,8 +48,12 @@ class GaleneClient(
         private const val PROTOCOL_VERSION = "2"
     }
 
-    /** Session identifier sent in the handshake; the server uses it as our user `id`. */
-    val clientId: String = UUID.randomUUID().toString().replace("-", "")
+    /**
+     * Identifier sent in the handshake; the server uses it as our user `id`. New for each
+     * connection: after a network loss the server may still hold the previous session.
+     */
+    var clientId: String = newId()
+        private set
 
     private val _connectionState = MutableStateFlow(ConnectionState.Disconnected)
     val connectionState: StateFlow<ConnectionState> = _connectionState.asStateFlow()
@@ -52,14 +62,18 @@ class GaleneClient(
     private val _events = MutableSharedFlow<SignalingEvent>(replay = 0, extraBufferCapacity = 64)
     val events: SharedFlow<SignalingEvent> = _events.asSharedFlow()
 
-    private var webSocket: WebSocket? = null
+    // Callbacks from any other socket (one we closed or replaced) are ignored
+    @Volatile private var webSocket: WebSocket? = null
     private var currentGroup: String? = null
+    // Name given by the server in `joined`, repeated in our chat messages
+    private var username: String? = null
 
     // ─── Connection ────────────────────────────────────────────────────────
 
     /** Opens the WebSocket to [serverUrl] (`wss://host/ws`), closing any previous connection. */
     fun connect(serverUrl: String) {
         disconnect()
+        clientId = newId()
         _connectionState.value = ConnectionState.Connecting
         Log.d(TAG, "connect() → $serverUrl")
 
@@ -74,13 +88,17 @@ class GaleneClient(
         webSocket = httpClient.newWebSocket(request, Listener())
     }
 
-    /** Leaves the group cleanly (`leave`), then closes the WebSocket. Idempotent. */
+    /**
+     * Leaves the group cleanly (`leave`), then closes the WebSocket. Idempotent.
+     * Emits no [SignalingEvent.Disconnected]: that event only reports unwanted losses.
+     */
     fun disconnect() {
-        currentGroup?.let { group ->
-            webSocket?.send(json.encodeToString(LeaveMsg(group = group)))
-        }
-        webSocket?.close(1000, "User left")
+        val ws = webSocket
         webSocket = null
+        currentGroup?.let { group ->
+            ws?.send(json.encodeToString(LeaveMsg(group = group)))
+        }
+        ws?.close(1000, "User left")
         currentGroup = null
         _connectionState.value = ConnectionState.Disconnected
     }
@@ -128,6 +146,33 @@ class GaleneClient(
         send(AnswerMsg(id = streamId, sdp = sdp))
     }
 
+    /**
+     * Sends [text] to the whole group, or to the user [dest] only; [me] for an action (`/me`).
+     * The server echoes group messages back to us, not private ones.
+     */
+    fun sendChat(text: String, me: Boolean = false, dest: String? = null) {
+        send(ChatMsg(kind = if (me) "me" else null, source = clientId, username = username, dest = dest, value = text))
+    }
+
+    /** Raises or lowers our hand: `setdata` on ourselves, seen by everyone in the user list. */
+    fun setRaisedHand(raised: Boolean) {
+        val value = JsonObject(mapOf("raisehand" to if (raised) JsonPrimitive(true) else JsonNull))
+        sendUserAction("setdata", clientId, value)
+    }
+
+    /**
+     * Acts on the user [dest]. Operator actions: `kick`, `op`, `unop`, `present`, `unpresent`;
+     * the server refuses them if we lack the `op` permission.
+     */
+    fun sendUserAction(kind: String, dest: String, value: JsonElement? = null) {
+        send(UserActionMsg(kind = kind, source = clientId, dest = dest, username = username, value = value))
+    }
+
+    /** Sends a non-chat message to [dest], e.g. `mute` (an operator asks them to mute). */
+    fun sendUserMessage(kind: String, dest: String, value: JsonElement? = null) {
+        send(UserMessageMsg(kind = kind, source = clientId, dest = dest, username = username, value = value))
+    }
+
     /** Forwards a local ICE candidate for [streamId] (trickle ICE). */
     fun sendIce(streamId: String, candidate: IceCandidateJson) {
         send(IceMsg(id = streamId, candidate = candidate))
@@ -138,25 +183,31 @@ class GaleneClient(
     private inner class Listener : WebSocketListener() {
 
         override fun onOpen(ws: WebSocket, response: Response) {
+            if (ws !== webSocket) return
             Log.d(TAG, "WebSocket open → sending handshake id=$clientId")
             ws.send(json.encodeToString(HandshakeMsg(id = clientId)))
         }
 
         override fun onMessage(ws: WebSocket, text: String) {
+            if (ws !== webSocket) return
             Log.d(TAG, "← ${text.take(300)}")
             handleMessage(text)
         }
 
         override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
             Log.e(TAG, "WebSocket failure: ${t.message} / HTTP ${response?.code}", t)
+            if (ws !== webSocket) return
+            webSocket = null
             _connectionState.value = ConnectionState.Disconnected
             _events.tryEmit(SignalingEvent.Disconnected(t.message ?: t.javaClass.simpleName))
         }
 
         override fun onClosed(ws: WebSocket, code: Int, reason: String) {
             Log.d(TAG, "WebSocket closed: code=$code reason=$reason")
+            if (ws !== webSocket) return
+            webSocket = null
             _connectionState.value = ConnectionState.Disconnected
-            _events.tryEmit(SignalingEvent.Disconnected(if (code != 1000) reason else null))
+            _events.tryEmit(SignalingEvent.Disconnected(reason.ifEmpty { "closed by server ($code)" }))
         }
     }
 
@@ -175,6 +226,7 @@ class GaleneClient(
                 }
                 if (PROTOCOL_VERSION !in versions) {
                     disconnect()
+                    _events.tryEmit(SignalingEvent.Disconnected("unsupported protocol version $versions"))
                     return
                 }
                 _connectionState.value = ConnectionState.Connected
@@ -184,14 +236,18 @@ class GaleneClient(
             "joined" -> {
                 val msg = decode<JoinedMsg>(text) ?: return
                 when (msg.kind) {
-                    "join", "change" -> _events.tryEmit(
-                        SignalingEvent.Joined(
-                            group = msg.group ?: currentGroup ?: "",
-                            username = msg.username ?: "",
-                            permissions = msg.permissions ?: emptyList(),
-                            rtcConfiguration = msg.rtcConfiguration,
+                    "join", "change" -> {
+                        username = msg.username
+                        _events.tryEmit(
+                            SignalingEvent.Joined(
+                                group = msg.group ?: currentGroup ?: "",
+                                username = msg.username ?: "",
+                                permissions = msg.permissions ?: emptyList(),
+                                rtcConfiguration = msg.rtcConfiguration,
+                                change = msg.kind == "change",
+                            )
                         )
-                    )
+                    }
                     "fail" -> _events.tryEmit(SignalingEvent.JoinFailed(error = msg.error, message = msg.value))
                     "leave" -> _events.tryEmit(SignalingEvent.JoinLeft(msg.group ?: currentGroup ?: ""))
                 }
@@ -205,6 +261,7 @@ class GaleneClient(
                         id = msg.id,
                         username = msg.username,
                         permissions = msg.permissions,
+                        data = msg.data as? JsonObject,
                     )
                 )
             }
@@ -250,14 +307,49 @@ class GaleneClient(
 
             "ping" -> send(PongMsg())
 
-            "pong", "chat", "chathistory", "usermessage",
-            "useraction", "groupaction" -> Unit   // ignored for now
+            "chat", "chathistory" -> {
+                val msg = decode<ServerChatMsg>(text) ?: return
+                if (msg.kind == "caption") return   // subtitles: not shown yet
+                _events.tryEmit(
+                    SignalingEvent.Chat(
+                        ChatMessage(
+                            id = msg.id,
+                            source = msg.source?.ifEmpty { null },
+                            username = msg.username?.ifEmpty { null },
+                            text = msg.value.asText(),
+                            time = parseTime(msg.time),
+                            kind = if (msg.kind == "me") ChatMessage.Kind.ME else ChatMessage.Kind.NORMAL,
+                            isPrivate = !msg.dest.isNullOrEmpty(),
+                            privileged = msg.privileged,
+                            history = type == "chathistory",
+                        )
+                    )
+                )
+            }
+
+            "usermessage" -> {
+                val msg = decode<ServerUserMsg>(text) ?: return
+                val kind = msg.kind ?: return
+                _events.tryEmit(SignalingEvent.UserMessage(kind, msg.username, msg.privileged, msg.value))
+            }
+
+            "pong", "useraction", "groupaction" -> Unit   // ignored for now
 
             else -> Unit // unknown message — silently ignored
         }
     }
 
     // ─── Utilities ─────────────────────────────────────────────────────────
+
+    private fun newId() = UUID.randomUUID().toString().replace("-", "")
+
+    /** ISO 8601 string (protocol v2) or milliseconds (v1); now if absent or unreadable. */
+    private fun parseTime(time: JsonElement?): Long {
+        val p = time as? JsonPrimitive ?: return System.currentTimeMillis()
+        if (!p.isString) return p.longOrNull ?: System.currentTimeMillis()
+        return runCatching { OffsetDateTime.parse(p.content).toInstant().toEpochMilli() }
+            .getOrDefault(System.currentTimeMillis())
+    }
 
     private inline fun <reified T> decode(text: String): T? =
         runCatching { json.decodeFromString<T>(text) }.onFailure {
@@ -275,9 +367,19 @@ class GaleneClient(
             is IceMsg          -> json.encodeToString(msg)
             is RenegotiateMsg  -> json.encodeToString(msg)
             is PongMsg         -> json.encodeToString(msg)
+            is ChatMsg         -> json.encodeToString(msg)
+            is UserActionMsg   -> json.encodeToString(msg)
+            is UserMessageMsg  -> json.encodeToString(msg)
             else               -> return
         }
         Log.d(TAG, "→ ${text.take(300)}")
         webSocket?.send(text)
     }
+}
+
+/** Text of a message `value`: usually a string, anything else shown as JSON. */
+internal fun JsonElement?.asText(): String = when (this) {
+    null, JsonNull -> ""
+    is JsonPrimitive -> content
+    else -> toString()
 }

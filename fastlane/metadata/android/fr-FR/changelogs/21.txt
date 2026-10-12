@@ -1,0 +1,1 @@
+Chat (historique, messages privés, liens, badge de non-lus), lever la main, mise en évidence de qui parle, liste des participants avec actions d'opérateur, Picture-in-Picture, vidéo allégée en données mobiles, choix de la sortie audio avec micro Bluetooth, reconnexion automatique après une coupure réseau, APK plus léger par processeur (~7 Mo).

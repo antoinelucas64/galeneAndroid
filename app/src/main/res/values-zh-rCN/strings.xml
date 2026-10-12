@@ -41,7 +41,45 @@
     <string name="label_connecting">正在连接…</string>
     <string name="label_connected">已连接</string>
     <string name="label_disconnected">已断开</string>
+    <string name="label_reconnecting">正在重新连接…</string>
     <string name="label_error">错误</string>
+    <string name="action_audio_output">音频输出</string>
+    <string name="audio_route_speaker">扬声器</string>
+    <string name="audio_route_earpiece">听筒</string>
+    <string name="audio_route_headset">耳机</string>
+    <string name="audio_route_bluetooth">蓝牙</string>
+
+    <!-- Chat -->
+    <string name="action_chat">聊天</string>
+    <string name="chat_title">消息</string>
+    <string name="chat_hint">发送给所有人</string>
+    <string name="action_send">发送</string>
+    <string name="chat_empty">暂无消息。\n群组中的所有人都能看到消息，包括之后加入的人。</string>
+    <string name="chat_private">私信</string>
+    <string name="chat_server">服务器</string>
+    <string name="chat_muted_by">%1$s 关闭了你的麦克风</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">举手</string>
+    <string name="action_lower_hand">放下手</string>
+    <string name="label_hand_raised">已举手</string>
+    <string name="notice_hand_raised">%1$s 举手了</string>
+    <string name="chat_to_everyone">所有人</string>
+    <string name="chat_to">发送给：%1$s</string>
+    <string name="chat_private_to">私信给 %1$s</string>
+    <string name="chat_hint_private">私信给 %1$s</string>
+
+    <!-- Participants -->
+    <string name="action_participants">参与者</string>
+    <string name="label_operator">管理员</string>
+    <string name="action_private_message">私信</string>
+    <string name="action_kick">移出群组</string>
+    <string name="action_allow_present">允许演示</string>
+    <string name="action_forbid_present">禁止演示</string>
+    <string name="action_make_op">设为管理员</string>
+    <string name="action_remove_op">取消管理员权限</string>
+    <string name="confirm_kick">将 %1$s 移出群组？</string>
+    <string name="action_more">更多选项</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">通话中</string>
@@ -65,4 +103,6 @@
     <string name="error_connection_lost">连接已断开：%1$s</string>
     <string name="error_microphone">无法发送音频/视频：%1$s</string>
     <string name="error_downstream">无法接收媒体流：%1$s</string>
+    <string name="error_left_group">你已不在群组中（被服务器移出或群组已关闭）</string>
+    <string name="error_reconnect_failed">无法重新连接服务器。请检查网络后重新加入。</string>
 </resources>

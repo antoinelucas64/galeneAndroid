@@ -41,8 +41,14 @@ It is not affiliated with the Galène project.
 | ✅ Two-way video, front / back camera | ✅ Adaptive participant grid, tap for fullscreen |
 | ✅ Mute microphone / camera (the camera really turns off) | ✅ Call kept alive in the background (notification) |
 | ✅ Camera paused in the background, resumed on return | ✅ Automatic connection restart on ICE failure |
-| ⏳ Reconnection after network loss | ⏳ Bluetooth / wired headset routing |
-| ⏳ Android call integration (ConnectionService) | ⏳ Screen sharing, Picture-in-Picture |
+| ✅ Screen kept on during the call | ✅ Call resumes after an incoming phone call |
+| ✅ Interface in the phone's language (19 languages) | ⏳ Reconnection after network loss |
+| ⏳ Bluetooth headset microphone, wired headset routing | ✅ Group chat: history, clickable links, unread badge, operator notices |
+| ✅ Private chat messages (pick a recipient, tap to reply) | ⏳ Raise hand, highlight of who is speaking |
+| ✅ Picture-in-Picture with mute and hang-up buttons | ⏳ Participant list; operator actions (mute, allow presenting, operator rights, remove) |
+| ⏳ Lower video quality received on mobile data | ⏳ Android call integration (ConnectionService), screen sharing |
+
+⏳ = implemented, not yet tested on a real device.
 
 The interface follows the phone's language (Android 13+ also lets you pick it per app):
 English, French, German, Spanish, Italian, Portuguese (PT/BR), Dutch, Polish, Russian,
@@ -57,7 +63,7 @@ open it. Android asks you to allow installing apps from this source (your browse
 file manager) the first time.
 
 You can also build the APK yourself (see [Building](#building)). F-Droid publication is
-planned once the app is stable.
+in progress.
 
 ## Usage
 
@@ -113,7 +119,7 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 git clone https://github.com/antoinelucas64/galeneAndroid.git
 cd galeneAndroid
-./gradlew assembleDebug          # → app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleDebug          # → app/build/outputs/apk/debug/app-<abi>-debug.apk
 ```
 
 ### Installing on a phone
@@ -128,11 +134,14 @@ adb devices                      # the phone must be listed
 ### Following the logs
 
 ```bash
-adb logcat -s GaleneClient WebRTCManager
+adb logcat -s GaleneClient WebRTCManager AudioRouter
 ```
 
 - `GaleneClient`: signaling messages exchanged with the server (`→` sent, `←` received);
-- `WebRTCManager`: ICE servers, local candidates, connection state of each stream.
+- `WebRTCManager`: ICE servers, local candidates, connection state of each stream;
+- `AudioRouter`: available audio outputs and the one chosen.
+
+Debug builds also show this signaling trace in a line at the top of the room screen.
 
 After a native crash (libwebrtc), the cause is under the `rtc`, `libc` and `DEBUG` tags:
 
@@ -144,13 +153,27 @@ adb logcat -b crash -d
 
 ```bash
 ./gradlew assembleRelease
-# → app/build/outputs/apk/release/app-release-unsigned.apk
+# → app/build/outputs/apk/release/app-<abi>-release-unsigned.apk
 
 # Signing (create the keystore once)
 keytool -genkey -v -keystore galene-release.jks -alias galene -keyalg RSA -keysize 4096 -validity 10000
 $ANDROID_HOME/build-tools/35.0.0/apksigner sign --ks galene-release.jks \
-  --out app-release-signed.apk app/build/outputs/apk/release/app-release-unsigned.apk
+  --out galene-arm64-v8a.apk app/build/outputs/apk/release/app-arm64-v8a-release-unsigned.apk
 ```
+
+One APK is produced per processor family, since WebRTC's native library is most of
+the size (about 7 MB each, against 22 MB for the `universal` one that contains them all):
+
+| APK | Phones | versionCode |
+|---|---|---|
+| `arm64-v8a` | nearly all phones since 2017 | `versionCode × 10 + 2` |
+| `armeabi-v7a` | older 32-bit phones | `× 10 + 1` |
+| `x86`, `x86_64` | emulators, some Chromebooks | `× 10 + 3`, `× 10 + 4` |
+| `universal` | all | `× 10 + 0` |
+
+The release build is reproducible: built twice from the same commit in different
+directories, the unsigned APKs are identical byte for byte. Another machine needs the
+same JDK and build-tools versions to get the same result.
 
 ### Tests
 
@@ -196,9 +219,9 @@ in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 - [x] **Phase 1 — Audio MVP**: connection, authentication, two-way audio
 - [x] **Phase 2 — Video and UX**: video, permissions, grid, controls, lifecycle, Galène-style login
-- [ ] **Phase 3 — Robustness**: ~~background calls~~ ✓, network reconnection, audio routing, incoming phone calls
-- [ ] **Phase 4 — System integration**: ConnectionService, UnifiedPush, screen sharing, PiP
-- [ ] **Phase 5 — Distribution**: ~~multilingual UI~~, F-Droid, reproducible builds, user documentation
+- [ ] **Phase 3 — Robustness**: ~~background calls~~ ✓, ~~screen kept on~~ ✓, ~~incoming phone calls~~ ✓, network reconnection, audio routing (Bluetooth microphone, wired headset)
+- [ ] **Phase 4 — System integration**: ConnectionService, UnifiedPush, screen sharing, ~~PiP~~ ✓
+- [ ] **Phase 5 — Distribution**: ~~multilingual UI~~ ✓, F-Droid (submitted), ~~reproducible builds~~ ✓, user documentation
 
 ## Contributing
 

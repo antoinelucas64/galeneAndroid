@@ -46,7 +46,45 @@
     <string name="label_connecting">جارٍ الاتصال…</string>
     <string name="label_connected">متصل</string>
     <string name="label_disconnected">غير متصل</string>
+    <string name="label_reconnecting">جارٍ إعادة الاتصال…</string>
     <string name="label_error">خطأ</string>
+    <string name="action_audio_output">مخرج الصوت</string>
+    <string name="audio_route_speaker">مكبّر الصوت</string>
+    <string name="audio_route_earpiece">سماعة الهاتف</string>
+    <string name="audio_route_headset">سماعة الرأس</string>
+    <string name="audio_route_bluetooth">بلوتوث</string>
+
+    <!-- Chat -->
+    <string name="action_chat">الدردشة</string>
+    <string name="chat_title">الرسائل</string>
+    <string name="chat_hint">رسالة إلى الجميع</string>
+    <string name="action_send">إرسال</string>
+    <string name="chat_empty">لا توجد رسائل بعد.\nيرى الرسائلَ جميعُ أعضاء المجموعة، بمن فيهم من ينضم لاحقًا.</string>
+    <string name="chat_private">خاصة</string>
+    <string name="chat_server">الخادم</string>
+    <string name="chat_muted_by">قام %1$s بكتم الميكروفون الخاص بك</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">رفع اليد</string>
+    <string name="action_lower_hand">خفض اليد</string>
+    <string name="label_hand_raised">اليد مرفوعة</string>
+    <string name="notice_hand_raised">رفع %1$s يده</string>
+    <string name="chat_to_everyone">الجميع</string>
+    <string name="chat_to">إلى: %1$s</string>
+    <string name="chat_private_to">خاصة إلى %1$s</string>
+    <string name="chat_hint_private">رسالة خاصة إلى %1$s</string>
+
+    <!-- Participants -->
+    <string name="action_participants">المشاركون</string>
+    <string name="label_operator">مشرف</string>
+    <string name="action_private_message">رسالة خاصة</string>
+    <string name="action_kick">إزالة من المجموعة</string>
+    <string name="action_allow_present">السماح بالعرض</string>
+    <string name="action_forbid_present">منع العرض</string>
+    <string name="action_make_op">تعيين مشرفًا</string>
+    <string name="action_remove_op">إزالة صلاحيات المشرف</string>
+    <string name="confirm_kick">هل تريد إزالة %1$s من المجموعة؟</string>
+    <string name="action_more">خيارات أخرى</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">مكالمة جارية</string>
@@ -70,4 +108,6 @@
     <string name="error_connection_lost">انقطع الاتصال: %1$s</string>
     <string name="error_microphone">تعذّر إرسال الصوت/الفيديو: %1$s</string>
     <string name="error_downstream">تعذّر استقبال بث: %1$s</string>
+    <string name="error_left_group">لم تعد في المجموعة (أزالك الخادم أو أُغلقت المجموعة)</string>
+    <string name="error_reconnect_failed">تعذّرت إعادة الاتصال بالخادم. تحقق من الشبكة وانضم مجددًا.</string>
 </resources>

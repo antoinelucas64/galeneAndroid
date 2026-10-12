@@ -41,7 +41,45 @@
     <string name="label_connecting">연결 중…</string>
     <string name="label_connected">연결됨</string>
     <string name="label_disconnected">연결 끊김</string>
+    <string name="label_reconnecting">다시 연결 중…</string>
     <string name="label_error">오류</string>
+    <string name="action_audio_output">오디오 출력</string>
+    <string name="audio_route_speaker">스피커</string>
+    <string name="audio_route_earpiece">수화부</string>
+    <string name="audio_route_headset">헤드셋</string>
+    <string name="audio_route_bluetooth">블루투스</string>
+
+    <!-- Chat -->
+    <string name="action_chat">채팅</string>
+    <string name="chat_title">메시지</string>
+    <string name="chat_hint">모두에게 메시지</string>
+    <string name="action_send">보내기</string>
+    <string name="chat_empty">아직 메시지가 없습니다.\n메시지는 나중에 참가하는 사람을 포함해 그룹 전체에 표시됩니다.</string>
+    <string name="chat_private">비공개</string>
+    <string name="chat_server">서버</string>
+    <string name="chat_muted_by">%1$s님이 내 마이크를 껐습니다</string>
+
+    <!-- Meeting -->
+    <string name="action_raise_hand">손 들기</string>
+    <string name="action_lower_hand">손 내리기</string>
+    <string name="label_hand_raised">손 듦</string>
+    <string name="notice_hand_raised">%1$s님이 손을 들었습니다</string>
+    <string name="chat_to_everyone">모두</string>
+    <string name="chat_to">받는 사람: %1$s</string>
+    <string name="chat_private_to">%1$s님에게 비공개</string>
+    <string name="chat_hint_private">%1$s님에게 비공개 메시지</string>
+
+    <!-- Participants -->
+    <string name="action_participants">참가자</string>
+    <string name="label_operator">운영자</string>
+    <string name="action_private_message">비공개 메시지</string>
+    <string name="action_kick">그룹에서 내보내기</string>
+    <string name="action_allow_present">발표 허용</string>
+    <string name="action_forbid_present">발표 금지</string>
+    <string name="action_make_op">운영자로 지정</string>
+    <string name="action_remove_op">운영자 권한 해제</string>
+    <string name="confirm_kick">%1$s님을 그룹에서 내보낼까요?</string>
+    <string name="action_more">추가 옵션</string>
 
     <!-- Call-in-progress notification -->
     <string name="notification_channel_call">통화 중</string>
@@ -65,4 +103,6 @@
     <string name="error_connection_lost">연결이 끊어졌습니다: %1$s</string>
     <string name="error_microphone">오디오/비디오를 보낼 수 없습니다: %1$s</string>
     <string name="error_downstream">스트림을 받을 수 없습니다: %1$s</string>
+    <string name="error_left_group">더 이상 그룹에 있지 않습니다(서버에서 내보냄 또는 그룹 종료)</string>
+    <string name="error_reconnect_failed">서버에 다시 연결할 수 없습니다. 네트워크를 확인하고 다시 참가하세요.</string>
 </resources>
