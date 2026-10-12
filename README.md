@@ -67,7 +67,9 @@ in progress.
 
 ## Usage
 
-The flow is the same as in Galène's web client.
+**Full user guide: [English](docs/user-guide.md) · [Français](docs/guide-utilisateur.md)** — joining, in-call controls, chat, participants, operator actions, Picture-in-Picture, troubleshooting.
+
+In short, the flow is the same as in Galène's web client.
 
 1. **Server** — enter the server address (`galene.example.org`): the app lists its public
    groups. An unlisted group can be joined by name. The last server used is remembered.
@@ -221,7 +223,7 @@ in [ARCHITECTURE.md](ARCHITECTURE.md).
 - [x] **Phase 2 — Video and UX**: video, permissions, grid, controls, lifecycle, Galène-style login
 - [ ] **Phase 3 — Robustness**: ~~background calls~~ ✓, ~~screen kept on~~ ✓, ~~incoming phone calls~~ ✓, network reconnection, audio routing (Bluetooth microphone, wired headset)
 - [ ] **Phase 4 — System integration**: ConnectionService, UnifiedPush, screen sharing, ~~PiP~~ ✓
-- [ ] **Phase 5 — Distribution**: ~~multilingual UI~~ ✓, F-Droid (submitted), ~~reproducible builds~~ ✓, user documentation
+- [ ] **Phase 5 — Distribution**: ~~multilingual UI~~ ✓, F-Droid (submitted), ~~reproducible builds~~ ✓, ~~user documentation~~ ✓
 
 ## Contributing
 
