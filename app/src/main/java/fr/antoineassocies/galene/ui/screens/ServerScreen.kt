@@ -62,7 +62,7 @@ fun ServerScreen(
                 onValueChange = viewModel::onInputChange,
                 label = { Text(stringResource(R.string.label_server_or_link)) },
                 placeholder = { Text("galene.example.org") },
-                supportingText = { Text(state.error ?: stringResource(R.string.hint_server_or_link)) },
+                supportingText = { Text(state.error?.asString() ?: stringResource(R.string.hint_server_or_link)) },
                 isError = state.error != null && state.groups == null,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),

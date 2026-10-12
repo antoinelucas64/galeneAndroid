@@ -67,7 +67,7 @@ class GaleneClient(
             .onFailure { e ->
                 Log.e(TAG, "Invalid URL: $serverUrl — ${e.message}")
                 _connectionState.value = ConnectionState.Disconnected
-                _events.tryEmit(SignalingEvent.Disconnected("URL invalide : ${e.message}"))
+                _events.tryEmit(SignalingEvent.Disconnected("Invalid URL: ${e.message}"))
             }
             .getOrNull() ?: return
 
@@ -150,7 +150,7 @@ class GaleneClient(
         override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
             Log.e(TAG, "WebSocket failure: ${t.message} / HTTP ${response?.code}", t)
             _connectionState.value = ConnectionState.Disconnected
-            _events.tryEmit(SignalingEvent.Disconnected(t.message ?: "Erreur réseau"))
+            _events.tryEmit(SignalingEvent.Disconnected(t.message ?: t.javaClass.simpleName))
         }
 
         override fun onClosed(ws: WebSocket, code: Int, reason: String) {

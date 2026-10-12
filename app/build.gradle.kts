@@ -15,6 +15,17 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
+
+        // Languages of the app (res/values-*); the libraries' other translations are dropped
+        resourceConfigurations += listOf(
+            "en", "fr", "de", "es", "it", "pt", "pt-rBR", "nl", "pl", "ru", "uk",
+            "sv", "tr", "zh-rCN", "zh-rTW", "ja", "ko", "hi", "ar",
+        )
+    }
+
+    // Lists those languages in the system's per-app language setting (Android 13+)
+    androidResources {
+        generateLocaleConfig = true
     }
 
     buildTypes {

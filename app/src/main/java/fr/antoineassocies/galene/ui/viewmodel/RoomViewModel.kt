@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import fr.antoineassocies.galene.R
 import fr.antoineassocies.galene.domain.AudioRouter
 import fr.antoineassocies.galene.domain.ConnectionState
 import fr.antoineassocies.galene.domain.GaleneClient
@@ -17,6 +18,8 @@ import fr.antoineassocies.galene.domain.WebRTCManager
 import fr.antoineassocies.galene.domain.model.JoinRequest
 import fr.antoineassocies.galene.domain.model.Participant
 import fr.antoineassocies.galene.service.CallForegroundService
+import fr.antoineassocies.galene.ui.UiText
+import fr.antoineassocies.galene.ui.toUiText
 import org.webrtc.EglBase
 import org.webrtc.VideoTrack
 import java.util.UUID
@@ -40,7 +43,7 @@ data class RoomUiState(
     val sendingVideo: Boolean = false,      // a camera is open and published
     val frontCamera: Boolean = true,        // to mirror the local preview
     val selfUsername: String = "",
-    val errorMessage: String? = null,
+    val errorMessage: UiText? = null,
     /** Join refused by the server: the screen goes back to the login form. */
     val joinFailure: SignalingEvent.JoinFailed? = null,
     val statusText: String = "",            // debug line shown in the UI
@@ -112,8 +115,12 @@ class RoomViewModel(
         viewModelScope.launch {
             delay(15_000)
             if (_uiState.value.connectionState == ConnectionState.Connecting) {
-                val msg = "Pas de réponse après 15 s — vérifiez l'adresse et le réseau\n${request.endpoint}"
-                _uiState.update { it.copy(statusText = msg, errorMessage = msg) }
+                _uiState.update {
+                    it.copy(
+                        statusText = "No answer after 15 s",
+                        errorMessage = UiText.Res(R.string.error_timeout, request.endpoint),
+                    )
+                }
                 galeneClient.disconnect()
             }
         }
@@ -188,11 +195,10 @@ class RoomViewModel(
                     }
 
                     is SignalingEvent.Disconnected -> {
-                        val msg = event.reason ?: "Connexion fermée"
                         _uiState.update {
                             it.copy(
-                                statusText = "Disconnected: $msg",
-                                errorMessage = if (event.reason != null) "Connexion perdue : $msg" else null
+                                statusText = "Disconnected: ${event.reason ?: "closed"}",
+                                errorMessage = event.reason?.let { r -> UiText.Res(R.string.error_connection_lost, r) }
                             )
                         }
                     }
@@ -280,7 +286,7 @@ class RoomViewModel(
                 }
             }.onFailure {
                 uplinkRequested = false
-                _uiState.update { s -> s.copy(errorMessage = "Erreur micro : ${it.message}") }
+                _uiState.update { s -> s.copy(errorMessage = UiText.Res(R.string.error_microphone, it.toUiText())) }
             }
         }
     }
@@ -309,7 +315,7 @@ class RoomViewModel(
                 val answerSdp = webRTCManager.handleRemoteOffer(event.id, event.sdp, event.replace)
                 galeneClient.sendAnswer(event.id, answerSdp)
             }.onFailure {
-                _uiState.update { s -> s.copy(errorMessage = "Erreur réception flux : ${it.message}") }
+                _uiState.update { s -> s.copy(errorMessage = UiText.Res(R.string.error_downstream, it.toUiText())) }
             }
         }
     }

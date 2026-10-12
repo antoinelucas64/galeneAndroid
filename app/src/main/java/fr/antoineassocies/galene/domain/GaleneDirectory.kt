@@ -1,5 +1,7 @@
 package fr.antoineassocies.galene.domain
 
+import androidx.annotation.StringRes
+import fr.antoineassocies.galene.R
 import fr.antoineassocies.galene.domain.model.GroupStatus
 import fr.antoineassocies.galene.domain.model.GroupTarget
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +22,8 @@ import java.io.IOException
  *
  * Mirrors what the web client does: list of public groups (landing page), status of a
  * group (group page), and the exchange with an authentication server.
- * Every function runs on [Dispatchers.IO] and throws [IOException] with a message
- * meant for the user.
+ * Every function runs on [Dispatchers.IO] and throws [LocalizedIOException], whose
+ * message the UI shows in the user's language.
  */
 class GaleneDirectory(
     private val http: OkHttpClient,
@@ -30,8 +32,8 @@ class GaleneDirectory(
 
     /** Groups declared public (`public = true` in their configuration). */
     suspend fun publicGroups(server: HttpUrl): List<GroupStatus> = withContext(Dispatchers.IO) {
-        val url = server.resolve("/public-groups.json") ?: throw IOException("Adresse invalide")
-        val body = get(url.toString(), notFound = "Ce serveur ne publie pas de liste de groupes")
+        val url = server.resolve("/public-groups.json") ?: throw error(R.string.error_invalid_address, "Invalid address")
+        val body = get(url.toString(), notFound = R.string.error_no_public_list)
         json.decodeFromString(ListSerializer(GroupStatus.serializer()), body)
     }
 
@@ -40,10 +42,10 @@ class GaleneDirectory(
      * which is tried second.
      */
     suspend fun groupStatus(target: GroupTarget): GroupStatus = withContext(Dispatchers.IO) {
-        val body = runCatching { get(target.statusUrl, notFound = NO_SUCH_GROUP) }
+        val body = runCatching { get(target.statusUrl, notFound = R.string.error_no_such_group) }
             .recoverCatching { first ->
-                if (first.message != NO_SUCH_GROUP) throw first
-                get(target.statusUrl + ".json", notFound = NO_SUCH_GROUP)
+                if ((first as? LocalizedIOException)?.messageRes != R.string.error_no_such_group) throw first
+                get(target.statusUrl + ".json", notFound = R.string.error_no_such_group)
             }
             .getOrThrow()
         json.decodeFromString(GroupStatus.serializer(), body)
@@ -81,36 +83,37 @@ class GaleneDirectory(
 
         http.newCall(request).execute().use { r ->
             when {
-                r.code == 401 || r.code == 403 -> throw IOException("Nom d'utilisateur ou mot de passe incorrect")
-                !r.isSuccessful -> throw IOException("Le serveur d'authentification a répondu ${r.code}")
+                r.code == 401 || r.code == 403 -> throw error(R.string.error_bad_credentials, "Bad credentials")
+                !r.isSuccessful -> throw error(R.string.error_auth_server_http, "Auth server HTTP ${r.code}", r.code)
                 r.code == 204 -> AuthResult.UsePassword
                 r.body?.contentType()?.let { "${it.type}/${it.subtype}" }?.lowercase() == "application/jwt" -> {
                     val token = r.body?.string().orEmpty().trim()
-                    if (token.isEmpty()) throw IOException("Le serveur d'authentification a renvoyé un jeton vide")
+                    if (token.isEmpty()) throw error(R.string.error_auth_empty_token, "Empty token")
                     AuthResult.Token(token)
                 }
-                else -> throw IOException("Réponse inattendue du serveur d'authentification")
+                else -> throw error(R.string.error_auth_unexpected, "Unexpected auth server response")
             }
         }
     }
 
-    private fun get(url: String, notFound: String): String {
+    private fun get(url: String, @StringRes notFound: Int): String {
         val request = Request.Builder().url(url).header("Accept", "application/json").build()
         val response = try {
             http.newCall(request).execute()
         } catch (e: IOException) {
-            throw IOException("Serveur injoignable : ${e.message}", e)
+            throw LocalizedIOException(
+                R.string.error_unreachable, listOf(e.message ?: e.javaClass.simpleName), "Unreachable: ${e.message}", e
+            )
         }
         return response.use { r ->
             when {
-                r.code == 404 -> throw IOException(notFound)
-                !r.isSuccessful -> throw IOException("Le serveur a répondu ${r.code}")
-                else -> r.body?.string() ?: throw IOException("Réponse vide du serveur")
+                r.code == 404 -> throw error(notFound, "HTTP 404 $url")
+                !r.isSuccessful -> throw error(R.string.error_server_http, "HTTP ${r.code} $url", r.code)
+                else -> r.body?.string() ?: throw error(R.string.error_empty_response, "Empty body $url")
             }
         }
     }
 
-    private companion object {
-        const val NO_SUCH_GROUP = "Ce groupe n'existe pas"
-    }
+    private fun error(@StringRes res: Int, log: String, vararg args: Any) =
+        LocalizedIOException(res, args.toList(), log)
 }

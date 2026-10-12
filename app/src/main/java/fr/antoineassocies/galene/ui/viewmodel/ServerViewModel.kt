@@ -2,11 +2,14 @@ package fr.antoineassocies.galene.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.antoineassocies.galene.R
 import fr.antoineassocies.galene.data.UserPreferences
 import fr.antoineassocies.galene.domain.GaleneDirectory
 import fr.antoineassocies.galene.domain.model.GaleneLink
 import fr.antoineassocies.galene.domain.model.GroupStatus
 import fr.antoineassocies.galene.domain.model.GroupTarget
+import fr.antoineassocies.galene.ui.UiText
+import fr.antoineassocies.galene.ui.toUiText
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +29,7 @@ data class ServerUiState(
     val server: HttpUrl? = null,
     /** null until the list is loaded; empty if the server publishes none. */
     val groups: List<GroupStatus>? = null,
-    val error: String? = null,
+    val error: UiText? = null,
 )
 
 /**
@@ -61,7 +64,7 @@ class ServerViewModel(
     /** Validates the input: a server shows its groups, a group link opens that group directly. */
     fun submit() {
         when (val link = GaleneLink.parse(_uiState.value.input)) {
-            null -> _uiState.update { it.copy(error = "Adresse invalide") }
+            null -> _uiState.update { it.copy(error = UiText.Res(R.string.error_invalid_address)) }
             is GaleneLink.Group -> {
                 remember(link.base)
                 _openGroup.trySend(link.target)
@@ -94,7 +97,7 @@ class ServerViewModel(
                 }
                 .onFailure { e ->
                     // The server may exist without publishing a list: keep the group-name field available
-                    _uiState.update { it.copy(loading = false, groups = emptyList(), error = e.message) }
+                    _uiState.update { it.copy(loading = false, groups = emptyList(), error = e.toUiText()) }
                 }
         }
     }

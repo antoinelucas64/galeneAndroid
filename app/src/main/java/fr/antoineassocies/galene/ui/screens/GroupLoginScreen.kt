@@ -80,7 +80,7 @@ fun GroupLoginScreen(
                     CircularProgressIndicator()
                 }
                 state.loadError != null -> {
-                    Text(state.loadError!!, color = MaterialTheme.colorScheme.error)
+                    Text(state.loadError!!.asString(), color = MaterialTheme.colorScheme.error)
                     OutlinedButton(onClick = viewModel::loadStatus) { Text(stringResource(R.string.action_retry)) }
                 }
                 else -> LoginForm(state = state, viewModel = viewModel)
@@ -165,7 +165,7 @@ private fun ColumnScope.LoginForm(
         }
     }
 
-    state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+    state.error?.let { Text(it.asString(), color = MaterialTheme.colorScheme.error) }
 
     Button(
         onClick = viewModel::submit,

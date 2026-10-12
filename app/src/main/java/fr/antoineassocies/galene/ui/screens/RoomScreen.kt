@@ -143,10 +143,10 @@ fun RoomScreen(
         AlertDialog(
             onDismissRequest = {},
             confirmButton = {
-                TextButton(onClick = { viewModel.leave(); onLeave() }) { Text("OK") }
+                TextButton(onClick = { viewModel.leave(); onLeave() }) { Text(stringResource(android.R.string.ok)) }
             },
-            title = { Text("Erreur") },
-            text = { Text(msg) }
+            title = { Text(stringResource(R.string.label_error)) },
+            text = { Text(msg.asString()) }
         )
     }
 

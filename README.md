@@ -44,7 +44,11 @@ It is not affiliated with the Galène project.
 | ⏳ Reconnection after network loss | ⏳ Bluetooth / wired headset routing |
 | ⏳ Android call integration (ConnectionService) | ⏳ Screen sharing, Picture-in-Picture |
 
-The user interface is currently in French; an English translation is planned.
+The interface follows the phone's language (Android 13+ also lets you pick it per app):
+English, French, German, Spanish, Italian, Portuguese (PT/BR), Dutch, Polish, Russian,
+Ukrainian, Swedish, Turkish, Chinese (simplified/traditional), Japanese, Korean, Hindi and
+Arabic. Translations other than French and English are machine-assisted: corrections are
+welcome in `app/src/main/res/values-*/strings.xml`.
 
 ## Installation
 
@@ -194,7 +198,7 @@ in [ARCHITECTURE.md](ARCHITECTURE.md).
 - [x] **Phase 2 — Video and UX**: video, permissions, grid, controls, lifecycle, Galène-style login
 - [ ] **Phase 3 — Robustness**: ~~background calls~~ ✓, network reconnection, audio routing, incoming phone calls
 - [ ] **Phase 4 — System integration**: ConnectionService, UnifiedPush, screen sharing, PiP
-- [ ] **Phase 5 — Distribution**: reproducible builds, F-Droid, user documentation, English UI
+- [ ] **Phase 5 — Distribution**: ~~multilingual UI~~, F-Droid, reproducible builds, user documentation
 
 ## Contributing
 

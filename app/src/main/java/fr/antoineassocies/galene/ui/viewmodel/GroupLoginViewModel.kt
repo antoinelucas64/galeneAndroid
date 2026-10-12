@@ -2,6 +2,7 @@ package fr.antoineassocies.galene.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.antoineassocies.galene.R
 import fr.antoineassocies.galene.data.UserPreferences
 import fr.antoineassocies.galene.domain.GaleneDirectory
 import fr.antoineassocies.galene.domain.SignalingEvent
@@ -9,6 +10,8 @@ import fr.antoineassocies.galene.domain.model.GroupStatus
 import fr.antoineassocies.galene.domain.model.GroupTarget
 import fr.antoineassocies.galene.domain.model.JoinRequest
 import fr.antoineassocies.galene.domain.model.PresentMode
+import fr.antoineassocies.galene.ui.UiText
+import fr.antoineassocies.galene.ui.toUiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +26,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 data class GroupLoginUiState(
     val loading: Boolean = true,
     val status: GroupStatus? = null,
-    val loadError: String? = null,
+    val loadError: UiText? = null,
     val username: String = "",
     val password: String = "",
     val present: PresentMode = PresentMode.MIC_AND_CAMERA,
@@ -32,7 +35,7 @@ data class GroupLoginUiState(
     /** The server answered `need-username`: the invitation link requires a name. */
     val usernameRequiredByToken: Boolean = false,
     val joining: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
 ) {
     /** With a token the name is optional (the link may set it); otherwise it is required. */
     val usernameRequired: Boolean get() = token == null || usernameRequiredByToken
@@ -82,7 +85,7 @@ class GroupLoginViewModel(
         viewModelScope.launch {
             runCatching { directory.groupStatus(target) }
                 .onSuccess { status -> _uiState.update { it.copy(loading = false, status = status) } }
-                .onFailure { e -> _uiState.update { it.copy(loading = false, loadError = e.message) } }
+                .onFailure { e -> _uiState.update { it.copy(loading = false, loadError = e.toUiText()) } }
         }
     }
 
@@ -127,7 +130,7 @@ class GroupLoginViewModel(
                 _uiState.update { it.copy(joining = false, password = "") }
                 _join.trySend(request)
             }.onFailure { e ->
-                _uiState.update { it.copy(joining = false, error = e.message) }
+                _uiState.update { it.copy(joining = false, error = e.toUiText()) }
             }
         }
     }
@@ -136,12 +139,15 @@ class GroupLoginViewModel(
     fun onJoinFailed(failure: SignalingEvent.JoinFailed) {
         _uiState.update { s ->
             if (failure.needsUsername) {
-                s.copy(usernameRequiredByToken = true, error = "Ce lien d'invitation demande un nom d'utilisateur")
+                s.copy(usernameRequiredByToken = true, error = UiText.Res(R.string.error_token_needs_username))
             } else {
                 // As the web client does: a refused token is dropped, back to password login
                 s.copy(
                     token = null,
-                    error = "Le serveur a refusé l'entrée : ${failure.message ?: failure.error ?: "raison inconnue"}",
+                    error = UiText.Res(
+                        R.string.error_join_refused,
+                        failure.message ?: failure.error ?: UiText.Res(R.string.error_unknown),
+                    ),
                 )
             }
         }
