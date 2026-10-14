@@ -1,0 +1,1 @@
+New launcher icon. Targets Android 16 (API 36), as now required by Google Play.

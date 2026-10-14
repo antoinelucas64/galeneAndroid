@@ -1,0 +1,1 @@
+Nouvelle icône. Cible Android 16 (API 36), désormais exigé par Google Play.

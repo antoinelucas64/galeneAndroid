@@ -173,6 +173,24 @@ the size (about 7 MB each, against 22 MB for the `universal` one that contains t
 | `x86`, `x86_64` | emulators, some Chromebooks | `× 10 + 3`, `× 10 + 4` |
 | `universal` | all | `× 10 + 0` |
 
+For Google Play, build an Android App Bundle instead and sign it with the same keystore
+(`jarsigner` comes with the JDK; drop `-sigalg` if the key is not RSA):
+
+```bash
+./gradlew bundleRelease
+# → app/build/outputs/bundle/release/app-release.aab
+
+keytool -list -keystore galene-release.jks    # shows the key alias
+jarsigner -sigalg SHA256withRSA -digestalg SHA-256 -keystore galene-release.jks \
+  -signedjar app/build/outputs/bundle/release/app-release-signed.aab \
+  app/build/outputs/bundle/release/app-release.aab galene
+```
+
+The bundle's versionCode is `versionCode × 10`, like the universal APK; Google Play
+then serves each phone the native library for its processor. With Play App Signing,
+this keystore is only the upload key: the APKs installed from Play are signed by
+Google, so they cannot update an F-Droid or self-built install (and vice versa).
+
 The release build is reproducible: built twice from the same commit in different
 directories, the unsigned APKs are identical byte for byte. Another machine needs the
 same JDK and build-tools versions to get the same result.

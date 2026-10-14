@@ -11,18 +11,18 @@ plugins {
  * APK `* 10 + 0`), the scheme F-Droid's `VercodeOperation` expects.
  */
 val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)
-val appVersionCode = 2
+val appVersionCode = 3
 
 android {
     namespace = "fr.antoineassocies.galene"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "fr.antoineassocies.galene"
         minSdk = 26  // Android 8.0 — covers 95%+ of active devices
-        targetSdk = 35
+        targetSdk = 36
         versionCode = appVersionCode
-        versionName = "0.2.0"
+        versionName = "0.2.1"
 
         // Languages of the app (res/values-*); the libraries' other translations are dropped
         resourceConfigurations += listOf(
