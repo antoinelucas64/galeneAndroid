@@ -164,9 +164,12 @@ git checkout v<version>
 
 # Signing (create the keystore once)
 keytool -genkey -v -keystore galene-release.jks -alias galene -keyalg RSA -keysize 4096 -validity 10000
-$ANDROID_HOME/build-tools/35.0.0/apksigner sign --ks galene-release.jks \
+$ANDROID_HOME/build-tools/35.0.0/apksigner sign --alignment-preserved --ks galene-release.jks \
   --out galene-arm64-v8a.apk app/build/outputs/apk/release/app-arm64-v8a-release-unsigned.apk
 ```
+
+`--alignment-preserved` is required for F-Droid: without it apksigner rewrites the zip
+alignment padding, and F-Droid can no longer copy the signature onto its own build.
 
 One APK is produced per processor family, since WebRTC's native library is most of
 the size (about 7 MB each, against 22 MB for the `universal` one that contains them all):
