@@ -153,8 +153,13 @@ adb logcat -b crash -d
 
 ### Release build
 
+Published APKs must be built from a clean checkout of the release tag, without the
+Gradle build cache or incremental Kotlin compilation: otherwise `classes.dex` differs from
+F-Droid's build and the reproducible build check fails.
+
 ```bash
-./gradlew assembleRelease
+git checkout v<version>
+./gradlew clean assembleRelease --no-build-cache --rerun-tasks -Pkotlin.incremental=false
 # → app/build/outputs/apk/release/app-<abi>-release-unsigned.apk
 
 # Signing (create the keystore once)
