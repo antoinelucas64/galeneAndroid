@@ -28,6 +28,7 @@ import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 import org.webrtc.VideoTrack
 import kotlin.math.ceil
+import kotlin.math.min
 import kotlin.math.sqrt
 
 /** One grid cell: a participant, with or without video. */
@@ -41,7 +42,8 @@ data class VideoTile(
 )
 
 /**
- * Grid filling all available space: n tiles → ⌈√n⌉ columns.
+ * Grid filling all available space; the column count depends on the space's shape
+ * (see [bestColumnCount]), so tiles stay close to 16:9 in both orientations.
  * No scrolling: beyond a dozen participants tiles get small, which is acceptable
  * for the intended use (small meetings).
  */
@@ -53,10 +55,41 @@ fun VideoGrid(
     modifier: Modifier = Modifier,
 ) {
     if (tiles.isEmpty()) return
-    val columns = ceil(sqrt(tiles.size.toDouble())).toInt()
-    val rows = tiles.chunked(columns)
+    BoxWithConstraints(modifier.padding(4.dp)) {
+        val columns = if (constraints.hasBoundedWidth && constraints.hasBoundedHeight) {
+            bestColumnCount(tiles.size, maxWidth.value, maxHeight.value, gap = 4f)
+        } else {
+            ceil(sqrt(tiles.size.toDouble())).toInt()
+        }
+        VideoGridRows(tiles, columns, eglContext, onTileClick)
+    }
+}
 
-    Column(modifier.padding(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+/**
+ * Column count maximising the area a 16:9 picture would occupy in each cell
+ * (letterboxed). This rules out very elongated cells (e.g. 3 tiles in landscape →
+ * 3 columns rather than 2×2, 2 tiles in portrait → stacked rather than side by side)
+ * and accounts for the cells left empty on the last row.
+ */
+internal fun bestColumnCount(n: Int, width: Float, height: Float, gap: Float): Int {
+    val ratio = 16f / 9f
+    return (1..n).maxBy { cols ->
+        val rows = (n + cols - 1) / cols
+        val w = (width - gap * (cols - 1)) / cols
+        val h = (height - gap * (rows - 1)) / rows
+        if (w <= 0f || h <= 0f) 0f else min(w, h * ratio) * min(h, w / ratio)
+    }
+}
+
+@Composable
+private fun VideoGridRows(
+    tiles: List<VideoTile>,
+    columns: Int,
+    eglContext: EglBase.Context,
+    onTileClick: (VideoTile) -> Unit,
+) {
+    val rows = tiles.chunked(columns)
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         rows.forEach { row ->
             Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 row.forEach { tile ->
