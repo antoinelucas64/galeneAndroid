@@ -3,7 +3,10 @@ package fr.antoineassocies.galene.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import fr.antoineassocies.galene.R
@@ -39,6 +43,8 @@ data class VideoTile(
     val mirror: Boolean = false,
     val speaking: Boolean = false,
     val raisedHand: Boolean = false,
+    /** Participant this tile shows (several tiles may share one: camera + screen). */
+    val participantId: String? = null,
 )
 
 /**
@@ -105,6 +111,85 @@ private fun VideoGridRows(
 }
 
 /**
+ * One-to-one call, as in phone video apps: the other person over all the space,
+ * oneself in a small picture in a corner.
+ */
+@Composable
+fun OneToOneLayout(
+    remote: VideoTile,
+    self: VideoTile,
+    eglContext: EglBase.Context,
+    onTileClick: (VideoTile) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(modifier.padding(4.dp)) {
+        key(remote.key) {
+            TileView(remote, eglContext, Modifier.fillMaxSize(), onClick = { onTileClick(remote) })
+        }
+        val landscape = maxWidth > maxHeight
+        key(self.key) {
+            TileView(
+                self, eglContext,
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(12.dp)
+                    .size(if (landscape) DpSize(144.dp, 108.dp) else DpSize(96.dp, 128.dp)),
+                onClick = { onTileClick(self) },
+                overlay = true,
+            )
+        }
+    }
+}
+
+/**
+ * Speaker view for three people or more: [main] (the active speaker) large, the others
+ * in a scrollable strip — below in portrait, on the right in landscape.
+ */
+@Composable
+fun SpeakerLayout(
+    main: VideoTile,
+    others: List<VideoTile>,
+    eglContext: EglBase.Context,
+    onTileClick: (VideoTile) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(modifier.padding(4.dp)) {
+        val mainTile = @Composable { m: Modifier ->
+            key(main.key) {
+                TileView(
+                    main, eglContext, m, onClick = { onTileClick(main) },
+                    scaling = RendererCommon.ScalingType.SCALE_ASPECT_FIT,
+                )
+            }
+        }
+        val stripTile = @Composable { tile: VideoTile, m: Modifier ->
+            key(tile.key) { TileView(tile, eglContext, m, onClick = { onTileClick(tile) }) }
+        }
+        if (maxWidth > maxHeight) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                mainTile(Modifier.weight(1f).fillMaxHeight())
+                Column(
+                    Modifier.width(160.dp).fillMaxHeight().verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    others.forEach { stripTile(it, Modifier.fillMaxWidth().height(100.dp)) }
+                }
+            }
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                mainTile(Modifier.weight(1f).fillMaxWidth())
+                Row(
+                    Modifier.fillMaxWidth().height(136.dp).horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    others.forEach { stripTile(it, Modifier.width(102.dp).fillMaxHeight()) }
+                }
+            }
+        }
+    }
+}
+
+/**
  * A single participant over all available space. The video is shown whole
  * (letterboxed if needed) rather than cropped: everything should be visible, e.g. a whiteboard.
  */
@@ -134,6 +219,8 @@ private fun TileView(
     onClick: () -> Unit,
     scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL,
     rounded: Boolean = true,
+    /** Drawn over another video (see [VideoRenderer]). */
+    overlay: Boolean = false,
 ) {
     val shape = if (rounded) RoundedCornerShape(12.dp) else RectangleShape
     Box(
@@ -142,7 +229,7 @@ private fun TileView(
             .background(if (rounded) MaterialTheme.colorScheme.surfaceVariant else Color.Black)
     ) {
         if (tile.track != null) {
-            VideoRenderer(tile.track, eglContext, tile.mirror, Modifier.fillMaxSize(), scaling)
+            VideoRenderer(tile.track, eglContext, tile.mirror, Modifier.fillMaxSize(), scaling, overlay)
         } else {
             Surface(
                 shape = CircleShape,
@@ -205,11 +292,14 @@ fun VideoRenderer(
     mirror: Boolean,
     modifier: Modifier = Modifier,
     scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL,
+    /** Over another SurfaceView: without this, which one ends up on top is undefined. */
+    overlay: Boolean = false,
 ) {
     key(track) {
         AndroidView(
             factory = { ctx ->
                 SurfaceViewRenderer(ctx).apply {
+                    setZOrderMediaOverlay(overlay)
                     init(eglContext, null)
                     setEnableHardwareScaler(true)
                     runCatching { track.addSink(this) }

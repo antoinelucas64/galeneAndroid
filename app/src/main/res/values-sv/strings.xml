@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Deltagare</string>
+    <string name="action_grid_view">Rutnätsvy</string>
+    <string name="action_speaker_view">Talarvy</string>
     <string name="label_operator">Operatör</string>
     <string name="action_private_message">Privat meddelande</string>
     <string name="action_kick">Ta bort från gruppen</string>
@@ -100,10 +102,19 @@
     <string name="error_empty_response">Tomt svar från servern</string>
     <string name="error_token_needs_username">Den här inbjudningslänken kräver ett användarnamn</string>
     <string name="error_join_refused">Servern nekade inträde: %1$s</string>
+    <string name="error_wrong_credentials">Fel användarnamn eller lösenord.</string>
+    <string name="error_invalid_invitation">Den här inbjudningslänken är ogiltig eller har gått ut.</string>
     <string name="error_timeout">Inget svar efter 15 s — kontrollera adressen och nätverket\n%1$s</string>
     <string name="error_connection_lost">Anslutningen förlorades: %1$s</string>
     <string name="error_microphone">Kan inte skicka ljud/video: %1$s</string>
     <string name="error_downstream">Kan inte ta emot en ström: %1$s</string>
     <string name="error_left_group">Du är inte längre med i gruppen (borttagen av servern eller gruppen stängd)</string>
     <string name="error_reconnect_failed">Det gick inte att återansluta till servern. Kontrollera nätverket och gå med igen.</string>
+
+    <!-- About -->
+    <string name="action_about">Om</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_developed_by">Utvecklad av %1$s</string>
+    <string name="about_source_code">Källkod</string>
+    <string name="action_close">Stäng</string>
 </resources>

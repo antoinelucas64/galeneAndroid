@@ -73,6 +73,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Participantes</string>
+    <string name="action_grid_view">Visualização em grade</string>
+    <string name="action_speaker_view">Visualização do orador</string>
     <string name="label_operator">Operador</string>
     <string name="action_private_message">Mensagem privada</string>
     <string name="action_kick">Remover do grupo</string>
@@ -101,10 +103,19 @@
     <string name="error_empty_response">Resposta vazia do servidor</string>
     <string name="error_token_needs_username">Este link de convite exige um nome de usuário</string>
     <string name="error_join_refused">O servidor recusou a entrada: %1$s</string>
+    <string name="error_wrong_credentials">Nome de usuário ou senha incorretos.</string>
+    <string name="error_invalid_invitation">Este link de convite é inválido ou expirou.</string>
     <string name="error_timeout">Sem resposta após 15 s — verifique o endereço e a rede\n%1$s</string>
     <string name="error_connection_lost">Conexão perdida: %1$s</string>
     <string name="error_microphone">Não é possível enviar áudio/vídeo: %1$s</string>
     <string name="error_downstream">Não é possível receber um fluxo: %1$s</string>
     <string name="error_left_group">Você não está mais no grupo (removido pelo servidor ou grupo fechado)</string>
     <string name="error_reconnect_failed">Não foi possível reconectar ao servidor. Verifique a rede e entre novamente.</string>
+
+    <!-- About -->
+    <string name="action_about">Sobre</string>
+    <string name="about_version">Versão %1$s</string>
+    <string name="about_developed_by">Desenvolvido por %1$s</string>
+    <string name="about_source_code">Código-fonte</string>
+    <string name="action_close">Fechar</string>
 </resources>

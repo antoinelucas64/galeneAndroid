@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Katılımcılar</string>
+    <string name="action_grid_view">Izgara görünümü</string>
+    <string name="action_speaker_view">Konuşmacı görünümü</string>
     <string name="label_operator">Operatör</string>
     <string name="action_private_message">Özel mesaj</string>
     <string name="action_kick">Gruptan çıkar</string>
@@ -100,10 +102,19 @@
     <string name="error_empty_response">Sunucudan boş yanıt</string>
     <string name="error_token_needs_username">Bu davet bağlantısı bir kullanıcı adı gerektiriyor</string>
     <string name="error_join_refused">Sunucu girişi reddetti: %1$s</string>
+    <string name="error_wrong_credentials">Kullanıcı adı veya parola yanlış.</string>
+    <string name="error_invalid_invitation">Bu davet bağlantısı geçersiz veya süresi dolmuş.</string>
     <string name="error_timeout">15 sn sonra yanıt yok — adresi ve ağı kontrol edin\n%1$s</string>
     <string name="error_connection_lost">Bağlantı koptu: %1$s</string>
     <string name="error_microphone">Ses/görüntü gönderilemiyor: %1$s</string>
     <string name="error_downstream">Bir akış alınamıyor: %1$s</string>
     <string name="error_left_group">Artık grupta değilsiniz (sunucu tarafından çıkarıldınız veya grup kapandı)</string>
     <string name="error_reconnect_failed">Sunucuya yeniden bağlanılamadı. Ağı kontrol edip tekrar katılın.</string>
+
+    <!-- About -->
+    <string name="action_about">Hakkında</string>
+    <string name="about_version">Sürüm %1$s</string>
+    <string name="about_developed_by">Geliştiren: %1$s</string>
+    <string name="about_source_code">Kaynak kodu</string>
+    <string name="action_close">Kapat</string>
 </resources>

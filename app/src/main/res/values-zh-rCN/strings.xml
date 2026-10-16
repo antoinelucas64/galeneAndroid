@@ -71,6 +71,8 @@
 
     <!-- Participants -->
     <string name="action_participants">参与者</string>
+    <string name="action_grid_view">网格视图</string>
+    <string name="action_speaker_view">演讲者视图</string>
     <string name="label_operator">管理员</string>
     <string name="action_private_message">私信</string>
     <string name="action_kick">移出群组</string>
@@ -99,10 +101,19 @@
     <string name="error_empty_response">服务器响应为空</string>
     <string name="error_token_needs_username">此邀请链接需要用户名</string>
     <string name="error_join_refused">服务器拒绝进入：%1$s</string>
+    <string name="error_wrong_credentials">用户名或密码错误。</string>
+    <string name="error_invalid_invitation">此邀请链接无效或已过期。</string>
     <string name="error_timeout">15 秒内无响应 — 请检查地址和网络\n%1$s</string>
     <string name="error_connection_lost">连接已断开：%1$s</string>
     <string name="error_microphone">无法发送音频/视频：%1$s</string>
     <string name="error_downstream">无法接收媒体流：%1$s</string>
     <string name="error_left_group">你已不在群组中（被服务器移出或群组已关闭）</string>
     <string name="error_reconnect_failed">无法重新连接服务器。请检查网络后重新加入。</string>
+
+    <!-- About -->
+    <string name="action_about">关于</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="about_developed_by">由 %1$s 开发</string>
+    <string name="about_source_code">源代码</string>
+    <string name="action_close">关闭</string>
 </resources>

@@ -9,17 +9,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import fr.antoineassocies.galene.BuildConfig
 import fr.antoineassocies.galene.R
 import fr.antoineassocies.galene.domain.model.GroupStatus
 import fr.antoineassocies.galene.domain.model.GroupTarget
@@ -37,6 +40,9 @@ fun ServerScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var otherGroup by remember { mutableStateOf("") }
+    var showAbout by remember { mutableStateOf(false) }
+
+    if (showAbout) AboutDialog(onDismiss = { showAbout = false })
 
     LaunchedEffect(viewModel) {
         viewModel.openGroup.collect(onOpenGroup)
@@ -48,11 +54,17 @@ fun ServerScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text(
-                stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                IconButton(onClick = { showAbout = true }) {
+                    Icon(Icons.Default.Info, contentDescription = stringResource(R.string.action_about))
+                }
+            }
         }
 
         // ─── Server or link ───────────────────────────────────────────────
@@ -150,4 +162,38 @@ private fun GroupRow(group: GroupStatus, onClick: () -> Unit) {
             },
         )
     }
+}
+
+private const val DEVELOPER_NAME = "Antoine & Associés"
+private const val DEVELOPER_URL = "https://antoineassocies.fr"
+private const val SOURCE_URL = "https://github.com/antoinelucas64/galeneAndroid"
+
+/** App name, version, developer and source code links. */
+@Composable
+private fun AboutDialog(onDismiss: () -> Unit) {
+    val uriHandler = LocalUriHandler.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Default.Info, contentDescription = null) },
+        title = { Text(stringResource(R.string.app_name)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(R.string.about_version, BuildConfig.VERSION_NAME))
+                Text(
+                    stringResource(R.string.about_developed_by, DEVELOPER_NAME),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                TextButton(onClick = { uriHandler.openUri(DEVELOPER_URL) }, contentPadding = PaddingValues(0.dp)) {
+                    Text(DEVELOPER_URL.removePrefix("https://"))
+                }
+                Text(stringResource(R.string.about_source_code), modifier = Modifier.padding(top = 8.dp))
+                TextButton(onClick = { uriHandler.openUri(SOURCE_URL) }, contentPadding = PaddingValues(0.dp)) {
+                    Text(SOURCE_URL.removePrefix("https://"))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
+        },
+    )
 }

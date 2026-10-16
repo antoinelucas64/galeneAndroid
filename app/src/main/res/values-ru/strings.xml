@@ -74,6 +74,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Участники</string>
+    <string name="action_grid_view">Сетка</string>
+    <string name="action_speaker_view">Вид докладчика</string>
     <string name="label_operator">Оператор</string>
     <string name="action_private_message">Личное сообщение</string>
     <string name="action_kick">Удалить из группы</string>
@@ -102,10 +104,19 @@
     <string name="error_empty_response">Пустой ответ сервера</string>
     <string name="error_token_needs_username">Для этой ссылки-приглашения нужно имя пользователя</string>
     <string name="error_join_refused">Сервер отказал во входе: %1$s</string>
+    <string name="error_wrong_credentials">Неверное имя пользователя или пароль.</string>
+    <string name="error_invalid_invitation">Эта ссылка-приглашение недействительна или устарела.</string>
     <string name="error_timeout">Нет ответа в течение 15 с — проверьте адрес и сеть\n%1$s</string>
     <string name="error_connection_lost">Соединение потеряно: %1$s</string>
     <string name="error_microphone">Не удалось передать звук/видео: %1$s</string>
     <string name="error_downstream">Не удалось принять поток: %1$s</string>
     <string name="error_left_group">Вы больше не в группе (удалены сервером или группа закрыта)</string>
     <string name="error_reconnect_failed">Не удалось переподключиться к серверу. Проверьте сеть и войдите снова.</string>
+
+    <!-- About -->
+    <string name="action_about">О приложении</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_developed_by">Разработано %1$s</string>
+    <string name="about_source_code">Исходный код</string>
+    <string name="action_close">Закрыть</string>
 </resources>

@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Teilnehmende</string>
+    <string name="action_grid_view">Rasteransicht</string>
+    <string name="action_speaker_view">Sprecheransicht</string>
     <string name="label_operator">Operator</string>
     <string name="action_private_message">Private Nachricht</string>
     <string name="action_kick">Aus der Gruppe entfernen</string>
@@ -100,10 +102,19 @@
     <string name="error_empty_response">Leere Antwort vom Server</string>
     <string name="error_token_needs_username">Dieser Einladungslink erfordert einen Benutzernamen</string>
     <string name="error_join_refused">Der Server hat den Zutritt verweigert: %1$s</string>
+    <string name="error_wrong_credentials">Falscher Benutzername oder falsches Passwort.</string>
+    <string name="error_invalid_invitation">Dieser Einladungslink ist ungültig oder abgelaufen.</string>
     <string name="error_timeout">Keine Antwort nach 15 s — Adresse und Netzwerk prüfen\n%1$s</string>
     <string name="error_connection_lost">Verbindung verloren: %1$s</string>
     <string name="error_microphone">Audio/Video kann nicht gesendet werden: %1$s</string>
     <string name="error_downstream">Ein Stream kann nicht empfangen werden: %1$s</string>
     <string name="error_left_group">Du bist nicht mehr in der Gruppe (vom Server entfernt oder Gruppe geschlossen)</string>
     <string name="error_reconnect_failed">Erneute Verbindung zum Server fehlgeschlagen. Prüfe das Netzwerk und tritt erneut bei.</string>
+
+    <!-- About -->
+    <string name="action_about">Über</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_developed_by">Entwickelt von %1$s</string>
+    <string name="about_source_code">Quellcode</string>
+    <string name="action_close">Schließen</string>
 </resources>

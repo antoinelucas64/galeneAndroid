@@ -71,6 +71,8 @@
 
     <!-- Participants -->
     <string name="action_participants">参加者</string>
+    <string name="action_grid_view">グリッド表示</string>
+    <string name="action_speaker_view">スピーカー表示</string>
     <string name="label_operator">オペレーター</string>
     <string name="action_private_message">個別メッセージ</string>
     <string name="action_kick">グループから削除</string>
@@ -99,10 +101,19 @@
     <string name="error_empty_response">サーバーの応答が空です</string>
     <string name="error_token_needs_username">この招待リンクにはユーザー名が必要です</string>
     <string name="error_join_refused">サーバーが入室を拒否しました: %1$s</string>
+    <string name="error_wrong_credentials">ユーザー名またはパスワードが正しくありません。</string>
+    <string name="error_invalid_invitation">この招待リンクは無効か、期限が切れています。</string>
     <string name="error_timeout">15 秒間応答がありません — アドレスとネットワークを確認してください\n%1$s</string>
     <string name="error_connection_lost">接続が切れました: %1$s</string>
     <string name="error_microphone">音声/映像を送信できません: %1$s</string>
     <string name="error_downstream">ストリームを受信できません: %1$s</string>
     <string name="error_left_group">グループから退出しました（サーバーによる削除、またはグループの終了）</string>
     <string name="error_reconnect_failed">サーバーに再接続できませんでした。ネットワークを確認して、もう一度参加してください。</string>
+
+    <!-- About -->
+    <string name="action_about">このアプリについて</string>
+    <string name="about_version">バージョン %1$s</string>
+    <string name="about_developed_by">開発: %1$s</string>
+    <string name="about_source_code">ソースコード</string>
+    <string name="action_close">閉じる</string>
 </resources>

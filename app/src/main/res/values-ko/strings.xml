@@ -71,6 +71,8 @@
 
     <!-- Participants -->
     <string name="action_participants">참가자</string>
+    <string name="action_grid_view">그리드 보기</string>
+    <string name="action_speaker_view">발표자 보기</string>
     <string name="label_operator">운영자</string>
     <string name="action_private_message">비공개 메시지</string>
     <string name="action_kick">그룹에서 내보내기</string>
@@ -99,10 +101,19 @@
     <string name="error_empty_response">서버 응답이 비어 있습니다</string>
     <string name="error_token_needs_username">이 초대 링크에는 사용자 이름이 필요합니다</string>
     <string name="error_join_refused">서버가 입장을 거부했습니다: %1$s</string>
+    <string name="error_wrong_credentials">사용자 이름 또는 비밀번호가 올바르지 않습니다.</string>
+    <string name="error_invalid_invitation">이 초대 링크는 유효하지 않거나 만료되었습니다.</string>
     <string name="error_timeout">15초 동안 응답이 없습니다 — 주소와 네트워크를 확인하세요\n%1$s</string>
     <string name="error_connection_lost">연결이 끊어졌습니다: %1$s</string>
     <string name="error_microphone">오디오/비디오를 보낼 수 없습니다: %1$s</string>
     <string name="error_downstream">스트림을 받을 수 없습니다: %1$s</string>
     <string name="error_left_group">더 이상 그룹에 있지 않습니다(서버에서 내보냄 또는 그룹 종료)</string>
     <string name="error_reconnect_failed">서버에 다시 연결할 수 없습니다. 네트워크를 확인하고 다시 참가하세요.</string>
+
+    <!-- About -->
+    <string name="action_about">정보</string>
+    <string name="about_version">버전 %1$s</string>
+    <string name="about_developed_by">개발: %1$s</string>
+    <string name="about_source_code">소스 코드</string>
+    <string name="action_close">닫기</string>
 </resources>

@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Deelnemers</string>
+    <string name="action_grid_view">Rasterweergave</string>
+    <string name="action_speaker_view">Sprekerweergave</string>
     <string name="label_operator">Operator</string>
     <string name="action_private_message">Privébericht</string>
     <string name="action_kick">Uit de groep verwijderen</string>
@@ -100,10 +102,19 @@
     <string name="error_empty_response">Leeg antwoord van de server</string>
     <string name="error_token_needs_username">Deze uitnodigingslink vereist een gebruikersnaam</string>
     <string name="error_join_refused">De server weigerde de toegang: %1$s</string>
+    <string name="error_wrong_credentials">Onjuiste gebruikersnaam of wachtwoord.</string>
+    <string name="error_invalid_invitation">Deze uitnodigingslink is ongeldig of verlopen.</string>
     <string name="error_timeout">Geen antwoord na 15 s — controleer het adres en het netwerk\n%1$s</string>
     <string name="error_connection_lost">Verbinding verloren: %1$s</string>
     <string name="error_microphone">Kan geen audio/video verzenden: %1$s</string>
     <string name="error_downstream">Kan geen stream ontvangen: %1$s</string>
     <string name="error_left_group">Je bent niet meer in de groep (verwijderd door de server of groep gesloten)</string>
     <string name="error_reconnect_failed">Kan niet opnieuw verbinden met de server. Controleer het netwerk en neem opnieuw deel.</string>
+
+    <!-- About -->
+    <string name="action_about">Over</string>
+    <string name="about_version">Versie %1$s</string>
+    <string name="about_developed_by">Ontwikkeld door %1$s</string>
+    <string name="about_source_code">Broncode</string>
+    <string name="action_close">Sluiten</string>
 </resources>

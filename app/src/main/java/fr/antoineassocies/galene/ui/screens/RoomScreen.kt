@@ -45,6 +45,8 @@ import fr.antoineassocies.galene.ui.components.ChatPreview
 import fr.antoineassocies.galene.ui.components.FullscreenTile
 import fr.antoineassocies.galene.ui.components.ParticipantActions
 import fr.antoineassocies.galene.ui.components.ParticipantsPanel
+import fr.antoineassocies.galene.ui.components.OneToOneLayout
+import fr.antoineassocies.galene.ui.components.SpeakerLayout
 import fr.antoineassocies.galene.ui.components.VideoGrid
 import fr.antoineassocies.galene.ui.components.VideoTile
 import fr.antoineassocies.galene.ui.viewmodel.RoomViewModel
@@ -133,6 +135,7 @@ fun RoomScreen(
             VideoTile(
                 "self", selfLabel, localTrack.takeIf { !uiState.videoMuted }, mirror = uiState.frontCamera,
                 speaking = uiState.selfId in uiState.speaking, raisedHand = uiState.handRaised,
+                participantId = uiState.selfId,
             )
         )
         uiState.remoteStreams.forEach {
@@ -140,6 +143,7 @@ fun RoomScreen(
                 VideoTile(
                     it.id, it.username, remoteTracks[it.id],
                     speaking = it.sourceId in uiState.speaking, raisedHand = it.sourceId in raisedHands,
+                    participantId = it.sourceId,
                 )
             )
         }
@@ -147,7 +151,9 @@ fun RoomScreen(
         val publishing = uiState.remoteStreams.mapNotNull { it.sourceId }.toSet()
         uiState.participants
             .filter { it.id != uiState.selfId && it.id !in publishing }
-            .forEach { add(VideoTile(it.id, it.username, null, speaking = it.id in uiState.speaking, raisedHand = it.raisedHand)) }
+            .forEach {
+                add(VideoTile(it.id, it.username, null, speaking = it.id in uiState.speaking, raisedHand = it.raisedHand, participantId = it.id))
+            }
     }
 
     // ─── Picture-in-Picture: leaving the app shrinks the call into a small window ──
@@ -201,6 +207,8 @@ fun RoomScreen(
     // ─── Chat, full screen over the call ──────────────────────────────────
     val joined = uiState.connectionState == ConnectionState.Connected && !uiState.reconnecting
     var participantsOpen by rememberSaveable { mutableStateOf(false) }
+    // From three people up: the active speaker large (default) or everyone equal
+    var gridView by rememberSaveable { mutableStateOf(false) }
     if (uiState.chatOpen) {
         ChatPanel(
             messages = uiState.chat,
@@ -263,6 +271,12 @@ fun RoomScreen(
                         Icon(Icons.Default.Cameraswitch, contentDescription = stringResource(R.string.action_switch_camera))
                     }
                     AudioOutputButton(uiState.audioRoute, uiState.audioRoutes, viewModel::selectAudioRoute)
+                    if (tiles.size > 2) {
+                        IconButton(onClick = { gridView = !gridView }) {
+                            if (gridView) Icon(Icons.Default.AccountBox, contentDescription = stringResource(R.string.action_speaker_view))
+                            else Icon(Icons.Default.GridView, contentDescription = stringResource(R.string.action_grid_view))
+                        }
+                    }
                     // Badge: number of hands up, to see them even with the list closed
                     IconButton(onClick = { participantsOpen = true }, enabled = joined) {
                         BadgedBox(badge = {
@@ -333,11 +347,21 @@ fun RoomScreen(
                         .fillMaxWidth()
                         .onGloballyPositioned { videoBounds = it.boundsInWindow().toAndroidRect() }
                 ) {
-                    VideoGrid(
-                        tiles, viewModel.eglContext,
-                        onTileClick = { focusedKey = it.key },
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                    val onTileClick: (VideoTile) -> Unit = { focusedKey = it.key }
+                    when {
+                        tiles.size == 2 -> OneToOneLayout(
+                            remote = tiles[1], self = tiles[0], viewModel.eglContext, onTileClick, Modifier.fillMaxSize(),
+                        )
+                        tiles.size > 2 && !gridView -> {
+                            // The active speaker, otherwise someone with video, otherwise the first of the others
+                            val main = tiles.firstOrNull { it.participantId == uiState.activeSpeaker && it.track != null }
+                                ?: tiles.firstOrNull { it.participantId == uiState.activeSpeaker }
+                                ?: tiles.drop(1).firstOrNull { it.track != null }
+                                ?: tiles[1]
+                            SpeakerLayout(main, tiles - main, viewModel.eglContext, onTileClick, Modifier.fillMaxSize())
+                        }
+                        else -> VideoGrid(tiles, viewModel.eglContext, onTileClick, Modifier.fillMaxSize())
+                    }
                     ChatPreview(
                         uiState.chatPreview,
                         onClick = viewModel::openChat,

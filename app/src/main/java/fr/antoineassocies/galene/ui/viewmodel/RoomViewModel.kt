@@ -77,7 +77,7 @@ data class RoomUiState(
     val notice: UiText? = null,
     /** Participant ids of the people speaking right now ([selfId] included). */
     val speaking: Set<String> = emptySet(),
-    /** Last other participant who spoke: the one shown in Picture-in-Picture. */
+    /** Other participant shown large (speaker layout, Picture-in-Picture): the loudest recent speaker. */
     val activeSpeaker: String? = null,
     /** Participant the chat sends to privately; null = the whole group. */
     val chatRecipient: String? = null,
@@ -128,6 +128,8 @@ class RoomViewModel(
         const val ACTIVITY_INTERVAL_MS = 250L
         const val ACTIVITY_HOLD_MS = 700L
         const val ACTIVITY_THRESHOLD = 0.2 * 0.2   // energy is the integral of the squared level
+        /** The active speaker (big tile, PiP) stays at least this long, so the layout does not jump. */
+        const val ACTIVE_SPEAKER_MIN_MS = 2_000L
     }
 
     private val _uiState = MutableStateFlow(RoomUiState(selfId = galeneClient.clientId))
@@ -578,6 +580,7 @@ class RoomViewModel(
         viewModelScope.launch {
             var previous = emptyMap<String, AudioEnergy>()
             val lastLoud = mutableMapOf<String, Long>()
+            var activeSince = 0L
             while (true) {
                 delay(ACTIVITY_INTERVAL_MS)
                 if (!joined) {
@@ -586,23 +589,34 @@ class RoomViewModel(
                 }
                 val current = webRTCManager.audioEnergies()
                 val now = System.currentTimeMillis()
+                // Mean power over the last interval, per stream
+                val power = mutableMapOf<String, Double>()
                 current.forEach { (id, sample) ->
                     val old = previous[id] ?: return@forEach
                     val seconds = (sample.timestampUs - old.timestampUs) / 1e6
-                    if (seconds > 0 && (sample.total - old.total) / seconds > ACTIVITY_THRESHOLD) lastLoud[id] = now
+                    if (seconds <= 0) return@forEach
+                    power[id] = (sample.total - old.total) / seconds
+                    if (power.getValue(id) > ACTIVITY_THRESHOLD) lastLoud[id] = now
                 }
                 previous = current
                 lastLoud.keys.retainAll(current.keys)
 
                 val state = _uiState.value
-                val speaking = lastLoud.filterValues { now - it < ACTIVITY_HOLD_MS }.keys.mapNotNull { streamId ->
+                fun participantOf(streamId: String): String? =
                     if (streamId == uplinkStreamId) state.selfId.takeIf { !state.audioMuted }
                     else state.remoteStreams.firstOrNull { it.id == streamId }?.sourceId
-                }.toSet()
-                // The latest of the others to start speaking becomes the active speaker
-                val newSpeaker = (speaking - state.speaking - state.selfId).firstOrNull()
-                val active = newSpeaker
-                    ?: state.activeSpeaker?.takeIf { id -> state.participants.any { it.id == id } }
+                val speakingStreams = lastLoud.filterValues { now - it < ACTIVITY_HOLD_MS }.keys
+                val speaking = speakingStreams.mapNotNull(::participantOf).toSet()
+
+                // Active speaker: kept while still speaking and for a minimum time; otherwise
+                // the loudest of the others speaking right now
+                val previousActive = state.activeSpeaker?.takeIf { id -> state.participants.any { it.id == id } }
+                val keep = previousActive != null && (previousActive in speaking || now - activeSince < ACTIVE_SPEAKER_MIN_MS)
+                val loudest = speakingStreams
+                    .mapNotNull { id -> participantOf(id)?.takeIf { it != state.selfId }?.let { it to (power[id] ?: 0.0) } }
+                    .maxByOrNull { it.second }?.first
+                val active = if (keep) previousActive else loudest ?: previousActive
+                if (active != state.activeSpeaker) activeSince = now
                 if (speaking != state.speaking || active != state.activeSpeaker) {
                     _uiState.update { it.copy(speaking = speaking, activeSpeaker = active) }
                 }

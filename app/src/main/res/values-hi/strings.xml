@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">प्रतिभागी</string>
+    <string name="action_grid_view">ग्रिड दृश्य</string>
+    <string name="action_speaker_view">वक्ता दृश्य</string>
     <string name="label_operator">संचालक</string>
     <string name="action_private_message">निजी संदेश</string>
     <string name="action_kick">समूह से हटाएँ</string>
@@ -100,10 +102,19 @@
     <string name="error_empty_response">सर्वर से खाली उत्तर</string>
     <string name="error_token_needs_username">इस आमंत्रण लिंक के लिए उपयोगकर्ता नाम आवश्यक है</string>
     <string name="error_join_refused">सर्वर ने प्रवेश अस्वीकार कर दिया: %1$s</string>
+    <string name="error_wrong_credentials">गलत उपयोगकर्ता नाम या पासवर्ड।</string>
+    <string name="error_invalid_invitation">यह आमंत्रण लिंक अमान्य है या समाप्त हो गया है।</string>
     <string name="error_timeout">15 सेकंड तक कोई उत्तर नहीं — पता और नेटवर्क जाँचें\n%1$s</string>
     <string name="error_connection_lost">कनेक्शन टूट गया: %1$s</string>
     <string name="error_microphone">ऑडियो/वीडियो नहीं भेजा जा सका: %1$s</string>
     <string name="error_downstream">स्ट्रीम प्राप्त नहीं की जा सकी: %1$s</string>
     <string name="error_left_group">आप अब समूह में नहीं हैं (सर्वर द्वारा हटाया गया या समूह बंद हुआ)</string>
     <string name="error_reconnect_failed">सर्वर से फिर से कनेक्ट नहीं हो सका। नेटवर्क जाँचें और फिर से शामिल हों।</string>
+
+    <!-- About -->
+    <string name="action_about">परिचय</string>
+    <string name="about_version">संस्करण %1$s</string>
+    <string name="about_developed_by">%1$s द्वारा विकसित</string>
+    <string name="about_source_code">स्रोत कोड</string>
+    <string name="action_close">बंद करें</string>
 </resources>

@@ -73,6 +73,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Participantes</string>
+    <string name="action_grid_view">Vista de cuadrícula</string>
+    <string name="action_speaker_view">Vista de orador</string>
     <string name="label_operator">Operador</string>
     <string name="action_private_message">Mensaje privado</string>
     <string name="action_kick">Expulsar del grupo</string>
@@ -101,10 +103,19 @@
     <string name="error_empty_response">Respuesta vacía del servidor</string>
     <string name="error_token_needs_username">Este enlace de invitación requiere un nombre de usuario</string>
     <string name="error_join_refused">El servidor rechazó la entrada: %1$s</string>
+    <string name="error_wrong_credentials">Nombre de usuario o contraseña incorrectos.</string>
+    <string name="error_invalid_invitation">Este enlace de invitación no es válido o ha caducado.</string>
     <string name="error_timeout">Sin respuesta tras 15 s — comprueba la dirección y la red\n%1$s</string>
     <string name="error_connection_lost">Conexión perdida: %1$s</string>
     <string name="error_microphone">No se puede enviar audio/vídeo: %1$s</string>
     <string name="error_downstream">No se puede recibir un flujo: %1$s</string>
     <string name="error_left_group">Ya no estás en el grupo (expulsado por el servidor o grupo cerrado)</string>
     <string name="error_reconnect_failed">No se pudo reconectar al servidor. Comprueba la red y vuelve a unirte.</string>
+
+    <!-- About -->
+    <string name="action_about">Acerca de</string>
+    <string name="about_version">Versión %1$s</string>
+    <string name="about_developed_by">Desarrollado por %1$s</string>
+    <string name="about_source_code">Código fuente</string>
+    <string name="action_close">Cerrar</string>
 </resources>

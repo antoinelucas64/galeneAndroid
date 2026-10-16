@@ -7,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
@@ -129,6 +130,7 @@ private fun ColumnScope.LoginForm(
         label = {
             Text(stringResource(if (state.usernameRequired) R.string.label_username else R.string.label_username_optional))
         },
+        isError = state.credentialsRejected,
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = if (state.showPassword) ImeAction.Next else ImeAction.Go),
         keyboardActions = KeyboardActions(onGo = { viewModel.submit() }),
@@ -140,6 +142,7 @@ private fun ColumnScope.LoginForm(
             onValueChange = viewModel::onPasswordChange,
             label = { Text(stringResource(R.string.label_password)) },
             supportingText = status.authServer?.let { { Text(stringResource(R.string.hint_auth_server)) } },
+            isError = state.credentialsRejected,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Go),
             keyboardActions = KeyboardActions(onGo = { viewModel.submit() }),
@@ -147,6 +150,8 @@ private fun ColumnScope.LoginForm(
             modifier = Modifier.fillMaxWidth(),
         )
     }
+
+    state.error?.let { ErrorCard(it.asString()) }
 
     // ─── What to publish on joining ───────────────────────────────────────
     Text(stringResource(R.string.label_present), style = MaterialTheme.typography.titleSmall)
@@ -165,8 +170,6 @@ private fun ColumnScope.LoginForm(
         }
     }
 
-    state.error?.let { Text(it.asString(), color = MaterialTheme.colorScheme.error) }
-
     Button(
         onClick = viewModel::submit,
         enabled = state.canJoin,
@@ -174,5 +177,23 @@ private fun ColumnScope.LoginForm(
     ) {
         if (state.joining) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
         else Text(stringResource(R.string.action_join))
+    }
+}
+
+/** Join error, prominent enough to be noticed when coming back from the room screen. */
+@Composable
+private fun ErrorCard(message: String) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.ErrorOutline, contentDescription = null)
+            Spacer(Modifier.width(12.dp))
+            Text(message, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 }

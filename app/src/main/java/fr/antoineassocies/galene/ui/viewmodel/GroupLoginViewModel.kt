@@ -36,6 +36,8 @@ data class GroupLoginUiState(
     val usernameRequiredByToken: Boolean = false,
     val joining: Boolean = false,
     val error: UiText? = null,
+    /** The server refused the name / password: the fields are flagged until edited. */
+    val credentialsRejected: Boolean = false,
 ) {
     /** With a token the name is optional (the link may set it); otherwise it is required. */
     val usernameRequired: Boolean get() = token == null || usernameRequiredByToken
@@ -89,8 +91,10 @@ class GroupLoginViewModel(
         }
     }
 
-    fun onUsernameChange(value: String) = _uiState.update { it.copy(username = value, error = null) }
-    fun onPasswordChange(value: String) = _uiState.update { it.copy(password = value, error = null) }
+    fun onUsernameChange(value: String) =
+        _uiState.update { it.copy(username = value, error = null, credentialsRejected = false) }
+    fun onPasswordChange(value: String) =
+        _uiState.update { it.copy(password = value, error = null, credentialsRejected = false) }
     fun onPresentChange(value: PresentMode) = _uiState.update { it.copy(present = value) }
 
     /** Resolves authentication, then emits the join request. */
@@ -98,7 +102,7 @@ class GroupLoginViewModel(
         val state = _uiState.value
         val status = state.status ?: return
         if (!state.canJoin) return
-        _uiState.update { it.copy(joining = true, error = null) }
+        _uiState.update { it.copy(joining = true, error = null, credentialsRejected = false) }
 
         viewModelScope.launch {
             runCatching {
@@ -141,16 +145,27 @@ class GroupLoginViewModel(
             if (failure.needsUsername) {
                 s.copy(usernameRequiredByToken = true, error = UiText.Res(R.string.error_token_needs_username))
             } else {
+                val notAuthorised = failure.message == NOT_AUTHORISED
                 // As the web client does: a refused token is dropped, back to password login
                 s.copy(
                     token = null,
-                    error = UiText.Res(
-                        R.string.error_join_refused,
-                        failure.message ?: failure.error ?: UiText.Res(R.string.error_unknown),
-                    ),
+                    credentialsRejected = notAuthorised && s.token == null,
+                    error = when {
+                        notAuthorised && s.token != null -> UiText.Res(R.string.error_invalid_invitation)
+                        notAuthorised -> UiText.Res(R.string.error_wrong_credentials)
+                        else -> UiText.Res(
+                            R.string.error_join_refused,
+                            failure.message ?: failure.error ?: UiText.Res(R.string.error_unknown),
+                        )
+                    },
                 )
             }
         }
+    }
+
+    private companion object {
+        /** Galène's `group.ErrNotAuthorised`: wrong name / password, or refused token. */
+        const val NOT_AUTHORISED = "not authorised"
     }
 
     /** Default endpoint when the status gives none: `wss://host/ws`, as the web client does. */

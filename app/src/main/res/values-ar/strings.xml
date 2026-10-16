@@ -76,6 +76,8 @@
 
     <!-- Participants -->
     <string name="action_participants">المشاركون</string>
+    <string name="action_grid_view">عرض شبكي</string>
+    <string name="action_speaker_view">عرض المتحدث</string>
     <string name="label_operator">مشرف</string>
     <string name="action_private_message">رسالة خاصة</string>
     <string name="action_kick">إزالة من المجموعة</string>
@@ -104,10 +106,19 @@
     <string name="error_empty_response">استجابة فارغة من الخادم</string>
     <string name="error_token_needs_username">يتطلب رابط الدعوة هذا اسم مستخدم</string>
     <string name="error_join_refused">رفض الخادم الدخول: %1$s</string>
+    <string name="error_wrong_credentials">اسم المستخدم أو كلمة المرور غير صحيحة.</string>
+    <string name="error_invalid_invitation">رابط الدعوة هذا غير صالح أو منتهي الصلاحية.</string>
     <string name="error_timeout">لا استجابة بعد 15 ثانية — تحقق من العنوان والشبكة\n%1$s</string>
     <string name="error_connection_lost">انقطع الاتصال: %1$s</string>
     <string name="error_microphone">تعذّر إرسال الصوت/الفيديو: %1$s</string>
     <string name="error_downstream">تعذّر استقبال بث: %1$s</string>
     <string name="error_left_group">لم تعد في المجموعة (أزالك الخادم أو أُغلقت المجموعة)</string>
     <string name="error_reconnect_failed">تعذّرت إعادة الاتصال بالخادم. تحقق من الشبكة وانضم مجددًا.</string>
+
+    <!-- About -->
+    <string name="action_about">حول</string>
+    <string name="about_version">الإصدار %1$s</string>
+    <string name="about_developed_by">تطوير %1$s</string>
+    <string name="about_source_code">الشيفرة المصدرية</string>
+    <string name="action_close">إغلاق</string>
 </resources>

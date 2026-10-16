@@ -73,6 +73,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Participants</string>
+    <string name="action_grid_view">Vue en grille</string>
+    <string name="action_speaker_view">Vue orateur</string>
     <string name="label_operator">Opérateur</string>
     <string name="action_private_message">Message privé</string>
     <string name="action_kick">Exclure du groupe</string>
@@ -101,10 +103,19 @@
     <string name="error_empty_response">Réponse vide du serveur</string>
     <string name="error_token_needs_username">Ce lien d\'invitation demande un nom d\'utilisateur</string>
     <string name="error_join_refused">Le serveur a refusé l\'entrée : %1$s</string>
+    <string name="error_wrong_credentials">Nom d\'utilisateur ou mot de passe incorrect.</string>
+    <string name="error_invalid_invitation">Ce lien d\'invitation est invalide ou a expiré.</string>
     <string name="error_timeout">Pas de réponse après 15 s — vérifiez l\'adresse et le réseau\n%1$s</string>
     <string name="error_connection_lost">Connexion perdue : %1$s</string>
     <string name="error_microphone">Impossible d\'envoyer l\'audio/vidéo : %1$s</string>
     <string name="error_downstream">Impossible de recevoir un flux : %1$s</string>
     <string name="error_left_group">Vous n\'êtes plus dans le groupe (retiré par le serveur ou groupe fermé)</string>
     <string name="error_reconnect_failed">Impossible de se reconnecter au serveur. Vérifiez le réseau et rejoignez à nouveau.</string>
+
+    <!-- About -->
+    <string name="action_about">À propos</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_developed_by">Développé par %1$s</string>
+    <string name="about_source_code">Code source</string>
+    <string name="action_close">Fermer</string>
 </resources>

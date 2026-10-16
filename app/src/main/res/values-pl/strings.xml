@@ -74,6 +74,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Uczestnicy</string>
+    <string name="action_grid_view">Widok siatki</string>
+    <string name="action_speaker_view">Widok mówcy</string>
     <string name="label_operator">Operator</string>
     <string name="action_private_message">Prywatna wiadomość</string>
     <string name="action_kick">Usuń z grupy</string>
@@ -102,10 +104,19 @@
     <string name="error_empty_response">Pusta odpowiedź serwera</string>
     <string name="error_token_needs_username">Ten link z zaproszeniem wymaga nazwy użytkownika</string>
     <string name="error_join_refused">Serwer odmówił wejścia: %1$s</string>
+    <string name="error_wrong_credentials">Nieprawidłowa nazwa użytkownika lub hasło.</string>
+    <string name="error_invalid_invitation">Ten link z zaproszeniem jest nieprawidłowy lub wygasł.</string>
     <string name="error_timeout">Brak odpowiedzi po 15 s — sprawdź adres i sieć\n%1$s</string>
     <string name="error_connection_lost">Utracono połączenie: %1$s</string>
     <string name="error_microphone">Nie można wysłać dźwięku/obrazu: %1$s</string>
     <string name="error_downstream">Nie można odebrać strumienia: %1$s</string>
     <string name="error_left_group">Nie jesteś już w grupie (usunięty przez serwer lub grupa zamknięta)</string>
     <string name="error_reconnect_failed">Nie udało się ponownie połączyć z serwerem. Sprawdź sieć i dołącz ponownie.</string>
+
+    <!-- About -->
+    <string name="action_about">O aplikacji</string>
+    <string name="about_version">Wersja %1$s</string>
+    <string name="about_developed_by">Stworzone przez %1$s</string>
+    <string name="about_source_code">Kod źródłowy</string>
+    <string name="action_close">Zamknij</string>
 </resources>

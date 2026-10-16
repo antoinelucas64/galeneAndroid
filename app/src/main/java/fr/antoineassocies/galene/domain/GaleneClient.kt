@@ -46,6 +46,7 @@ class GaleneClient(
     companion object {
         private const val TAG = "GaleneClient"
         private const val PROTOCOL_VERSION = "2"
+        private val SECRET_FIELDS = Regex("(\"(?:password|token)\":)\"(?:[^\"\\\\]|\\\\.)*\"")
     }
 
     /**
@@ -372,7 +373,8 @@ class GaleneClient(
             is UserMessageMsg  -> json.encodeToString(msg)
             else               -> return
         }
-        Log.d(TAG, "→ ${text.take(300)}")
+        // Credentials never end up in logcat
+        Log.d(TAG, "→ ${text.replace(SECRET_FIELDS, "$1\"***\"").take(300)}")
         webSocket?.send(text)
     }
 }

@@ -74,6 +74,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Учасники</string>
+    <string name="action_grid_view">Сітка</string>
+    <string name="action_speaker_view">Вигляд доповідача</string>
     <string name="label_operator">Оператор</string>
     <string name="action_private_message">Особисте повідомлення</string>
     <string name="action_kick">Вилучити з групи</string>
@@ -102,10 +104,19 @@
     <string name="error_empty_response">Порожня відповідь сервера</string>
     <string name="error_token_needs_username">Для цього посилання-запрошення потрібне ім\'я користувача</string>
     <string name="error_join_refused">Сервер відмовив у вході: %1$s</string>
+    <string name="error_wrong_credentials">Неправильне ім\'я користувача або пароль.</string>
+    <string name="error_invalid_invitation">Це посилання-запрошення недійсне або застаріло.</string>
     <string name="error_timeout">Немає відповіді протягом 15 с — перевірте адресу та мережу\n%1$s</string>
     <string name="error_connection_lost">З\'єднання втрачено: %1$s</string>
     <string name="error_microphone">Не вдалося передати звук/відео: %1$s</string>
     <string name="error_downstream">Не вдалося отримати потік: %1$s</string>
     <string name="error_left_group">Ви більше не в групі (видалені сервером або групу закрито)</string>
     <string name="error_reconnect_failed">Не вдалося перепідключитися до сервера. Перевірте мережу та увійдіть знову.</string>
+
+    <!-- About -->
+    <string name="action_about">Про застосунок</string>
+    <string name="about_version">Версія %1$s</string>
+    <string name="about_developed_by">Розроблено %1$s</string>
+    <string name="about_source_code">Вихідний код</string>
+    <string name="action_close">Закрити</string>
 </resources>
