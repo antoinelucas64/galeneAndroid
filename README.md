@@ -153,6 +153,10 @@ adb logcat -b crash -d
 
 ### Release build
 
+`scripts/release.sh <x.y.z>` does all of the steps below: version bump, commit and tag,
+build from a clean clone of the tag, signed APKs and AAB in `release/v<x.y.z>/`. It
+pushes nothing. If the tag already exists, it only rebuilds it (after a `git tag -f`).
+
 Published APKs must be built from a clean checkout of the release tag, without the
 Gradle build cache or incremental Kotlin compilation: otherwise `classes.dex` differs from
 F-Droid's build and the reproducible build check fails.
