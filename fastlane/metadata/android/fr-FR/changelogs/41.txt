@@ -1,0 +1,1 @@
+Appel à deux : l'autre en plein écran, soi-même dans un coin. À partir de trois, celui qui parle le plus fort est affiché en grand (vue en grille toujours disponible). Grille adaptée au portrait et au paysage. Message clair en cas de mauvais identifiant ou mot de passe, ou de lien d'invitation expiré. Nouvel écran « À propos ». Les mots de passe n'apparaissent plus dans les logs.

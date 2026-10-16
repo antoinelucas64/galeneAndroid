@@ -1,0 +1,1 @@
+One-to-one calls: the other person full screen, yourself in a corner. From three people up, the loudest speaker is shown large (grid view still available). Grid adapts to portrait and landscape. Clear message for a wrong username or password, or an expired invitation link. New "About" screen. Passwords no longer appear in logs.
