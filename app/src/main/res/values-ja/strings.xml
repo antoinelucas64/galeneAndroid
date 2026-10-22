@@ -71,6 +71,8 @@
 
     <!-- Participants -->
     <string name="action_participants">参加者</string>
+    <string name="action_invite">招待する</string>
+    <string name="invite_share_subject">Galène の「%1$s」に参加してください</string>
     <string name="action_grid_view">グリッド表示</string>
     <string name="action_speaker_view">スピーカー表示</string>
     <string name="label_operator">オペレーター</string>
@@ -108,6 +110,8 @@
     <string name="error_microphone">音声/映像を送信できません: %1$s</string>
     <string name="error_downstream">ストリームを受信できません: %1$s</string>
     <string name="error_left_group">グループから退出しました（サーバーによる削除、またはグループの終了）</string>
+    <string name="error_invite">招待を作成できませんでした: %1$s</string>
+    <string name="error_link_during_call">このリンクを開くには、通話を終了してください</string>
     <string name="error_reconnect_failed">サーバーに再接続できませんでした。ネットワークを確認して、もう一度参加してください。</string>
 
     <!-- About -->

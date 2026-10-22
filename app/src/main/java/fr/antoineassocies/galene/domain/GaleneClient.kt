@@ -174,6 +174,11 @@ class GaleneClient(
         send(UserMessageMsg(kind = kind, source = clientId, dest = dest, username = username, value = value))
     }
 
+    /** Acts on the current group, e.g. `maketoken` (needs the `token` permission). */
+    fun sendGroupAction(kind: String, value: JsonElement? = null) {
+        send(GroupActionMsg(kind = kind, source = clientId, username = username, value = value))
+    }
+
     /** Forwards a local ICE candidate for [streamId] (trickle ICE). */
     fun sendIce(streamId: String, candidate: IceCandidateJson) {
         send(IceMsg(id = streamId, candidate = candidate))
@@ -191,7 +196,7 @@ class GaleneClient(
 
         override fun onMessage(ws: WebSocket, text: String) {
             if (ws !== webSocket) return
-            Log.d(TAG, "← ${text.take(300)}")
+            Log.d(TAG, "← ${text.replace(SECRET_FIELDS, "$1\"***\"").take(300)}")
             handleMessage(text)
         }
 
@@ -331,7 +336,7 @@ class GaleneClient(
             "usermessage" -> {
                 val msg = decode<ServerUserMsg>(text) ?: return
                 val kind = msg.kind ?: return
-                _events.tryEmit(SignalingEvent.UserMessage(kind, msg.username, msg.privileged, msg.value))
+                _events.tryEmit(SignalingEvent.UserMessage(kind, msg.username, msg.privileged, msg.value, error = msg.error != null))
             }
 
             "pong", "useraction", "groupaction" -> Unit   // ignored for now
@@ -371,6 +376,7 @@ class GaleneClient(
             is ChatMsg         -> json.encodeToString(msg)
             is UserActionMsg   -> json.encodeToString(msg)
             is UserMessageMsg  -> json.encodeToString(msg)
+            is GroupActionMsg  -> json.encodeToString(msg)
             else               -> return
         }
         // Credentials never end up in logcat

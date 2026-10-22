@@ -124,6 +124,7 @@ class GroupLoginViewModel(
                     endpoint = status.endpoint ?: defaultEndpoint(status.location ?: target.location),
                     group = status.name,
                     title = status.title,
+                    location = status.location ?: target.location,
                     username = username.ifEmpty { null },
                     password = password,
                     token = token,

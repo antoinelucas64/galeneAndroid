@@ -73,6 +73,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Participantes</string>
+    <string name="action_invite">Convidar alguém</string>
+    <string name="invite_share_subject">Junta-te a mim em «%1$s» no Galène</string>
     <string name="action_grid_view">Vista em grelha</string>
     <string name="action_speaker_view">Vista de orador</string>
     <string name="label_operator">Operador</string>
@@ -110,6 +112,8 @@
     <string name="error_microphone">Não é possível enviar áudio/vídeo: %1$s</string>
     <string name="error_downstream">Não é possível receber um fluxo: %1$s</string>
     <string name="error_left_group">Já não está no grupo (removido pelo servidor ou grupo fechado)</string>
+    <string name="error_invite">Não foi possível criar o convite: %1$s</string>
+    <string name="error_link_during_call">Sai da chamada em curso para abrir esta ligação</string>
     <string name="error_reconnect_failed">Não foi possível religar ao servidor. Verifique a rede e entre novamente.</string>
 
     <!-- About -->

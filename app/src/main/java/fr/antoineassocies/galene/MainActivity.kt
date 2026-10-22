@@ -1,11 +1,16 @@
 package fr.antoineassocies.galene
 
 import android.app.PictureInPictureParams
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import fr.antoineassocies.galene.domain.model.GaleneLink
 import fr.antoineassocies.galene.ui.GaleneNavHost
 import fr.antoineassocies.galene.ui.theme.GaleneTheme
 
@@ -14,6 +19,8 @@ import fr.antoineassocies.galene.ui.theme.GaleneTheme
  *
  * Declared `singleTop` in the manifest, so that the call notification brings the user
  * back to the ongoing call instead of opening a second instance.
+ *
+ * Also opened by a group / invitation link, clicked or shared to the app ([incomingLink]).
  */
 class MainActivity : ComponentActivity() {
 
@@ -31,14 +38,31 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    /** Group link the app was opened with, until the navigation has handled it. */
+    private var incomingLink by mutableStateOf<GaleneLink.Group?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Not again after a rotation: the link has already been handled
+        if (savedInstanceState == null) incomingLink = groupLink(intent)
         setContent {
             GaleneTheme {
-                GaleneNavHost()
+                GaleneNavHost(incomingLink = incomingLink, onLinkHandled = { incomingLink = null })
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        groupLink(intent)?.let { incomingLink = it }
+    }
+
+    /** The group link a clicked link (VIEW) or shared text (SEND) carries, if any. */
+    private fun groupLink(intent: Intent?): GaleneLink.Group? = when (intent?.action) {
+        Intent.ACTION_VIEW -> intent.dataString?.let { GaleneLink.parse(it) as? GaleneLink.Group }
+        Intent.ACTION_SEND -> intent.getStringExtra(Intent.EXTRA_TEXT)?.let(GaleneLink::findGroup)
+        else -> null
     }
 
     /** Before Android 12, Picture-in-Picture must be requested when the user leaves the app. */

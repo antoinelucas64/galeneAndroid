@@ -2,6 +2,7 @@ package fr.antoineassocies.galene.ui.components
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,7 +34,7 @@ interface ParticipantActions {
  * Full-screen list of the people in the group, as in Meet: raised hands first (in the
  * order they arrive), then me, then the others by name. Each row offers a private
  * message, and to operators the web client's actions: mute, allow / forbid presenting,
- * operator rights, removal (confirmed).
+ * operator rights, removal (confirmed). An "invite" row at the top shares a link to the group.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +44,7 @@ fun ParticipantsPanel(
     speaking: Set<String>,
     isOperator: Boolean,
     actions: ParticipantActions,
+    onInvite: () -> Unit,
     onClose: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
@@ -66,6 +68,19 @@ fun ParticipantsPanel(
         },
     ) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding)) {
+            item(key = "invite") {
+                ListItem(
+                    leadingContent = {
+                        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.size(40.dp)) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.PersonAdd, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                            }
+                        }
+                    },
+                    headlineContent = { Text(stringResource(R.string.action_invite)) },
+                    modifier = Modifier.clickable(onClick = onInvite),
+                )
+            }
             items(sorted, key = { it.id }) { p ->
                 ParticipantRow(
                     p,

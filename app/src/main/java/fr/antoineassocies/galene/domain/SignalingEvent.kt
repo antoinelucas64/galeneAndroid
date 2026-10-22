@@ -79,7 +79,8 @@ sealed class SignalingEvent {
 
     /**
      * Message from another client or the server that is not chat: [kind] `error`, `warning`,
-     * `info`, `kicked` (shown to the user), `mute` (we are asked to mute), `clearchat`.
+     * `info`, `kicked` (shown to the user), `mute` (we are asked to mute), `clearchat`,
+     * `token` (answer to `maketoken`; [error] set if it failed, [value] being the reason).
      * Only honoured when [privileged] (sent by an operator or the server), as the web client does.
      */
     data class UserMessage(
@@ -87,6 +88,7 @@ sealed class SignalingEvent {
         val username: String?,
         val privileged: Boolean,
         val value: JsonElement?,
+        val error: Boolean = false,
     ) : SignalingEvent()
 
     /** Connection lost or closed by the server (never emitted for our own [GaleneClient.disconnect]). */

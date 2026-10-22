@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Deelnemers</string>
+    <string name="action_invite">Iemand uitnodigen</string>
+    <string name="invite_share_subject">Doe mee in ‘%1$s’ op Galène</string>
     <string name="action_grid_view">Rasterweergave</string>
     <string name="action_speaker_view">Sprekerweergave</string>
     <string name="label_operator">Operator</string>
@@ -109,6 +111,8 @@
     <string name="error_microphone">Kan geen audio/video verzenden: %1$s</string>
     <string name="error_downstream">Kan geen stream ontvangen: %1$s</string>
     <string name="error_left_group">Je bent niet meer in de groep (verwijderd door de server of groep gesloten)</string>
+    <string name="error_invite">Uitnodiging kon niet worden gemaakt: %1$s</string>
+    <string name="error_link_during_call">Verlaat het huidige gesprek om deze link te openen</string>
     <string name="error_reconnect_failed">Kan niet opnieuw verbinden met de server. Controleer het netwerk en neem opnieuw deel.</string>
 
     <!-- About -->

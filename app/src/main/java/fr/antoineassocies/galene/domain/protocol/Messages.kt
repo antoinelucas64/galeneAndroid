@@ -103,6 +103,16 @@ data class UserMessageMsg(
     val value: JsonElement? = null,
 )
 
+/** Action on the current group, e.g. `maketoken` (creates an invitation). */
+@Serializable
+data class GroupActionMsg(
+    val type: String = "groupaction",
+    val kind: String,
+    val source: String,
+    val username: String? = null,
+    val value: JsonElement? = null,
+)
+
 // ─── ICE candidate (shared up/down) ─────────────────────────────────────────
 
 @Serializable
@@ -207,6 +217,7 @@ data class ServerUserMsg(
     val username: String? = null,
     val dest: String? = null,
     val privileged: Boolean = false,
+    val error: String? = null,      // set when a group action (e.g. `maketoken`) failed; [value] is the reason
     val value: JsonElement? = null,
 )
 

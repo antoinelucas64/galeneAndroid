@@ -71,6 +71,8 @@
 
     <!-- Participants -->
     <string name="action_participants">參與者</string>
+    <string name="action_invite">邀請他人</string>
+    <string name="invite_share_subject">來 Galène 的「%1$s」找我</string>
     <string name="action_grid_view">格狀檢視</string>
     <string name="action_speaker_view">演講者檢視</string>
     <string name="label_operator">管理員</string>
@@ -108,6 +110,8 @@
     <string name="error_microphone">無法傳送音訊/視訊：%1$s</string>
     <string name="error_downstream">無法接收串流：%1$s</string>
     <string name="error_left_group">你已不在群組中（被伺服器移除或群組已關閉）</string>
+    <string name="error_invite">無法建立邀請：%1$s</string>
+    <string name="error_link_during_call">請先離開目前的通話再開啟此連結</string>
     <string name="error_reconnect_failed">無法重新連線至伺服器。請檢查網路後重新加入。</string>
 
     <!-- About -->

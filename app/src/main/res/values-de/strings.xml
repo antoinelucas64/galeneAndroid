@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Teilnehmende</string>
+    <string name="action_invite">Jemanden einladen</string>
+    <string name="invite_share_subject">Komm zu mir in „%1$s“ auf Galène</string>
     <string name="action_grid_view">Rasteransicht</string>
     <string name="action_speaker_view">Sprecheransicht</string>
     <string name="label_operator">Operator</string>
@@ -109,6 +111,8 @@
     <string name="error_microphone">Audio/Video kann nicht gesendet werden: %1$s</string>
     <string name="error_downstream">Ein Stream kann nicht empfangen werden: %1$s</string>
     <string name="error_left_group">Du bist nicht mehr in der Gruppe (vom Server entfernt oder Gruppe geschlossen)</string>
+    <string name="error_invite">Einladung konnte nicht erstellt werden: %1$s</string>
+    <string name="error_link_during_call">Beende den laufenden Anruf, um diesen Link zu öffnen</string>
     <string name="error_reconnect_failed">Erneute Verbindung zum Server fehlgeschlagen. Prüfe das Netzwerk und tritt erneut bei.</string>
 
     <!-- About -->

@@ -74,6 +74,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Учасники</string>
+    <string name="action_invite">Запросити</string>
+    <string name="invite_share_subject">Приєднуйся до мене в «%1$s» у Galène</string>
     <string name="action_grid_view">Сітка</string>
     <string name="action_speaker_view">Вигляд доповідача</string>
     <string name="label_operator">Оператор</string>
@@ -111,6 +113,8 @@
     <string name="error_microphone">Не вдалося передати звук/відео: %1$s</string>
     <string name="error_downstream">Не вдалося отримати потік: %1$s</string>
     <string name="error_left_group">Ви більше не в групі (видалені сервером або групу закрито)</string>
+    <string name="error_invite">Не вдалося створити запрошення: %1$s</string>
+    <string name="error_link_during_call">Завершіть поточний дзвінок, щоб відкрити це посилання</string>
     <string name="error_reconnect_failed">Не вдалося перепідключитися до сервера. Перевірте мережу та увійдіть знову.</string>
 
     <!-- About -->

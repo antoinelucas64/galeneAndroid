@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Katılımcılar</string>
+    <string name="action_invite">Birini davet et</string>
+    <string name="invite_share_subject">Galène\'de “%1$s” odasında bana katıl</string>
     <string name="action_grid_view">Izgara görünümü</string>
     <string name="action_speaker_view">Konuşmacı görünümü</string>
     <string name="label_operator">Operatör</string>
@@ -109,6 +111,8 @@
     <string name="error_microphone">Ses/görüntü gönderilemiyor: %1$s</string>
     <string name="error_downstream">Bir akış alınamıyor: %1$s</string>
     <string name="error_left_group">Artık grupta değilsiniz (sunucu tarafından çıkarıldınız veya grup kapandı)</string>
+    <string name="error_invite">Davet oluşturulamadı: %1$s</string>
+    <string name="error_link_during_call">Bu bağlantıyı açmak için devam eden aramadan çıkın</string>
     <string name="error_reconnect_failed">Sunucuya yeniden bağlanılamadı. Ağı kontrol edip tekrar katılın.</string>
 
     <!-- About -->

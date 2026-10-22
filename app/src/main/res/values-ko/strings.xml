@@ -71,6 +71,8 @@
 
     <!-- Participants -->
     <string name="action_participants">참가자</string>
+    <string name="action_invite">초대하기</string>
+    <string name="invite_share_subject">Galène의 “%1$s”에 참여하세요</string>
     <string name="action_grid_view">그리드 보기</string>
     <string name="action_speaker_view">발표자 보기</string>
     <string name="label_operator">운영자</string>
@@ -108,6 +110,8 @@
     <string name="error_microphone">오디오/비디오를 보낼 수 없습니다: %1$s</string>
     <string name="error_downstream">스트림을 받을 수 없습니다: %1$s</string>
     <string name="error_left_group">더 이상 그룹에 있지 않습니다(서버에서 내보냄 또는 그룹 종료)</string>
+    <string name="error_invite">초대를 만들 수 없습니다: %1$s</string>
+    <string name="error_link_during_call">이 링크를 열려면 진행 중인 통화를 종료하세요</string>
     <string name="error_reconnect_failed">서버에 다시 연결할 수 없습니다. 네트워크를 확인하고 다시 참가하세요.</string>
 
     <!-- About -->

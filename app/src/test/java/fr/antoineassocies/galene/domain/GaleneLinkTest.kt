@@ -62,4 +62,17 @@ class GaleneLinkTest {
         val link = group("https://galene.example.org/group/s/?token=SECRET")
         assertTrue("SECRET" !in link.target.toString())
     }
+
+    @Test
+    fun `group link found in shared text`() {
+        val link = GaleneLink.findGroup("Join me in “Room” on Galène\nhttps://galene.example.org/group/room/?token=ABC")
+        assertEquals("https://galene.example.org/group/room/", link?.target?.location)
+        assertEquals("ABC", link?.target?.token)
+    }
+
+    @Test
+    fun `shared text without group link`() {
+        assertNull(GaleneLink.findGroup("see https://galene.example.org/ tomorrow"))
+        assertNull(GaleneLink.findGroup("no link here"))
+    }
 }

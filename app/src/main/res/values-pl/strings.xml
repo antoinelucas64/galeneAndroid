@@ -74,6 +74,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Uczestnicy</string>
+    <string name="action_invite">Zaproś kogoś</string>
+    <string name="invite_share_subject">Dołącz do mnie w „%1$s” w Galène</string>
     <string name="action_grid_view">Widok siatki</string>
     <string name="action_speaker_view">Widok mówcy</string>
     <string name="label_operator">Operator</string>
@@ -111,6 +113,8 @@
     <string name="error_microphone">Nie można wysłać dźwięku/obrazu: %1$s</string>
     <string name="error_downstream">Nie można odebrać strumienia: %1$s</string>
     <string name="error_left_group">Nie jesteś już w grupie (usunięty przez serwer lub grupa zamknięta)</string>
+    <string name="error_invite">Nie udało się utworzyć zaproszenia: %1$s</string>
+    <string name="error_link_during_call">Zakończ trwające połączenie, aby otworzyć ten link</string>
     <string name="error_reconnect_failed">Nie udało się ponownie połączyć z serwerem. Sprawdź sieć i dołącz ponownie.</string>
 
     <!-- About -->

@@ -6,6 +6,7 @@ package fr.antoineassocies.galene.domain.model
  * @property endpoint signaling WebSocket, given by the server in the group status
  * @property group technical group name (may contain `/` for subgroups)
  * @property title display name of the group, for the title bar
+ * @property location web URL of the group (`https://server/group/name/`), base of invitation links
  * @property username user name; null lets the server decide (invitation link that already
  *   sets the name). A token that sets the name wins over the one sent.
  * @property password Galène password (exclusive with [token])
@@ -15,6 +16,7 @@ data class JoinRequest(
     val endpoint: String,
     val group: String,
     val title: String,
+    val location: String,
     val username: String?,
     val password: String?,
     val token: String?,

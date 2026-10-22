@@ -39,6 +39,15 @@ sealed class GaleneLink {
             val token = url.queryParameter("token")?.takeIf { it.isNotBlank() }
             return Group(base, GroupTarget.of(base, name, token))
         }
+
+        private val URL_IN_TEXT = Regex("""https?://\S+""")
+
+        /**
+         * First group link found in [text], e.g. an invitation shared from a messaging app
+         * ("Join me in … on Galène\nhttps://…/group/room/?token=…"). Null if there is none.
+         */
+        fun findGroup(text: String): Group? =
+            URL_IN_TEXT.findAll(text).firstNotNullOfOrNull { parse(it.value) as? Group }
     }
 }
 

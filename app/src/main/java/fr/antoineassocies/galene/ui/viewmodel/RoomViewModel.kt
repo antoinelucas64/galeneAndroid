@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -34,7 +37,12 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.add
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import kotlinx.serialization.json.doubleOrNull
 import org.webrtc.EglBase
 import org.webrtc.VideoTrack
@@ -130,6 +138,9 @@ class RoomViewModel(
         const val ACTIVITY_THRESHOLD = 0.2 * 0.2   // energy is the integral of the squared level
         /** The active speaker (big tile, PiP) stays at least this long, so the layout does not jump. */
         const val ACTIVE_SPEAKER_MIN_MS = 2_000L
+
+        /** Lifetime of the invitations we create, as the web client's `/invite`. */
+        const val INVITE_VALIDITY_MS = 24 * 60 * 60 * 1000L
     }
 
     private val _uiState = MutableStateFlow(RoomUiState(selfId = galeneClient.clientId))
@@ -139,6 +150,10 @@ class RoomViewModel(
     val eglContext: EglBase.Context get() = webRTCManager.eglContext
     val localVideoTrack: StateFlow<VideoTrack?> = webRTCManager.localVideoTrack
     val remoteVideoTracks: StateFlow<Map<String, VideoTrack>> = webRTCManager.remoteVideoTracks
+
+    // Invitation link to share, consumed once by the screen (not state: no replay after rotation)
+    private val _invites = Channel<String>(Channel.BUFFERED)
+    val invites: Flow<String> = _invites.receiveAsFlow()
 
     // Kept locally to know whether we are allowed to publish
     private var selfPermissions: List<String> = emptyList()
@@ -490,8 +505,45 @@ class RoomViewModel(
                 }
             }
             "clearchat" -> clearChat(event.value)
+            "token" -> {
+                val token = (event.value as? JsonObject)?.get("token")?.asText()?.ifEmpty { null }
+                if (event.error || token == null) {
+                    _uiState.update { it.copy(notice = UiText.Res(R.string.error_invite, event.value.asText())) }
+                } else {
+                    _invites.trySend(inviteLink(token))
+                }
+            }
         }
     }
+
+    // ─── Invitations ───────────────────────────────────────────────────────
+
+    /**
+     * Shares a link to the group. With the `token` permission, the server creates an
+     * invitation (`maketoken`, as the web client's `/invite`): valid for a day, it lets
+     * the guest in without a password, with our presenting / chat rights. Otherwise the
+     * plain group address is shared, and the guest needs the group's credentials.
+     */
+    fun invite() {
+        if ("token" !in selfPermissions) {
+            _invites.trySend(request.location)
+            return
+        }
+        val template = buildJsonObject {
+            put("group", request.group)
+            put("expires", INVITE_VALIDITY_MS)
+            putJsonArray("permissions") {
+                if ("present" in selfPermissions) add("present")
+                if ("message" in selfPermissions) add("message")
+            }
+        }
+        galeneClient.sendGroupAction("maketoken", template)
+    }
+
+    /** `<group location>?token=…`, the link the web client builds, understood by both clients. */
+    private fun inviteLink(token: String): String =
+        request.location.toHttpUrlOrNull()?.newBuilder()?.query(null)?.setQueryParameter("token", token)?.build()?.toString()
+            ?: "${request.location}?token=$token"
 
     /** No target: everything; otherwise one message (`id`) or one user's messages (`userId`). */
     private fun clearChat(value: JsonElement?) {

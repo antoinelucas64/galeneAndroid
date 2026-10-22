@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">प्रतिभागी</string>
+    <string name="action_invite">किसी को आमंत्रित करें</string>
+    <string name="invite_share_subject">Galène पर “%1$s” में मुझसे जुड़ें</string>
     <string name="action_grid_view">ग्रिड दृश्य</string>
     <string name="action_speaker_view">वक्ता दृश्य</string>
     <string name="label_operator">संचालक</string>
@@ -109,6 +111,8 @@
     <string name="error_microphone">ऑडियो/वीडियो नहीं भेजा जा सका: %1$s</string>
     <string name="error_downstream">स्ट्रीम प्राप्त नहीं की जा सकी: %1$s</string>
     <string name="error_left_group">आप अब समूह में नहीं हैं (सर्वर द्वारा हटाया गया या समूह बंद हुआ)</string>
+    <string name="error_invite">आमंत्रण नहीं बनाया जा सका: %1$s</string>
+    <string name="error_link_during_call">यह लिंक खोलने के लिए चल रही कॉल छोड़ें</string>
     <string name="error_reconnect_failed">सर्वर से फिर से कनेक्ट नहीं हो सका। नेटवर्क जाँचें और फिर से शामिल हों।</string>
 
     <!-- About -->

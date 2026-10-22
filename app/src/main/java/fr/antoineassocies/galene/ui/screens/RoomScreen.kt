@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -223,6 +225,21 @@ fun RoomScreen(
         return
     }
 
+    // ─── Invitation link → Android share sheet ─────────────────────────────
+    val context = LocalContext.current
+    val inviteSubject = stringResource(R.string.invite_share_subject, request.title)
+    val inviteChooser = stringResource(R.string.action_invite)
+    LaunchedEffect(Unit) {
+        viewModel.invites.collect { link ->
+            val send = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, inviteSubject)
+                putExtra(Intent.EXTRA_TEXT, "$inviteSubject\n$link")
+            }
+            context.startActivity(Intent.createChooser(send, inviteChooser))
+        }
+    }
+
     // ─── Participants, full screen over the call ──────────────────────────
     if (participantsOpen) {
         ParticipantsPanel(
@@ -240,6 +257,7 @@ fun RoomScreen(
                 override fun setPresent(id: String, allowed: Boolean) = viewModel.setParticipantPresent(id, allowed)
                 override fun setOperator(id: String, operator: Boolean) = viewModel.setParticipantOperator(id, operator)
             },
+            onInvite = viewModel::invite,
             onClose = { participantsOpen = false },
         )
         return

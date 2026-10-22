@@ -72,6 +72,8 @@
 
     <!-- Participants -->
     <string name="action_participants">Participants</string>
+    <string name="action_invite">Invite someone</string>
+    <string name="invite_share_subject">Join me in “%1$s” on Galène</string>
     <string name="action_grid_view">Grid view</string>
     <string name="action_speaker_view">Speaker view</string>
     <string name="label_operator">Operator</string>
@@ -109,6 +111,8 @@
     <string name="error_microphone">Could not send audio/video: %1$s</string>
     <string name="error_downstream">Could not receive a stream: %1$s</string>
     <string name="error_left_group">You are no longer in the group (removed by the server or group closed)</string>
+    <string name="error_invite">Could not create the invitation: %1$s</string>
+    <string name="error_link_during_call">Leave the current call to open this link</string>
     <string name="error_reconnect_failed">Could not reconnect to the server. Check the network and join again.</string>
 
     <!-- About -->

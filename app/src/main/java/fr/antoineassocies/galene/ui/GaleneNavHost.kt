@@ -1,16 +1,20 @@
 package fr.antoineassocies.galene.ui
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import fr.antoineassocies.galene.R
 import fr.antoineassocies.galene.domain.SignalingEvent
+import fr.antoineassocies.galene.domain.model.GaleneLink
 import fr.antoineassocies.galene.domain.model.GroupTarget
 import fr.antoineassocies.galene.domain.model.JoinRequest
 import fr.antoineassocies.galene.ui.screens.GroupLoginScreen
@@ -47,11 +51,26 @@ class NavigationHolder : ViewModel() {
  * home (server and public groups) → group page (login) → room.
  *
  * A server refusal in the room goes back to the group's login form with the reason.
+ *
+ * An [incomingLink] (invitation clicked or shared to the app) opens that group's login
+ * form, unless a call is in progress: it is not interrupted.
  */
 @Composable
-fun GaleneNavHost() {
+fun GaleneNavHost(incomingLink: GaleneLink.Group? = null, onLinkHandled: () -> Unit = {}) {
     val navController = rememberNavController()
     val holder: NavigationHolder = viewModel()
+    val context = LocalContext.current
+
+    LaunchedEffect(incomingLink) {
+        val link = incomingLink ?: return@LaunchedEffect
+        if (holder.request != null) {
+            Toast.makeText(context, R.string.error_link_during_call, Toast.LENGTH_LONG).show()
+        } else {
+            holder.target = link.target
+            navController.navigate(Routes.GROUP) { popUpTo(Routes.SERVER) }
+        }
+        onLinkHandled()
+    }
 
     NavHost(navController = navController, startDestination = Routes.SERVER) {
 

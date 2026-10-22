@@ -76,6 +76,8 @@
 
     <!-- Participants -->
     <string name="action_participants">المشاركون</string>
+    <string name="action_invite">دعوة شخص</string>
+    <string name="invite_share_subject">انضم إليّ في «%1$s» على Galène</string>
     <string name="action_grid_view">عرض شبكي</string>
     <string name="action_speaker_view">عرض المتحدث</string>
     <string name="label_operator">مشرف</string>
@@ -113,6 +115,8 @@
     <string name="error_microphone">تعذّر إرسال الصوت/الفيديو: %1$s</string>
     <string name="error_downstream">تعذّر استقبال بث: %1$s</string>
     <string name="error_left_group">لم تعد في المجموعة (أزالك الخادم أو أُغلقت المجموعة)</string>
+    <string name="error_invite">تعذّر إنشاء الدعوة: %1$s</string>
+    <string name="error_link_during_call">غادر المكالمة الحالية لفتح هذا الرابط</string>
     <string name="error_reconnect_failed">تعذّرت إعادة الاتصال بالخادم. تحقق من الشبكة وانضم مجددًا.</string>
 
     <!-- About -->
